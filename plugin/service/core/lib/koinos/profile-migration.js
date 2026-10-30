@@ -5,7 +5,23 @@ const fs = require("node:fs"), fsp = require("node:fs/promises"), path = require
 const { NETWORKS } = require("./constants");
 const { canonicalPath, claimProject } = require("./node-control");
 const DATA_DIRS = ["chain", "block_store", "mempool", "transaction_store", "account_history", "contract_meta_store"];
-const SERVICES = new Set(["amqp", "chain", "mempool", "block_store", "p2p", "block_producer", "jsonrpc", "grpc", "transaction_store", "contract_meta_store", "account_history", "rest"]);
+const SERVICE_IMAGES = Object.freeze({
+  amqp: "rabbitmq", chain: "koinos/koinos-chain", mempool: "koinos/koinos-mempool",
+  block_store: "koinos/koinos-block-store", p2p: "koinos/koinos-p2p",
+  block_producer: "koinos/koinos-block-producer", jsonrpc: "koinos/koinos-jsonrpc",
+  grpc: "koinos/koinos-grpc", transaction_store: "koinos/koinos-transaction-store",
+  contract_meta_store: "koinos/koinos-contract-meta-store", account_history: "koinos/koinos-account-history",
+  rest: "koinos/koinos-rest",
+});
+function recognizedImage(service, image) {
+  if (typeof service !== "string" || !Object.hasOwn(SERVICE_IMAGES, service) || typeof image !== "string") return false;
+  // Match the official repository for this exact Compose role. A broad letter-
+  // only image-name expression rejected our own digit-bearing p2p image.
+  const match = /^(?:docker\.io\/)?([^:@]+)(?::[A-Za-z0-9_][A-Za-z0-9_.-]{0,127})?(?:@sha256:[a-fA-F0-9]{64})?$/.exec(image);
+  if (!match) return false;
+  const repository = service === "amqp" && match[1] === "library/rabbitmq" ? "rabbitmq" : match[1];
+  return repository === SERVICE_IMAGES[service];
+}
 const MARKER = ".kai-restore-incomplete.json", CHUNK = 1024 * 1024, MAX_FILES = 2000000;
 const absent = e => e?.code === "ENOENT";
 const hex = value => typeof value === "string" && /^[a-f0-9]{64}$/.test(value);
@@ -128,7 +144,7 @@ function createProfileMigration({ manager, journalRoot = path.join(manager.dataR
   async function candidate(network) {
     const rows = await dockerRows(), project = NETWORKS[network].composeProject, owned = rows.filter(row => row.project === project);
     if (!owned.length) throw Error("No node from another KAI profile was found for this network.");
-    if (owned.some(row => !SERVICES.has(row.service) || typeof row.root !== "string" || !row.root || typeof row.image !== "string" || !/^(?:docker\.io\/)?(?:koinos\/koinos-[a-z-]+|rabbitmq)(?::|@|$)/.test(row.image))) throw Error("This Docker project is not a recognized Koinos AI node. Its containers were left untouched.");
+    if (owned.some(row => typeof row.root !== "string" || !row.root || !recognizedImage(row.service, row.image))) throw Error("This Docker project is not a recognized Koinos AI node. Its containers were left untouched.");
     const root = hostPath(owned[0].root), destination = target(network);
     if (owned.some(row => key(hostPath(row.root)) !== key(root))) throw Error("Node containers belong to different profiles; no containers were changed.");
     if (key(root) === key(destination.root)) throw Error("This node already belongs to this plugin.");

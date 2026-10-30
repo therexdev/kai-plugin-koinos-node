@@ -67,6 +67,56 @@ test("reviewed migration retires only the old stack and moves chain state withou
   assert.ok(!f.calls.some(args => args.includes("--volumes") || args.includes("-f") || args.includes("up")));
 });
 
+function templateContainers(f, { running = false } = {}) {
+  // Use every real service/image pair so optional services cannot disappear
+  // from migration compatibility coverage (the old two-service fixture did).
+  const compose = fs.readFileSync(path.join(f.manager.templateRoot, "docker-compose.yml"), "utf8");
+  return [...compose.matchAll(/^   ([a-z][a-z0-9_]*):\r?\n      image: ([^\r\n]+)$/gm)].map(([, service, image], index) => ({
+    id: (index + 1).toString(16).repeat(64), project: NETWORKS.mainnet.composeProject, root: f.source,
+    service, image: image.replace(/\$\{[^:}]+:-([^}]+)\}/g, "$1"), running, paused: false,
+    mounts: ["amqp", "rest"].includes(service) ? [] : [{ Type: "bind", Source: f.basedir, Destination: "/koinos", RW: true }],
+  }));
+}
+
+test("the full stopped legacy template including official p2p is recognized and migrates", async t => {
+  const f = fixture(t), rows = templateContainers(f);
+  assert.equal(rows.length, 12); assert.equal(rows.find(row => row.service === "p2p").image, "koinos/koinos-p2p:latest");
+  assert.ok(rows.every(row => row.running === false)); f.setRows(rows);
+  const preview = await f.service.preview("mainnet"); assert.equal(preview.available, true); assert.equal(preview.network, "mainnet");
+  assert.ok(!f.calls.some(args => ["update", "stop", "rm"].includes(args[0])));
+  f.service.start("mainnet", preview.previewId); const state = await finish(f.service);
+  assert.equal(state.phase, "complete", state.error); assert.equal(state.result.movedFiles, 3);
+  for (const command of ["update", "stop", "rm"]) {
+    const args = f.calls.find(args => args[0] === command); assert.ok(args); assert.equal(args.filter(value => /^[a-f0-9]{64}$/.test(value)).length, rows.length);
+    assert.ok(rows.every(row => args.includes(row.id)));
+  }
+  assert.equal(fs.existsSync(path.join(f.basedir, "chain")), false);
+  assert.equal(fs.readFileSync(path.join(f.basedir, "block_producer/private.key"), "utf8"), "private producer key remains old");
+});
+
+test("official service images support Docker Hub qualification, versions, and immutable digests", async t => {
+  const f = fixture(t), rows = templateContainers(f, { running: true });
+  for (const row of rows) {
+    const repository = row.image.split(":")[0];
+    row.image = row.service === "amqp" ? "docker.io/library/rabbitmq:3-management" : `docker.io/${repository}:v2.0.0@sha256:${"a".repeat(64)}`;
+  }
+  f.setRows(rows); assert.equal((await f.service.preview("mainnet")).available, true);
+  rows.find(row => row.service === "p2p").image = "koinos/koinos-p2p@sha256:" + "b".repeat(64);
+  rows.find(row => row.service === "amqp").image = "library/rabbitmq:3-management";
+  assert.equal((await f.service.preview("mainnet")).available, true);
+  assert.ok(!f.calls.some(args => ["update", "stop", "rm"].includes(args[0])));
+});
+
+test("unknown image repositories, wrong service images, and look-alike tags remain rejected", async t => {
+  for (const image of ["koinos/koinos-other:latest", "koinos/koinos-chain:latest", "example/koinos-p2p:latest", "registry.example/koinos/koinos-p2p:latest", "koinos/koinos-p2p-extra:latest", "koinos/koinos-p2p:latest/extra", "koinos/koinos-p2p@sha256:bad", "rabbitmq:3-management"]) await t.test(image, async t => {
+    const f = fixture(t), rows = templateContainers(f); rows.find(row => row.service === "p2p").image = image; f.setRows(rows);
+    await assert.rejects(f.service.preview("mainnet"), /not a recognized Koinos AI node/);
+    assert.ok(!f.calls.some(args => ["update", "stop", "rm"].includes(args[0]))); assert.ok(fs.existsSync(path.join(f.basedir, "chain/0001.sst")));
+  });
+  const f = fixture(t), rows = templateContainers(f); rows.find(row => row.service === "p2p").service = "p2p2"; f.setRows(rows);
+  await assert.rejects(f.service.preview("mainnet"), /not a recognized Koinos AI node/); assert.ok(!f.calls.some(args => ["update", "stop", "rm"].includes(args[0])));
+});
+
 test("a live old-app lock refuses container changes and source deletion", async t => {
   const f = fixture(t, { locked: true }), state = await begin(f); assert.equal(state.phase, "failed"); assert.match(state.error, /Another KAI app/); assert.equal(state.resumable, false);
   assert.ok(!f.calls.some(args => ["update", "stop", "rm"].includes(args[0]))); assert.ok(fs.existsSync(path.join(f.basedir, "chain/0001.sst")));

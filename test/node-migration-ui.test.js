@@ -90,3 +90,34 @@ test("background status cannot bypass a new paused review or resubmit a complete
   f.setJob({ phase: "complete", preview: review(), result: { summary: "Done" } }); await f.controller.poll();
   assert.equal(f.controller.view().canStart, false); f.controller.dispose();
 });
+
+test("a rejected preview settles all pending labels and keeps retry and review available", async () => {
+  const { mount } = require("../plugin/node-migration");
+  const nodes = new Map();
+  function element() { return { textContent: "", hidden: false, disabled: false, checked: false, open: false, dataset: {}, isConnected: true, addEventListener() {}, removeAttribute() {}, focus() {}, showModal() { this.open = true; }, close() { this.open = false; } }; }
+  const document = { activeElement: element(), addEventListener() {}, querySelector: () => null,
+    getElementById(id) { if (id.startsWith("view-")) return null; if (!nodes.has(id)) nodes.set(id, element()); return nodes.get(id); } };
+  const pending = deferred(); let fail = true;
+  const controller = mount(document, async channel => {
+    if (channel === "node:profileMigrationStatus") return { ok: true, data: { phase: "idle" } };
+    if (fail) return pending.promise;
+    return { ok: true, data: review() };
+  });
+  const get = suffix => nodes.get(`node-migration-${suffix}`);
+  try {
+    const opening = controller.open(); await new Promise(resolve => setImmediate(resolve));
+    assert.equal(get("destination").textContent, "Checking the plugin location…");
+    assert.equal(get("size").textContent, "Checking chain files…");
+    pending.resolve({ ok: false, error: "The stopped containers were not recognized." }); await opening;
+    assert.equal(controller.snapshot().loading, false);
+    assert.equal(get("destination").textContent, "Plugin location unavailable.");
+    assert.equal(get("size").textContent, "Chain size unavailable.");
+    assert.equal(get("network").textContent, "Not identified");
+    assert.equal(get("source").textContent, "No source was identified.");
+    assert.equal(get("error").textContent, "The stopped containers were not recognized.");
+    assert.equal(get("recheck").hidden, false); assert.equal(get("close").disabled, false); assert.equal(get("review").hidden, false); assert.equal(get("submit").disabled, true);
+    fail = false; await controller.preview();
+    assert.equal(get("destination").textContent, "/plugin/node/mainnet/basedir"); assert.equal(get("network").textContent, "mainnet");
+    assert.equal(get("error").hidden, true); controller.acknowledge(true); assert.equal(get("submit").disabled, false);
+  } finally { controller.dispose(); }
+});

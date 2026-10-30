@@ -8,3 +8,5 @@ node_modules/
 !plugin/service/node_modules/**
 
 /dist/kai-plugin-koinos-node-0.3.1.kaiplugin
+
+/dist/kai-plugin-koinos-node-0.3.2.kaiplugin

@@ -95,9 +95,9 @@
         text("title", job.phase === "complete" ? "Node migration complete" : view.resumable ? "Resume node migration" : "Migrate node to this plugin");
         text("intro", job.phase === "complete" ? "The chain data is now owned by this plugin. Start the node when you are ready." : "Move the existing chain data into this plugin so it can manage your node.");
         text("source", info?.source?.basedir || info?.source?.root || (state.loading ? "Checking the existing node…" : "No source was identified."));
-        text("destination", info?.destination?.basedir || info?.destination?.root || "Checking the plugin location…");
-        text("network", info?.network || "—");
-        text("size", info ? `${bytes(info.bytes)}${Number.isSafeInteger(info.files) ? ` · ${info.files.toLocaleString()} files` : ""}` : "Checking chain files…");
+        text("destination", info?.destination?.basedir || info?.destination?.root || (state.loading ? "Checking the plugin location…" : "Plugin location unavailable."));
+        text("network", info?.network || (state.loading ? "Checking…" : "Not identified"));
+        text("size", info ? `${bytes(info.bytes)}${Number.isSafeInteger(info.files) ? ` · ${info.files.toLocaleString()} files` : ""}` : state.loading ? "Checking chain files…" : "Chain size unavailable.");
         text("method", info?.mode === "move" ? "Same drive: chain data can be moved without keeping a second full copy." : info?.mode === "copy-delete" ? "Different drives: each verified file is copied, then removed from the old location. Completed files stay transferred if you pause." : "The migration checks the source, destination and available space before transferring.");
         text("detail", info?.detail || ""); $("detail").hidden = !info?.detail;
         text("wallet-note", info?.walletNotice || "This transfers chain data only. This plugin keeps its current wallet. Wallets, private production keys, KOIN and VHP are not transferred. If you generated a new wallet, transfer your KOIN and VHP manually before setting up production.");
@@ -154,7 +154,7 @@
     void controller.poll();
     return controller;
   }
-  if (typeof module === "object" && module.exports) module.exports = { createController, bytes };
+  if (typeof module === "object" && module.exports) module.exports = { createController, mount, bytes };
   if (root.document && root.koinos?.invoke) {
     const controller = mount(root.document, (channel, payload) => root.koinos.invoke(channel, payload));
     root.KaiNodeMigration = controller;
