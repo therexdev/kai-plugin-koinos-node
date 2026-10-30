@@ -1,3 +1,7 @@
+# KAI Koinos Node 0.1.1
+
+Restores the original KAI app layout in its own plugin window, with the same pearl and cobalt colors, typography, controls and scrollbars. Messages include an accessible dismiss button. Existing saved data and reviewed Core permissions are preserved.
+
 Initial signed Koinos Node plugin for KAI Core 0.3.0 or later.
 
 - Reuse saved Mainnet/Harbinger settings and node data directories.

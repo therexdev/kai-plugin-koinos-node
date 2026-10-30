@@ -12,9 +12,11 @@ Fully quit the older KAI app before starting Core. They share the Koinos AI prof
 
 1. Select **Check node** and approve local Docker/prerequisite inspection. Opening the plugin alone does not run Docker or start a node.
 2. If needed, use **Install guide** to open Docker's official instructions. Windows additionally offers **Enable WSL 2**, with native confirmation and the Windows administrator prompt. **Open Docker Desktop** starts an already installed copy, without downloading an installer.
-3. Select the Mainnet or Harbinger test network. Core reuses the saved `koinos-node/settings.json` location and its existing per-network directories.
-4. Choose **Start sync node**, or **Resume saved producer** if the old node configuration contains a producer address. The native review shows the network, folder and producer address. Managed configuration is backed up before it is regenerated; databases and producer keys are not relocated.
-5. Inspect service status or recent logs. Select **Stop node** to stop that network's KAI Docker project and preserve its data.
+3. Open **Node settings** and select the Mainnet or Harbinger test network. Core reuses the saved `koinos-node/settings.json` location and its existing per-network directories.
+4. On **Dashboard**, choose **Start sync node**, or open **Node** and choose **Resume saved producer** if the old node configuration contains a producer address. The native review shows the network, folder and producer address. Managed configuration is backed up before it is regenerated; databases and producer keys are not relocated.
+5. Inspect service status on **Dashboard**, or open **Node** for recent logs. Select **Stop node** to stop that network's KAI Docker project and preserve its data.
+
+The window uses the original Koinos Node rail and light dashboard layout, with **Dashboard**, **Node**, and **Node settings** for the supported controls. Warnings have an X to dismiss them.
 
 A node started from this plugin stops when the plugin closes or Core switches to Local-Only. Keep the plugin open while it runs. An already-running node is never silently adopted, restarted or stopped when the plugin opens or closes. Stop it explicitly before starting it under this plugin's ownership.
 
@@ -31,7 +33,7 @@ This official plugin uses a publisher-pinned native service. Its renderer has no
 
 Existing settings retain unknown fields and unrelated reward/custody configuration. Corrupt settings, symlinked files, and files changed outside the current session fail closed. Configuration backups live under `koinos-node/core-config-backups`; settings changes retain timestamped private backup files. These backups never copy producer private-key files.
 
-Financial operations, producer registration, key import/export, rewards automation, bridge/swaps, automatic recovery, quick sync and data-folder relocation are not exposed in version 0.1.0. Resuming a saved producer configuration starts its existing local block producer; no financial transaction is signed by the plugin.
+Financial operations, producer registration, key import/export, rewards automation, bridge/swaps, automatic recovery, quick sync and data-folder relocation are not exposed by this plugin. Resuming a saved producer configuration starts its existing local block producer; no financial transaction is signed by the plugin.
 
 ## Development and releases
 

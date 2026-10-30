@@ -3,7 +3,7 @@
   "apiVersion": 2,
   "id": "kai.koinos-node",
   "name": "KAI Koinos Node",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Inspect, start and stop a Koinos node using existing local data, with native approval for Docker actions.",
   "entry": "index.html",
   "permissions": [
