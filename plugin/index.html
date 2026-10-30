@@ -9,6 +9,7 @@
   <title>Koinos Node</title>
   <link rel="stylesheet" href="styles.css" />
   <link rel="stylesheet" href="node-brand.css" />
+  <link rel="stylesheet" href="node-migration.css" />
 </head>
 <body>
   <div id="app">
@@ -46,6 +47,23 @@
   </div>
   <div id="toasts"></div>
   <div id="modal-root"></div>
+  <dialog id="node-migration-dialog" class="node-migration-dialog" aria-labelledby="node-migration-title" aria-describedby="node-migration-intro">
+    <form id="node-migration-form">
+      <header class="node-migration-header"><div><span class="node-migration-eyebrow">Bring your chain data with you</span><h2 id="node-migration-title">Migrate node to this plugin</h2></div><button id="node-migration-close" class="node-migration-close" type="button" aria-label="Close node migration">×</button></header>
+      <div class="node-migration-body">
+        <p id="node-migration-intro" class="node-migration-intro">Move the existing chain data into this plugin so it can manage your node.</p>
+        <dl class="node-migration-locations"><div class="node-migration-location"><dt>Existing chain data</dt><dd id="node-migration-source"></dd></div><div class="node-migration-location"><dt>New plugin location</dt><dd id="node-migration-destination"></dd></div></dl>
+        <div class="node-migration-facts"><div><span>Network:</span> <strong id="node-migration-network"></strong></div><div id="node-migration-size"></div></div>
+        <p id="node-migration-method" class="node-migration-note"></p><p id="node-migration-detail" class="node-migration-note" hidden></p>
+        <p id="node-migration-wallet-note" class="node-migration-note node-migration-wallet"></p>
+        <div id="node-migration-review"><label class="node-migration-acknowledge"><input id="node-migration-acknowledge" type="checkbox"><span>I have closed the other KAI app, including its tray icon.</span></label><p class="node-migration-safety">The old node will be stopped before transferring. Keep the old app closed. You can pause safely and resume; completed files stay transferred. Neither node should be started until migration finishes.</p></div>
+        <div id="node-migration-progress-wrap" class="node-migration-progress" hidden><div class="node-migration-progress-heading"><span id="node-migration-progress-detail" role="status" aria-live="polite"></span><span id="node-migration-percent"></span></div><progress id="node-migration-progress" aria-label="Node migration progress"></progress><span id="node-migration-progress-count"></span></div>
+        <div id="node-migration-outcome" class="node-migration-outcome" role="status" aria-live="polite" aria-atomic="true" hidden><strong id="node-migration-outcome-title"></strong><p id="node-migration-outcome-detail"></p><p id="node-migration-outcome-warnings" hidden></p></div>
+        <p id="node-migration-error" role="alert" hidden></p>
+      </div>
+      <footer class="node-migration-footer"><button id="node-migration-recheck" class="btn ghost" type="button" hidden>Check again</button><div><button id="node-migration-dismiss" class="btn" type="button">Close</button><button id="node-migration-submit" class="btn primary" type="submit">Stop old node and migrate</button></div></footer>
+    </form>
+  </dialog>
   <script src="locales/catalogs.js"></script>
   <script src="i18n.js"></script>
   <script src="preferences.js"></script>
@@ -54,5 +72,6 @@
   <script src="qr.js"></script>
   <script src="renderer.js"></script>
   <script src="app.js"></script>
+  <script src="node-migration.js"></script>
 </body>
 </html>

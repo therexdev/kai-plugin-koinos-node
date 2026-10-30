@@ -38,6 +38,7 @@ class NodeManager {
     this._ownership = new Map();
     this._disposed = false;
     this.assertOperation = () => {};
+    this._profileMigrationActive = false;
     this.templateRoot = templateRoot;
     this.dataRoot = dataRoot;
     this.platform = platform;
@@ -258,7 +259,13 @@ class NodeManager {
     return owner;
   }
 
+  profileMigration() {
+    if (!this._profileMigration) this._profileMigration = require("./profile-migration").createProfileMigration({ manager: this });
+    return this._profileMigration;
+  }
+
   async _assertControl(networkId) {
+    if (this._profileMigrationActive) throw new Error("Pause or finish the chain migration before controlling the node.");
     if (this._disposed) throw new Error("Node supervisor is closed");
     if (!this._control.has(networkId)) this._control.set(networkId, claimProject(NETWORKS[networkId].composeProject, { lockRoot: this.lockRoot }));
     const owner = await this.ownership(networkId);
@@ -288,7 +295,7 @@ class NodeManager {
   supervise(getNetwork) {
     if (this._supervisor) return;
     const tick = async () => {
-      if (this._supervising || this._disposed) return;
+      if (this._supervising || this._disposed || this._profileMigrationActive) return;
       this._supervising = true;
       try {
         const networkId = getNetwork();
@@ -512,7 +519,7 @@ class NodeManager {
   }
 
   async _recover(w, health) {
-    if (this._disposed || !this._desiredRunning || this._watch !== w) return;
+    if (this._disposed || this._profileMigrationActive || !this._desiredRunning || this._watch !== w) return;
     w.recovering = true;
 
     // Use current-process logs to distinguish an actual database failure from
@@ -1161,6 +1168,7 @@ class NodeManager {
     const observed = await this.observe(networkId, services);
     return {
       control: ownership,
+      profileMigration: this.profileMigration().status(networkId),
       desiredRunning: !!this._desiredRunning,
       peers: observed.peers,
       production: observed.production || null,

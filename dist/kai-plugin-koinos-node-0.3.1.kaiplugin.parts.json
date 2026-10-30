@@ -1,0 +1,23 @@
+{
+  "format": 1,
+  "asset": "kai-plugin-koinos-node-0.3.1.kaiplugin",
+  "bytes": 19416955,
+  "sha256": "2569d5002e6d8d8a047addeee2dbc86829dc6ad8ab910724f2570c29bed82a12",
+  "parts": [
+    {
+      "file": "kai-plugin-koinos-node-0.3.1.kaiplugin.part001",
+      "bytes": 8388608,
+      "sha256": "87bc57fdeb5fd05c9c69bfb2f64c40932d7248d023deca788379c84ce794a19c"
+    },
+    {
+      "file": "kai-plugin-koinos-node-0.3.1.kaiplugin.part002",
+      "bytes": 8388608,
+      "sha256": "fbd29214b23f14d8d5e1d6c87f671466eb227fde60c1e90a36b4fcef65f5a1ec"
+    },
+    {
+      "file": "kai-plugin-koinos-node-0.3.1.kaiplugin.part003",
+      "bytes": 2639739,
+      "sha256": "77e2024fa2dd120172b0de890ac82d99375a7ca60869cd920f0aa2c597b7a320"
+    }
+  ]
+}

@@ -57,7 +57,7 @@ async function inspectOwner(exec, project, nodeRoot) {
   let roots;
   try { roots = result.stdout.trim().split("\n").map(line => JSON.parse(line)); } catch { roots = []; }
   if (roots.length !== ids.length || roots.some(p => typeof p !== "string" || !p)) return { ok: false, reason: "ownership-unknown", message: "This node does not identify its owning app. Automatic changes are paused." };
-  if (roots.some(p => canonicalPath(p) !== canonicalPath(nodeRoot))) return { ok: false, reason: "managed-elsewhere", message: "This node belongs to another KAI profile (Master or Live/Test). Keep that app open. Node controls here are disabled so it stays running." };
+  if (roots.some(p => canonicalPath(p) !== canonicalPath(nodeRoot))) return { ok: false, reason: "managed-elsewhere", message: "This node belongs to another KAI profile (Master or Live/Test). It can keep running there, or close that app and use Migrate node here. Other node controls stay disabled." };
   return { ok: true, empty: false };
 }
 

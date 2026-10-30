@@ -386,6 +386,10 @@ function buildChannels({ settings, state, wallet, chain, nodeMgr, setup, rewards
     return nodeMgr.start(networkId, producerAddress);
   });
 
+  handle("node:profileMigrationPreview", () => nodeMgr.profileMigration().preview(chain.network().id));
+  handle("node:profileMigrationStatus", () => nodeMgr.profileMigration().status(chain.network().id));
+  handle("node:profileMigrationStart", ({ previewId } = {}) => nodeMgr.profileMigration().start(chain.network().id, previewId));
+  handle("node:profileMigrationCancel", () => nodeMgr.profileMigration().cancel());
   handle("node:stop", () => nodeMgr.stop(chain.network().id));
   handle("node:repairServices", () => nodeMgr.repair(chain.network().id));
   handle("node:setAutoRecover", ({ on }) => {
