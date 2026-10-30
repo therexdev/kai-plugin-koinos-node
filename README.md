@@ -17,7 +17,7 @@ In Core, open **Plugins → Koinos Node → Review update / Install**. Review th
 
 Node uses the original `koinos-node` settings, state, financial journals and selected database location. Opening a plugin does not replace these with a second profile. Deliberate folder changes use the original checked move flow.
 
-Closing the Node window leaves its supervisor and approved background work running in Core. Disabling or removing the plugin stops its managed node and drains pending native work before releasing the service. Quitting Core drains pending work and preserves Docker continuity, as in the original application; use **Stop node** when you intend to stop Docker containers as well. Core Local-Only pauses network actions and waits for the actively supervised node to stop. Installer downloads are cancelled before a late installer can launch.
+Closing the Node window leaves its supervisor and approved background work running in Core. Disabling or removing the plugin stops its managed node and drains pending native work before releasing the service. Quitting Core drains pending work and preserves Docker continuity, as in the original application; use **Stop node** when you intend to stop Docker containers as well. Node networking is independent of AI privacy, as in the original app: Local-Only keeps AI processing local while an explicitly enabled Node, blockchain wallet and approved returns continue to work. Enabling Node never changes AI privacy. Disabling/removing Node or quitting Core cancels pending installer downloads before a late installer can launch.
 
 ## Plugin boundary
 
