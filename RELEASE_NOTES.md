@@ -1,5 +1,7 @@
-# 0.2.0
+# Koinos Node 0.3.0 — plugin-owned foundation architecture
 
-Restores the original Koinos AI feature interface and native capabilities in a separately installed plugin. Uses the existing shared profile and saved data. Requires KAI Core 0.5.0 or later.
+All Node engines, Docker templates, wallet/funding logic and production dependencies now ship in this plugin. Core provides only documented shared APIs. The complete seven-screen workspace and financial/native reviews remain.
 
-Original layouts, controls and workflows replace the earlier reduced plugin screens. Feature-specific approvals, secure credential handling, privacy settings and native service cleanup remain enforced.
+This version uses a fresh independent Node wallet and profile; it does not migrate or modify an older application's wallet or data. The Node wallet is separate from the Core wallet.
+
+Requires Foundation's schema 2 / API 3 plugin runtime and explicit native-code trust (full computer access). Older Core versions cannot load this release. No dependencies or install scripts run at installation.

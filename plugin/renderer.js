@@ -463,7 +463,7 @@ function renderWalletView() {
   if (stage === "none") {
     root.innerHTML = KaiI18n.html`
       <h1>Welcome 👋</h1>
-      <p class="lead">Set up a Koinos wallet to get started. It takes a few seconds — your key is generated locally and encrypted with a password on this computer.</p>
+      <p class="lead">Set up your Node wallet. This wallet belongs to Koinos Node and is separate from the Core wallet. No old wallet is copied automatically. Your key is generated locally and encrypted with your password.</p>
       <div class="grid-2">
         <div class="card">
           <h2>🆕 Create a new wallet</h2>
@@ -491,7 +491,7 @@ function renderWalletView() {
 
   if (stage === "locked") {
     root.innerHTML = KaiI18n.html`
-      <h1>Unlock your wallet</h1>
+      <h1>Unlock your Node wallet</h1>
       <p class="lead">Wallet <span class="mono">${esc(S.wallet.address ?? "")}</span></p>
       <div class="card" style="max-width:420px">
         <label class="field"><span>Password</span>

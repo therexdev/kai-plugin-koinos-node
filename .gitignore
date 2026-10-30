@@ -2,3 +2,7 @@ node_modules/
 *.pem
 *.key
 .DS_Store
+/dist/kai-plugin-koinos-node-0.3.0.kaiplugin
+
+!plugin/service/node_modules/
+!plugin/service/node_modules/**

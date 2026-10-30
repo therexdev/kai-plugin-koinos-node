@@ -1,47 +1,6 @@
-/*
- * The bridge that stands where Koinos Node Desktop's preload.js stood.
- *
- * renderer.js and styles.css in this folder are byte-for-byte the other
- * app's files — that is the point. They talk to `window.koinos.invoke`,
- * which preload.js used to satisfy over Electron IPC; here the same calls
- * travel over POST /core/koinos/rpc to the same handlers, ported whole into
- * Core. In this plugin the same response shape ({ok, data|error}) is carried
- * through publisher-pinned window.kai calls; the renderer does not get HTTP,
- * filesystem or process privileges. Folder selection is native and events poll
- * the feature-scoped broker.
- *
- * The two agreed differences with the standalone app both live here, so the
- * vendored files stay pristine and future versions re-vendor cleanly:
- *
- *   1. SAME WALLET. Core serves the channels against Koinos AI's own
- *      keystore — nothing to do here; it simply is.
- *   2. PASSWORD BEFORE FUNDS LEAVE. Core refuses the six channels that move
- *      value to someone else unless the call proves the wallet password. The
- *      standalone app doesn't send one, so this file intercepts those six
- *      and asks — with the app's own modal, so it looks native — then
- *      attaches what was typed to that one call and forgets it.
- *   4. WHAT IT IS WORTH, IN DOLLARS. The standalone app talks only in KOIN.
- *      A tester deciding whether a machine is worth running wants the answer
- *      in the currency they pay the electricity bill in, so a "Node value"
- *      card is added here — priced off the Uniswap v4 vKOIN/USDT pool that
- *      the funding route already uses. It reuses the vendored .card/.tile
- *      classes, so styles.css stays byte-identical too.
- *   3. THE CHAIN DATA FOLDER IS A CHOICE. The standalone app puts tens of
- *      gigabytes wherever its own data lives and never mentions it, which is
- *      wrong for anyone with a small system drive. Here it is offered — with
- *      the default pre-filled — before quick sync downloads anything, and can
- *      be moved to another drive afterwards. Both are added from this file,
- *      so renderer.js stays byte-identical to the app it came from.
- *   5. RECEIVE BY QR. Every address on these screens can be shown as a QR
- *      code, because the realistic way to fund a node is from a phone wallet
- *      or an exchange app, and neither can paste from this machine's
- *      clipboard. Retyping a 42-character address by hand is the one mistake
- *      here that cannot be undone.
- *
- * It also adapts the three Electron-only util channels (clipboard, external
- * links, folder opening) and lets the surrounding Koinos AI sidebar drive
- * which view is shown.
- */
+/* Sandboxed UI bridge to this plugin's native Node service. The Node wallet
+ * and funding engine belong to this plugin; they never read Core's wallet.
+ * Password checks and native reviews remain required for value leaving. */
 (function () {
   "use strict";
 

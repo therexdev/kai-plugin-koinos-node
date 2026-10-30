@@ -1,15 +1,20 @@
 {
-  "schema": 1,
-  "apiVersion": 2,
+  "schema": 2,
+  "apiVersion": 3,
   "id": "kai.koinos-node",
   "name": "KAI Koinos Node",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "The complete Koinos Node workspace: wallet, funding, block production, external signing, quick sync, recovery and reward history.",
   "entry": "index.html",
   "permissions": [
-    "koinos-node.read",
-    "koinos-node.manage",
-    "koinos-node.wallet",
-    "koinos-node.fund"
-  ]
+    "native.execute",
+    "storage.read",
+    "storage.write",
+    "desktop.windows",
+    "desktop.preferences"
+  ],
+  "runtime": "native",
+  "service": "service/index.js",
+  "provides": [],
+  "consumes": []
 }
