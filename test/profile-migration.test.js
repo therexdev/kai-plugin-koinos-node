@@ -6,6 +6,12 @@ const { createProfileMigration, MARKER } = require("../plugin/service/core/lib/k
 const { assertRestoreReady } = require("../plugin/service/core/lib/koinos/node-maintenance");
 const { NETWORKS } = require("../plugin/service/core/lib/koinos/constants");
 const ok = stdout => ({ ok: true, stdout: stdout || "", stderr: "" });
+function inside(directory, file, paths = path) {
+  // Windows Docker paths may use different drive-letter/path casing after the
+  // migration resolves them. Match path components rather than raw prefixes.
+  const relative = paths.relative(directory, String(file));
+  return relative !== "" && relative !== ".." && !relative.startsWith(".." + paths.sep) && !paths.isAbsolute(relative);
+}
 function fixture(t, options = {}) {
   const root = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), "kai-chain-migration-"))), source = path.join(root, "old", "mainnet"), dataRoot = path.join(root, "plugin", "node"), target = path.join(dataRoot, "mainnet"), basedir = path.join(source, "basedir");
   const templateRoot = path.resolve(__dirname, "../plugin/service/core/koinos-node-template");
@@ -34,6 +40,15 @@ function fixture(t, options = {}) {
 }
 async function finish(service) { const deadline = Date.now() + 10000; while (service.running && Date.now() < deadline) await new Promise(resolve => setTimeout(resolve, 5)); assert.equal(service.running, false); return service.status("mainnet"); }
 async function begin(f) { const preview = await f.service.preview("mainnet"); f.service.start("mainnet", preview.previewId); return finish(f.service); }
+
+test("migration failure injection matches normalized Windows paths without crossing directory boundaries", () => {
+  const root = "D:\\Temp\\Kai-Chain-Migration\\old\\mainnet\\basedir";
+  assert.equal(inside(root, "d:\\temp\\kai-chain-migration\\old\\mainnet\\basedir\\chain\\0001.sst", path.win32), true);
+  assert.equal(inside(root, "d:/TEMP/KAI-CHAIN-MIGRATION/old/mainnet/basedir/chain/0001.sst", path.win32), true);
+  assert.equal(inside(root, root, path.win32), false);
+  assert.equal(inside(root, root + "-other\\chain\\0001.sst", path.win32), false);
+  assert.equal(inside(root, "E:\\Temp\\Kai-Chain-Migration\\old\\mainnet\\basedir\\chain\\0001.sst", path.win32), false);
+});
 
 test("reviewed migration retires only the old stack and moves chain state without wallet or producer keys", async t => {
   const f = fixture(t), before = fs.statSync(path.join(f.basedir, "chain/0001.sst"));
@@ -79,10 +94,11 @@ test("linked source files and directories are never transferred", async t => {
 });
 
 test("cross-device copy verifies each destination and deletes each original after publication", async t => {
-  const f = fixture(t), original = fsp.link;
-  fsp.link = async (source, target) => { if (source.startsWith(f.basedir)) throw Object.assign(Error("different filesystem"), { code: "EXDEV" }); return original(source, target); };
+  const f = fixture(t), original = fsp.link; let injected = 0;
+  fsp.link = async (source, target) => { if (inside(f.basedir, source)) { injected++; throw Object.assign(Error("different filesystem"), { code: "EXDEV" }); } return original(source, target); };
   t.after(() => { fsp.link = original; });
   const before = fs.statSync(path.join(f.basedir, "chain/0001.sst")), state = await begin(f); assert.equal(state.phase, "complete", state.error);
+  assert.equal(injected, 3, "Every chain file must exercise the cross-device copy branch");
   const after = fs.statSync(path.join(f.target, "basedir/chain/0001.sst")); assert.notEqual(after.ino, before.ino); assert.equal(after.nlink, 1); assert.equal(fs.existsSync(path.join(f.basedir, "chain")), false);
 });
 
@@ -121,22 +137,26 @@ test("pause immediately after container retirement can resume from its preparati
 });
 
 test("failed cross-device source cleanup resumes the verified pending destination", async t => {
-  const f = fixture(t), link = fsp.link, unlink = fs.unlinkSync;
-  fsp.link = async (source, target) => { if (source.startsWith(f.basedir)) throw Object.assign(Error("cross-device"), { code: "EXDEV" }); return link(source, target); };
+  const f = fixture(t), link = fsp.link, unlink = fs.unlinkSync; let injected = 0;
+  fsp.link = async (source, target) => { if (inside(f.basedir, source)) { injected++; throw Object.assign(Error("cross-device"), { code: "EXDEV" }); } return link(source, target); };
   let blocked = false;
-  fs.unlinkSync = file => { if (!blocked && String(file).startsWith(f.basedir) && String(file).endsWith("0001.sst")) { blocked = true; throw Object.assign(Error("Synthetic cleanup lock"), { code: "EACCES" }); } return unlink(file); };
+  fs.unlinkSync = file => { if (!blocked && inside(f.basedir, file) && path.basename(String(file)) === "0001.sst") { blocked = true; throw Object.assign(Error("Synthetic cleanup lock"), { code: "EACCES" }); } return unlink(file); };
   t.after(() => { fsp.link = link; fs.unlinkSync = unlink; });
   let state = await begin(f); assert.equal(state.phase, "failed"); assert.ok(fs.existsSync(path.join(f.basedir, "chain/0001.sst"))); assert.ok(fs.existsSync(path.join(f.target, "basedir/chain/0001.sst")));
+  assert.ok(injected > 0, "Cross-device copy failure must be injected"); assert.equal(blocked, true, "Source cleanup failure must be injected");
+  assert.notEqual(fs.statSync(path.join(f.basedir, "chain/0001.sst")).ino, fs.statSync(path.join(f.target, "basedir/chain/0001.sst")).ino);
   const preview = await f.service.preview("mainnet"); f.service.start("mainnet", preview.previewId); state = await finish(f.service); assert.equal(state.phase, "complete", state.error);
 });
 
 test("cross-device crash after publication recognizes only its own extra staging link", async t => {
-  const f = fixture(t), link = fsp.link, unlink = fs.unlinkSync;
-  fsp.link = async (source, target) => { if (source.startsWith(f.basedir)) throw Object.assign(Error("cross-device"), { code: "EXDEV" }); return link(source, target); };
+  const f = fixture(t), link = fsp.link, unlink = fs.unlinkSync; let injected = 0;
+  fsp.link = async (source, target) => { if (inside(f.basedir, source)) { injected++; throw Object.assign(Error("cross-device"), { code: "EXDEV" }); } return link(source, target); };
   let blocked = false;
   fs.unlinkSync = file => { if (!blocked && String(file).includes(".kai-chain-") && String(file).endsWith(".tmp")) { blocked = true; throw Object.assign(Error("Synthetic crash after publication"), { code: "EACCES" }); } return unlink(file); };
   t.after(() => { fsp.link = link; fs.unlinkSync = unlink; });
   let state = await begin(f); assert.equal(state.phase, "failed"); const record = JSON.parse(fs.readFileSync(path.join(f.dataRoot,".profile-migrations/mainnet.json"),"utf8")); const targetFile = path.join(f.target, "basedir", record.current.relative); assert.equal(fs.statSync(targetFile).nlink, 2); assert.ok(fs.existsSync(path.join(f.basedir, record.current.relative)));
+  assert.ok(injected > 0, "Cross-device copy failure must be injected"); assert.equal(blocked, true, "Staging cleanup failure must be injected");
+  assert.notEqual(fs.statSync(path.join(f.basedir, record.current.relative)).ino, fs.statSync(targetFile).ino);
   const resumed = f.make(); t.after(() => resumed.dispose()); const preview = await resumed.preview("mainnet"); resumed.start("mainnet", preview.previewId); state = await finish(resumed); assert.equal(state.phase, "complete", state.error); assert.equal(fs.statSync(targetFile).nlink, 1);
 });
 
@@ -145,8 +165,8 @@ test("network changes without a journal reset the displayed migration state", as
 });
 
 test("target changes during the final Docker check preserve the original cross-device source", async t => {
-  const f = fixture(t), link = fsp.link;
-  fsp.link = async (source, target) => { if (source.startsWith(f.basedir)) throw Object.assign(Error("cross-device"), { code: "EXDEV" }); return link(source, target); };
+  const f = fixture(t), link = fsp.link; let injected = 0, originalBytes;
+  fsp.link = async (source, target) => { if (inside(f.basedir, source)) { injected++; throw Object.assign(Error("cross-device"), { code: "EXDEV" }); } return link(source, target); };
   t.after(() => { fsp.link = link; });
   let changed;
   f.onExec(args => {
@@ -154,9 +174,13 @@ test("target changes during the final Docker check preserve the original cross-d
     const file = path.join(f.dataRoot, ".profile-migrations/mainnet.json"); if (!fs.existsSync(file)) return;
     const current = JSON.parse(fs.readFileSync(file, "utf8")).current; if (!current) return;
     const destination = path.join(f.target, "basedir", current.relative); if (!fs.existsSync(destination)) return;
+    originalBytes = fs.readFileSync(path.join(f.basedir, current.relative));
+    assert.notEqual(fs.statSync(path.join(f.basedir, current.relative)).ino, fs.statSync(destination).ino);
     fs.writeFileSync(destination, Buffer.alloc(current.bytes, 8)); changed = current.relative;
   });
   const state = await begin(f); assert.equal(state.phase, "failed"); assert.match(state.error, /destination changed/); assert.ok(changed); assert.ok(fs.existsSync(path.join(f.basedir, changed))); assert.equal(state.resumable, true);
+  assert.ok(injected > 0, "Cross-device copy failure must be injected");
+  assert.deepEqual(fs.readFileSync(path.join(f.basedir, changed)), originalBytes, "Destination mutation must leave the original source bytes unchanged");
 });
 
 test("preparing journal is exposed as a resumable paused operation after restart", async t => {
