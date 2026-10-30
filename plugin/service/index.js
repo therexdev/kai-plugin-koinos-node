@@ -9,7 +9,12 @@ function create(api, dependencies = {}) {
   if (api.version !== 1) throw Error("Koinos Node requires Foundation API v1");
   const electron = dependencies.electron || require("electron");
   fs.mkdirSync(api.plugin.dataDir, { recursive: true, mode: 0o700 });
-  const walletDir = path.join(api.plugin.dataDir, "wallet");
+  const profileStat = fs.lstatSync(api.plugin.dataDir);
+  if (!profileStat.isDirectory() || profileStat.isSymbolicLink()) throw Error("Node profile must be a real directory.");
+  // The host chooses this root. OS ancestors may be aliases (/var on macOS),
+  // while every wallet/Node path below the canonical root remains guarded.
+  const dataDir = fs.realpathSync(api.plugin.dataDir);
+  const walletDir = path.join(dataDir, "wallet");
   safePath(walletDir);
   const walletFile = path.join(walletDir, "wallet.json");
   if (fs.existsSync(walletFile)) {
@@ -27,7 +32,7 @@ function create(api, dependencies = {}) {
     spendTail = work; return work;
   };
   const service = (dependencies.createNode || createNode)({
-    dataDir: api.plugin.dataDir, wallet, version: api.plugin.version,
+    dataDir, wallet, version: api.plugin.version,
     settings: api.settings, electron, withWalletSpend,
     getWindow: () => electron.BrowserWindow.fromId(api.desktop.hostWindowId()),
     confirm: (title, detail) => api.desktop.confirm(title, detail),

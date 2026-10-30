@@ -36,7 +36,7 @@ function vendor(name, from, targetBase, exact = null) {
 fs.rmSync(output, { recursive: true, force: true }); fs.mkdirSync(output, { recursive: true });
 for (const [name, version] of Object.entries(packageJson.dependencies || {})) vendor(name, sourceRoot, output, version);
 const records = [];
-function hashFiles(dir) { for (const item of fs.readdirSync(dir, { withFileTypes: true })) { const file = path.join(dir, item.name); if (item.isDirectory()) hashFiles(file); else records.push({ path: path.relative(path.join(root, "plugin"), file).split(path.sep).join("/"), sha256: crypto.createHash("sha256").update(fs.readFileSync(file)).digest("hex") }); } }
+function hashFiles(dir) { for (const item of fs.readdirSync(dir, { withFileTypes: true }).sort((a, b) => a.name < b.name ? -1 : a.name > b.name ? 1 : 0)) { const file = path.join(dir, item.name); if (item.isDirectory()) hashFiles(file); else records.push({ path: path.relative(path.join(root, "plugin"), file).split(path.sep).join("/"), sha256: crypto.createHash("sha256").update(fs.readFileSync(file)).digest("hex") }); } }
 hashFiles(output);
 fs.writeFileSync(path.join(root, "plugin/service/dependencies.json"), JSON.stringify({ schema: 1, packages: inventory, files: records }, null, 2) + "\n");
 console.log(`Bundled ${inventory.length} locked production dependency instances; ${records.length} files.`);

@@ -43,3 +43,16 @@ test("failed native shutdown remains retryable through the public service entry"
   assert.throws(() => service.call("node.read", {}), /closing/);
   await service.dispose({ reason: "disable" }); assert.equal(stops, 2); assert.equal(locked, 1);
 });
+test("trusted OS ancestor aliases are canonicalized before wallet checks", async t => {
+  const f = fixture(t), real = path.join(f.root, "real"), alias = path.join(f.root, "alias"); fs.mkdirSync(real); fs.mkdirSync(path.join(real, "data"));
+  fs.symlinkSync(real, alias, process.platform === "win32" ? "junction" : "dir"); f.api.plugin.dataDir = path.join(alias, "data");
+  const service = create(f.api, { electron: f.electron });
+  try { assert.equal((await service.call("node.read", { channel: "wallet:status" })).exists, false); } finally { await service.dispose(); }
+});
+test("the profile leaf and wallet directory cannot be redirected by symlinks", t => {
+  const f = fixture(t), real = path.join(f.root, "real"), alias = path.join(f.root, "alias"); fs.mkdirSync(real);
+  fs.symlinkSync(real, alias, process.platform === "win32" ? "junction" : "dir"); f.api.plugin.dataDir = alias;
+  assert.throws(() => create(f.api, { electron: f.electron }), /real directory/);
+  f.api.plugin.dataDir = f.root; fs.symlinkSync(real, path.join(f.root, "wallet"), process.platform === "win32" ? "junction" : "dir");
+  assert.throws(() => create(f.api, { electron: f.electron }), /unsafe/);
+});
