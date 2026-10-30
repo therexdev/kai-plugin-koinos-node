@@ -3,11 +3,13 @@
   "apiVersion": 2,
   "id": "kai.koinos-node",
   "name": "KAI Koinos Node",
-  "version": "0.1.1",
-  "description": "Inspect, start and stop a Koinos node using existing local data, with native approval for Docker actions.",
+  "version": "0.2.0",
+  "description": "The complete Koinos Node workspace: wallet, funding, block production, external signing, quick sync, recovery and reward history.",
   "entry": "index.html",
   "permissions": [
     "koinos-node.read",
-    "koinos-node.manage"
+    "koinos-node.manage",
+    "koinos-node.wallet",
+    "koinos-node.fund"
   ]
 }
