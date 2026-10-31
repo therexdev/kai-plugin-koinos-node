@@ -11,6 +11,7 @@ const { httpHead, httpGetText, httpDownload } = require("./download");
 const { assessHealth, describeRecovery, classifyCrash } = require("./node-health");
 const dataMove = require("./data-move");
 const { claimProject, inspectOwner } = require("./node-control");
+const { copyGeneratedFile, ensureGeneratedDirectory } = require("./generated-config");
 
 const { assertRestoreReady, inspectLogs, currentLogs, backupList, deleteBackup, installSnapshot, preflightFolders } = require("./node-maintenance");
 const OP_LOG_LIMIT = 400;
@@ -69,8 +70,8 @@ class NodeManager {
     const net = NETWORKS[networkId];
     if (!net) throw new Error(`Unknown network: ${networkId}`);
     const d = this.dirs(networkId);
-    fs.mkdirSync(d.config, { recursive: true });
-    fs.mkdirSync(d.basedir, { recursive: true });
+    ensureGeneratedDirectory(d.config);
+    ensureGeneratedDirectory(d.basedir);
 
     const tpl = (...p) => path.join(this.templateRoot, ...p);
     const composeSource = fs.readFileSync(tpl("docker-compose.yml"), "utf8");
@@ -78,9 +79,9 @@ class NodeManager {
       path.join(d.root, "docker-compose.yml"),
       this.platform === "darwin" ? composeForMacos(composeSource) : composeSource
     );
-    fs.copyFileSync(tpl("common", "koinos_descriptors.pb"), path.join(d.config, "koinos_descriptors.pb"));
-    fs.copyFileSync(tpl("common", "rabbitmq.conf"), path.join(d.config, "rabbitmq.conf"));
-    fs.copyFileSync(tpl(net.templateDir, "genesis_data.json"), path.join(d.config, "genesis_data.json"));
+    copyGeneratedFile(tpl("common", "koinos_descriptors.pb"), path.join(d.config, "koinos_descriptors.pb"));
+    copyGeneratedFile(tpl("common", "rabbitmq.conf"), path.join(d.config, "rabbitmq.conf"));
+    copyGeneratedFile(tpl(net.templateDir, "genesis_data.json"), path.join(d.config, "genesis_data.json"));
 
     fs.writeFileSync(path.join(d.config, "config.yml"), buildConfigYml(net, producerAddress, opts));
     if (this.platform === "darwin") stageMacosConfig(d);
@@ -1315,11 +1316,11 @@ function composeForMacos(text) {
 function stageMacosConfig(d) {
   const chainDir = path.join(d.basedir, "chain");
   const descriptorDir = path.join(d.basedir, "jsonrpc", "descriptors");
-  fs.mkdirSync(chainDir, { recursive: true });
-  fs.mkdirSync(descriptorDir, { recursive: true });
-  fs.copyFileSync(path.join(d.config, "config.yml"), path.join(d.basedir, "config.yml"));
-  fs.copyFileSync(path.join(d.config, "genesis_data.json"), path.join(chainDir, "genesis_data.json"));
-  fs.copyFileSync(
+  ensureGeneratedDirectory(chainDir);
+  ensureGeneratedDirectory(descriptorDir);
+  copyGeneratedFile(path.join(d.config, "config.yml"), path.join(d.basedir, "config.yml"));
+  copyGeneratedFile(path.join(d.config, "genesis_data.json"), path.join(chainDir, "genesis_data.json"));
+  copyGeneratedFile(
     path.join(d.config, "koinos_descriptors.pb"),
     path.join(descriptorDir, "koinos_descriptors.pb")
   );

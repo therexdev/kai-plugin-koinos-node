@@ -1,11 +1,9 @@
-# Koinos Node 0.3.3
+# Koinos Node 0.3.4
 
-Fixes a false network mismatch when migrating a node created by the Windows Alpha app. Alpha's Windows checkout can use CRLF line endings while the signed plugin contains LF files. Migration previously compared the raw genesis file bytes, so identical Mainnet data could be rejected.
+Fixes Windows node startup failing with `EPERM: operation not permitted, copyfile` for `koinos_descriptors.pb` after a successful chain migration, and on later starts of a newly configured node.
 
-Migration now compares the complete genesis JSON content while allowing insignificant whitespace, a UTF-8 BOM, object-property order and equivalent exact numeric values. Arrays, value types and every field remain checked. Parsing is bounded, preserves numeric precision, and rejects duplicate keys or malformed data. Genuine network differences still block migration. File-access, safety and format problems receive distinct explanations instead of being mislabeled as the wrong network.
+Installed plugin templates are read-only. Copying them directly also made the generated node configuration read-only, so Windows could reject the next overwrite. The plugin now creates writable copies of its generated public configuration and repairs copies left read-only by earlier versions. The installed plugin files stay read-only.
 
-Keep Docker open and close the old KAI app, including its tray process. In the Node plugin, choose **Migrate node to this plugin**, review the locations and choose **Stop old node and migrate**. Existing profile, network, mount, writer, journal and file-verification safeguards still apply. Chain data alone is transferred; wallets, production keys, KOIN and VHP are not. Transfer funds manually if using a new wallet.
+Update Koinos Node in Plugins, then start the node again. A completed migration does not need to be repeated. This update preserves migrated chain data, the plugin wallet, producer keys, funding records and migration journals. Existing configuration backups remain available.
 
-On systems where Docker owns files that the desktop user cannot read or remove, migration stops with a permissions explanation and retains recoverable data. It does not change permissions or elevate privileges automatically.
-
-Regression coverage uses the complete stopped compose stack with Windows-formatted Alpha genesis data, plus BOM and formatting variants. Different networks, changed genesis fields, array-order changes, unsafe numeric ambiguity and malformed inputs remain rejected. Migration testing uses temporary files and simulated Docker responses; no live user chain or funds were moved.
+Regression coverage exercises read-only installed templates, repeated configuration generation used by Start, recovery of existing read-only copies, and preservation of chain and wallet files. Windows CI exercises the native read-only overwrite failure. Tests use temporary files and simulated Docker responses; they do not operate a live user node or move funds.
