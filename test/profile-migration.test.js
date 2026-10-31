@@ -94,6 +94,78 @@ test("the full stopped legacy template including official p2p is recognized and 
   assert.equal(fs.readFileSync(path.join(f.basedir, "block_producer/private.key"), "utf8"), "private producer key remains old");
 });
 
+test("full stopped Windows legacy stacks migrate with equivalent genesis serialization", async t => {
+  const reverseKeys = value => Array.isArray(value) ? value.map(reverseKeys) : value && typeof value === "object" ? Object.fromEntries(Object.keys(value).reverse().map(key => [key, reverseKeys(value[key])])) : value;
+  for (const kind of ["Windows CRLF", "UTF-8 BOM with CRLF", "compact JSON", "reordered object keys"]) await t.test(kind, async t => {
+    const f = fixture(t), file = path.join(f.source, "config/genesis_data.json"), original = fs.readFileSync(file, "utf8");
+    const changed = kind === "Windows CRLF" ? original.replace(/\n/g, "\r\n") : kind === "UTF-8 BOM with CRLF" ? "\ufeff" + original.replace(/\n/g, "\r\n") : JSON.stringify(kind === "reordered object keys" ? reverseKeys(JSON.parse(original)) : JSON.parse(original));
+    f.write(file, changed); const rows = templateContainers(f); assert.equal(rows.length, 12); assert.ok(rows.every(row => !row.running)); f.setRows(rows);
+    const preview = await f.service.preview("mainnet"); assert.equal(preview.available, true); assert.equal(preview.network, "mainnet");
+    assert.ok(!f.calls.some(args => ["update", "stop", "rm"].includes(args[0])));
+    f.service.start("mainnet", preview.previewId); const state = await finish(f.service); assert.equal(state.phase, "complete", state.error);
+    assert.equal(state.result.movedFiles, 3); assert.equal(fs.existsSync(path.join(f.basedir, "chain")), false);
+    assert.equal(fs.readFileSync(file, "utf8"), changed, "Migration must not rewrite the old genesis");
+    assert.equal(fs.readFileSync(path.join(f.basedir, "block_producer/private.key"), "utf8"), "private producer key remains old");
+    assert.equal(fs.readFileSync(path.join(f.root, "old/wallet/wallet.json"), "utf8"), "original encrypted wallet remains old");
+    assert.equal(fs.existsSync(path.join(f.target, "basedir/block_producer/private.key")), false);
+    assert.equal(f.calls.find(args => args[0] === "rm").filter(id => /^[a-f0-9]{64}$/.test(id)).length, 12);
+  });
+});
+
+test("different network or genesis content is refused for the full stopped stack", async t => {
+  for (const kind of ["Harbinger", "changed value", "changed type", "changed array order"]) await t.test(kind, async t => {
+    const f = fixture(t), file = path.join(f.source, "config/genesis_data.json"), data = JSON.parse(fs.readFileSync(file, "utf8"));
+    if (kind === "Harbinger") f.write(file, fs.readFileSync(path.join(f.manager.templateRoot, "harbinger/genesis_data.json")));
+    else { if (kind === "changed value") data.entries[0].value += "A"; if (kind === "changed type") data.entries[0].space.system = String(data.entries[0].space.system); if (kind === "changed array order") data.entries.reverse(); f.write(file, JSON.stringify(data)); }
+    const unchanged = fs.readFileSync(file); f.setRows(templateContainers(f));
+    await assert.rejects(f.service.preview("mainnet"), /does not match the selected Mainnet network.*preserved/);
+    assert.ok(!f.calls.some(args => ["update", "stop", "rm"].includes(args[0]))); assert.ok(fs.existsSync(path.join(f.basedir, "chain/0001.sst"))); assert.deepEqual(fs.readFileSync(file), unchanged);
+  });
+});
+
+test("invalid genesis gives accurate validation errors without stopping or changing a node", async t => {
+  const invalid = [
+    ["malformed", "wrong network", /could not be validated: Genesis JSON is malformed/],
+    ["duplicate keys", '{"entries":[],"entries":[]}', /duplicate object key/],
+    ["invalid UTF-8", Buffer.from([0xff]), /valid UTF-8/],
+    ["oversized", Buffer.alloc(8 * 1024 * 1024 + 1), /8 MiB supported size limit/],
+    ["excessive values", '{"a":[' + "0,".repeat(200000) + '0]}', /too many values/],
+  ];
+  for (const [kind, content, message] of invalid) await t.test(kind, async t => {
+    const f = fixture(t), file = path.join(f.source, "config/genesis_data.json"); f.write(file, content); f.setRows(templateContainers(f));
+    await assert.rejects(f.service.preview("mainnet"), error => { assert.match(error.message, message); assert.doesNotMatch(error.message, /does not match/); return true; });
+    assert.ok(!f.calls.some(args => ["update", "stop", "rm"].includes(args[0]))); assert.ok(fs.existsSync(path.join(f.basedir, "chain/0001.sst"))); assert.deepEqual(fs.readFileSync(file), Buffer.from(content));
+  });
+});
+
+test("missing, linked and unreadable genesis files are identified before any Docker mutation", async t => {
+  for (const kind of ["missing", "linked", "unreadable"]) await t.test(kind, async t => {
+    const f = fixture(t), file = path.join(f.source, "config/genesis_data.json"); f.setRows(templateContainers(f)); let denied = false;
+    if (kind === "missing") fs.unlinkSync(file);
+    if (kind === "linked") fs.linkSync(file, path.join(f.source, "genesis-backup.json"));
+    if (kind === "unreadable") { const open = fs.openSync; fs.openSync = (name, ...args) => { if (path.relative(file, String(name)) === "") { denied = true; throw Object.assign(Error("Denied"), { code: "EACCES" }); } return open(name, ...args); }; t.after(() => { fs.openSync = open; }); }
+    await assert.rejects(f.service.preview("mainnet"), kind === "missing" ? /missing, linked or unsafe path/ : kind === "linked" ? /linked or is not a regular file/ : /could not be read/);
+    if (kind === "unreadable") assert.equal(denied, true, "Read-denial injection must exercise the file open");
+    assert.ok(!f.calls.some(args => ["update", "stop", "rm"].includes(args[0]))); assert.ok(fs.existsSync(path.join(f.basedir, "chain/0001.sst")));
+  });
+});
+
+test("genesis changes during reading or after review preserve the stopped source stack", async t => {
+  await t.test("changed during read", async t => {
+    const f = fixture(t), file = path.join(f.source, "config/genesis_data.json"), read = fs.readSync; f.setRows(templateContainers(f)); let changed = false;
+    fs.readSync = (fd, ...args) => { const count = read(fd, ...args); if (!changed) { changed = true; fs.appendFileSync(file, " "); } return count; };
+    t.after(() => { fs.readSync = read; });
+    await assert.rejects(f.service.preview("mainnet"), /changed while being read/); assert.equal(changed, true);
+    assert.ok(!f.calls.some(args => ["update", "stop", "rm"].includes(args[0]))); assert.ok(fs.existsSync(path.join(f.basedir, "chain/0001.sst")));
+  });
+  await t.test("wrong network after review", async t => {
+    const f = fixture(t); f.setRows(templateContainers(f)); const preview = await f.service.preview("mainnet");
+    f.write(path.join(f.source, "config/genesis_data.json"), fs.readFileSync(path.join(f.manager.templateRoot, "harbinger/genesis_data.json")));
+    f.service.start("mainnet", preview.previewId); const state = await finish(f.service); assert.equal(state.phase, "failed"); assert.match(state.error, /selected Mainnet network/);
+    assert.ok(!f.calls.some(args => ["update", "stop", "rm"].includes(args[0]))); assert.ok(fs.existsSync(path.join(f.basedir, "chain/0001.sst")));
+  });
+});
+
 test("official service images support Docker Hub qualification, versions, and immutable digests", async t => {
   const f = fixture(t), rows = templateContainers(f, { running: true });
   for (const row of rows) {
@@ -128,7 +200,7 @@ test("remote Docker contexts, mismatched genesis, unrelated writers, and occupie
     if (kind === "genesis") f.write(path.join(f.source, "config/genesis_data.json"), "wrong network");
     if (kind === "writer") f.setRows([...f.rows(), { id: "f".repeat(64), project: "unrelated", running: false, mounts: [{ Type: "bind", Source: path.dirname(f.basedir), Destination: "/data", RW: true }] }]);
     if (kind === "occupied") f.write(path.join(f.target, "basedir/chain/existing"), "keep");
-    await assert.rejects(f.service.preview("mainnet"), /local Docker|network|Another Docker|already has chain/);
+    await assert.rejects(f.service.preview("mainnet"), /local Docker|malformed|Another Docker|already has chain/);
     assert.ok(!f.calls.some(args => ["update", "stop", "rm"].includes(args[0]))); assert.ok(fs.existsSync(path.join(f.basedir, "chain/0001.sst")));
   });
 });

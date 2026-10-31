@@ -4,6 +4,7 @@
 const fs = require("node:fs"), fsp = require("node:fs/promises"), path = require("node:path"), crypto = require("node:crypto");
 const { NETWORKS } = require("./constants");
 const { canonicalPath, claimProject } = require("./node-control");
+const { canonicalGenesis, MAX_BYTES: MAX_GENESIS_BYTES } = require("./genesis-json");
 const DATA_DIRS = ["chain", "block_store", "mempool", "transaction_store", "account_history", "contract_meta_store"];
 const SERVICE_IMAGES = Object.freeze({
   amqp: "rabbitmq", chain: "koinos/koinos-chain", mempool: "koinos/koinos-mempool",
@@ -66,6 +67,33 @@ function readJson(file, max = 16 * 1024 * 1024) {
   let value; try { value = JSON.parse(fs.readFileSync(file, "utf8")); } catch { throw Error("Node migration record is unreadable; it was preserved."); }
   if (!value || typeof value !== "object" || Array.isArray(value)) throw Error("Node migration record is invalid; it was preserved.");
   return value;
+}
+function genesisValue(file, label) {
+  const fail = message => Error(`${label} ${message} Its containers and chain data were preserved.`);
+  const safePath = () => {
+    try { checkedPath(file); }
+    catch (error) { throw fail(error.code ? "could not be read. Check its file permissions and try again." : "has a missing, linked or unsafe path."); }
+  };
+  safePath(); let fd, data;
+  try {
+    const before = fs.lstatSync(file);
+    if (!privateFile(before)) throw fail("is linked or is not a regular file.");
+    if (before.size > MAX_GENESIS_BYTES) throw fail("exceeds the 8 MiB supported size limit.");
+    const unchanged = entry => privateFile(entry) && same(identity(before), identity(entry)) && before.ctimeMs === entry.ctimeMs;
+    fd = fs.openSync(file, fs.constants.O_RDONLY | (fs.constants.O_NOFOLLOW || 0));
+    if (!unchanged(fs.fstatSync(fd))) throw fail("changed while being opened. Keep the old application closed and try again.");
+    // Bound the read even if another process replaces or grows the file.
+    data = Buffer.allocUnsafe(before.size + 1); let read = 0;
+    while (read < data.length) { const count = fs.readSync(fd, data, read, data.length - read, read); if (!count) break; read += count; }
+    safePath();
+    if (read !== before.size || !unchanged(fs.fstatSync(fd)) || !unchanged(fs.lstatSync(file))) throw fail("changed while being read. Keep the old application closed and try again.");
+    data = data.subarray(0, read);
+  } catch (error) {
+    if (error.code) throw fail("could not be read. Check its file permissions and try again.");
+    throw error;
+  } finally { if (fd !== undefined) fs.closeSync(fd); }
+  try { return canonicalGenesis(data); }
+  catch (error) { throw fail("could not be validated: " + error.message); }
 }
 function relativeFile(root, relative) {
   if (typeof relative !== "string" || relative.length > 8192 || relative.includes("\\") || relative.split("/").some(part => !part || part === "." || part === ".." || /[:\0\r\n]/.test(part)) || !DATA_DIRS.includes(relative.split("/")[0])) throw Error("Invalid chain migration file path.");
@@ -157,7 +185,7 @@ function createProfileMigration({ manager, journalRoot = path.join(manager.dataR
     if (overlap(basedir, destination.basedir) || overlap(root, destination.root)) throw Error("Old and new node folders overlap; select separate storage before migration.");
     checkedPath(destination.root, { missing: true }); checkedPath(destination.basedir, { missing: true });
     const oldGenesis = path.join(root, "config", "genesis_data.json"), currentGenesis = path.join(manager.templateRoot, NETWORKS[network].templateDir, "genesis_data.json");
-    checkedPath(oldGenesis); if (!privateFile(fs.lstatSync(oldGenesis)) || fs.statSync(oldGenesis).size > 8 * 1024 * 1024 || !fs.readFileSync(oldGenesis).equals(fs.readFileSync(currentGenesis))) throw Error("The old node's network does not match the selected network.");
+    if (genesisValue(oldGenesis, "The old node's genesis file") !== genesisValue(currentGenesis, "The plugin's genesis template")) throw Error(`The old node's genesis does not match the selected ${NETWORKS[network].label} network. Its containers and chain data were preserved.`);
     for (const name of DATA_DIRS) if (stat(path.join(destination.basedir, name))) throw Error("The plugin already has chain data. Existing destination data was preserved.");
     if (stat(path.join(basedir, MARKER)) || stat(path.join(destination.basedir, MARKER))) throw Error("A chain restore or migration is incomplete. Resume its recorded operation first.");
     writers(rows, basedir, destination.basedir, new Set(owned.map(row => row.id)));
