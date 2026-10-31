@@ -24,6 +24,9 @@
       backdrop.className = "modal-backdrop";
       var modal = document.createElement("div");
       modal.className = "modal";
+      modal.setAttribute("role", "dialog");
+      modal.setAttribute("aria-modal", "true");
+      modal.setAttribute("aria-label", title);
       var h = document.createElement("h2");
       h.textContent = title;
       var body = document.createElement("div");
@@ -41,7 +44,17 @@
       body.appendChild(input);
       var actions = document.createElement("div");
       actions.className = "actions";
-      var done = function (v) { backdrop.remove(); resolve(v); };
+      var done = function (v) { input.value = ""; backdrop.remove(); resolve(v); };
+      var heading = document.createElement("div");
+      heading.className = "node-modal-heading";
+      var dismiss = document.createElement("button");
+      dismiss.type = "button";
+      dismiss.className = "node-modal-close";
+      dismiss.setAttribute("aria-label", "Cancel wallet approval");
+      dismiss.textContent = "×";
+      dismiss.addEventListener("click", function () { done(null); });
+      heading.appendChild(h);
+      heading.appendChild(dismiss);
       var cancel = document.createElement("button");
       cancel.className = "btn";
       cancel.textContent = "Cancel";
@@ -56,7 +69,7 @@
       });
       actions.appendChild(cancel);
       actions.appendChild(okBtn);
-      modal.appendChild(h);
+      modal.appendChild(heading);
       modal.appendChild(body);
       modal.appendChild(actions);
       backdrop.appendChild(modal);
@@ -168,14 +181,27 @@
   }
 
   /** The app's own modal shell, so anything added here looks native. */
-  function kaiModal(title) {
+  function kaiModal(title, onCancel) {
     var root = document.getElementById("modal-root");
     if (!root) return null;
     var backdrop = el("div", "modal-backdrop");
     var box = el("div", "modal");
+    box.setAttribute("role", "dialog");
+    box.setAttribute("aria-modal", "true");
+    box.setAttribute("aria-label", title);
     var body = el("div", "modal-body");
     var actions = el("div", "actions");
-    box.appendChild(el("h2", null, title));
+    var heading = el("div", "node-modal-heading");
+    heading.appendChild(el("h2", null, title));
+    if (onCancel) {
+      var dismiss = el("button", "node-modal-close", "×");
+      dismiss.type = "button";
+      dismiss.setAttribute("aria-label", "Cancel folder selection");
+      dismiss.addEventListener("click", onCancel);
+      heading.appendChild(dismiss);
+      box.addEventListener("keydown", function (event) { if (event.key === "Escape") { event.preventDefault(); onCancel(); } });
+    }
+    box.appendChild(heading);
     box.appendChild(body);
     box.appendChild(actions);
     backdrop.appendChild(box);
@@ -197,7 +223,8 @@
   function askFolder(info, opts) {
     opts = opts || {};
     return new Promise(function (resolve) {
-      var m = kaiModal(opts.title || "Where should the chain data go?");
+      var dismiss = function () { m.close(); resolve(null); };
+      var m = kaiModal(opts.title || "Where should the chain data go?", dismiss);
       if (!m) return resolve(null);
 
       var lead = el("p", "small");
@@ -270,7 +297,7 @@
           vet(dir);
         });
       });
-      cancel.addEventListener("click", function () { m.close(); resolve(null); });
+      cancel.addEventListener("click", dismiss);
       confirm.addEventListener("click", function () { m.close(); resolve(chosen); });
 
       m.actions.appendChild(cancel);
@@ -332,7 +359,7 @@
           if (!dir || dir === info.path) return;
           return invoke("node:setDataDir", { path: dir }).then(function (res) {
             if (res && res.ok) toastish("Chain data will go to " + dir);
-            else if (res) alert(res.error);
+            else if (res) return window.kai.dialogs.alert(res.error, { title: "Could not change the data folder" });
           });
         });
       }
@@ -409,8 +436,8 @@
         } else if (s.cancelled) {
           toastish("Move cancelled — your data is untouched.");
         } else {
-          alert("The move did not finish: " + (s.error || "unknown error") +
-            "\n\nYour original data was left exactly where it was.");
+          return window.kai.dialogs.alert("The move did not finish: " + (s.error || "unknown error") +
+            "\n\nYour original data was left exactly where it was.", { title: "Chain data move did not finish" });
         }
       });
     }, 700);
@@ -419,7 +446,7 @@
       if (r && !r.ok) {
         clearInterval(poll);
         m.close();
-        alert(r.error + "\n\nYour original data was left exactly where it was.");
+        return window.kai.dialogs.alert(r.error + "\n\nYour original data was left exactly where it was.", { title: "Chain data move did not start" });
       }
     });
     if (info && info.sizeBytes) bar.textContent = "0 of " + fmtBytes(info.sizeBytes);

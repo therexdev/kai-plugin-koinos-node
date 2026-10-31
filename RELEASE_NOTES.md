@@ -1,9 +1,9 @@
-# Koinos Node 0.3.4
+# Koinos Node 0.3.5
 
-Fixes Windows node startup failing with `EPERM: operation not permitted, copyfile` for `koinos_descriptors.pb` after a successful chain migration, and on later starts of a newly configured node.
+Requires **KAI Core 0.7.3 or later**. Update Core before installing this plugin update.
 
-Installed plugin templates are read-only. Copying them directly also made the generated node configuration read-only, so Windows could reject the next overwrite. The plugin now creates writable copies of its generated public configuration and repairs copies left read-only by earlier versions. The installed plugin files stay read-only.
+Alerts and confirmation prompts now use Core’s styled dialogs, and wallet/password popups match the app’s typography, colors and close controls. Existing review, cancellation and wallet safeguards remain in place.
 
-Update Koinos Node in Plugins, then start the node again. A completed migration does not need to be repeated. This update preserves migrated chain data, the plugin wallet, producer keys, funding records and migration journals. Existing configuration backups remain available.
+This release includes the 0.3.4 Windows startup repair for generated configuration copied from read-only templates. Existing read-only copies are repaired on start; completed chain migration does not need to be repeated. Migrated chain data, wallets, producer keys, funding records and recovery journals stay in place.
 
-Regression coverage exercises read-only installed templates, repeated configuration generation used by Start, recovery of existing read-only copies, and preservation of chain and wallet files. Windows CI exercises the native read-only overwrite failure. Tests use temporary files and simulated Docker responses; they do not operate a live user node or move funds.
+Validation covers deferred and cancelled reviews without live account, payment or node operations. Native plugin services still require full computer/application trust; renderer UI remains sandboxed.

@@ -2,7 +2,7 @@
    renderer/styles and the live wallet/node behavior stay untouched. */
 :root{color-scheme:light;--bg:#f5f8fd;--bg-2:#f6f9ff;--card:#fff;--card-2:#edf4ff;--border:#dce6f4;--text:#193457;--muted:#5e7392;--accent:#155eef;--accent-2:#0875eb;--good:#168469;--warn:#98690e;--bad:#c93d4c}
 *{scrollbar-width:thin;scrollbar-color:#bccce3 transparent}
-body{font-size:14px;line-height:1.55}
+body{font-family:Inter,"Segoe UI",-apple-system,BlinkMacSystemFont,Roboto,Ubuntu,sans-serif;font-size:14px;line-height:1.55}
 #main{padding:30px 30px 60px}.view{max-width:1100px;margin:0 auto}
 h1{font-size:28px;letter-spacing:-.8px;font-weight:650;color:#163963;margin-bottom:6px}h2{font-size:16px;font-weight:650;letter-spacing:-.25px}.lead{font-size:13px;line-height:1.8;margin-bottom:25px}
 .card{border-radius:18px;padding:23px;box-shadow:0 5px 20px #203e6c05;margin-bottom:20px}
@@ -20,6 +20,7 @@ pre.logs{background:#102441;color:#dcecff;border-color:#284362;border-radius:12p
 
 .banner.warn{background:#fff8e8;color:#855e16;border-color:#eed9a9}.banner.bad{background:#fff0f2;color:#ab3446;border-color:#edc3ca}.banner.info{background:#edf5ff;color:#3265a1;border-color:#ccdef7}
 .wif-box{color:#855e16;background:#fff9ec;border-color:#e7cf9b}.tile .t-value{color:#235591}
+.node-modal-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:14px}.modal .node-modal-heading h2{margin:3px 0 0;line-height:1.4}.node-modal-close{flex:none;display:grid;place-items:center;width:32px;height:32px;padding:0;border:0;border-radius:8px;background:transparent;color:var(--muted);font-family:inherit;font-size:24px;line-height:1;cursor:pointer}.node-modal-close:hover{background:var(--bg);color:var(--text)}.modal .actions{flex-wrap:wrap}.modal-backdrop{backdrop-filter:blur(3px)}
 
 /* Give every dashboard section a consistent header and space above its tiles. */
 #view-dashboard>.card:not(.status-card)>.row:first-child{gap:12px 18px;margin-bottom:16px}

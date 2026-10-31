@@ -90,8 +90,18 @@ function showModal({ title, body, actions = [], onMount }) {
   const root = $("#modal-root");
   const backdrop = document.createElement("div");
   backdrop.className = "modal-backdrop";
-  backdrop.innerHTML = KaiI18n.html`<div class="modal"><h2>${esc(title)}</h2><div class="modal-body">${body}</div><div class="actions"></div></div>`;
+  backdrop.innerHTML = KaiI18n.html`<div class="modal" role="dialog" aria-modal="true" aria-label="${esc(title)}"><div class="node-modal-heading"><h2>${esc(title)}</h2></div><div class="modal-body">${body}</div><div class="actions"></div></div>`;
   const close = () => backdrop.remove();
+  if (!actions.some((a) => a.required)) {
+    const dismiss = document.createElement("button");
+    dismiss.type = "button";
+    dismiss.className = "node-modal-close";
+    dismiss.setAttribute("aria-label", "Close dialog");
+    dismiss.textContent = "×";
+    dismiss.addEventListener("click", close);
+    $(".node-modal-heading", backdrop).appendChild(dismiss);
+    backdrop.addEventListener("keydown", (event) => { if (event.key === "Escape") { event.preventDefault(); close(); } });
+  }
   const actionsEl = $(".actions", backdrop);
   for (const a of actions) {
     const b = document.createElement("button");
