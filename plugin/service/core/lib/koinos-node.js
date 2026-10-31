@@ -201,6 +201,18 @@ function buildChannels({ settings, state, wallet, chain, nodeMgr, setup, rewards
     return { ...res, amountSat, amountFormatted: formatAmount(amountSat) };
   });
 
+  handle("chain:maxSend", async ({ token, expectedAddress, expectedNetwork } = {}) => {
+    const address = wallet.address, network = chain.network().id, rpcIdentity = JSON.stringify(chain.rpcUrls());
+    if (!address || address !== expectedAddress || network !== expectedNetwork || !["koin", "vhp"].includes(token)) throw Error("Check the wallet, network and token before using Send All");
+    const balances = await chain.balances(address);
+    if (wallet.address !== address || chain.network().id !== network || JSON.stringify(chain.rpcUrls()) !== rpcIdentity) throw Error("Wallet or network changed. Try Send All again.");
+    const valid = value => typeof value === "string" && /^(0|[1-9]\d{0,19})$/.test(value) && BigInt(value) <= (1n << 64n) - 1n;
+    if (balances?.error || balances?.stale || !valid(balances?.[token]) || !valid(balances?.mana)) throw Error("A fresh token and mana balance is required for Send All");
+    const balance = BigInt(balances[token]), spendable = token === "koin" ? BigInt(chain.burnableFromMana(balances.mana)) : balance;
+    const available = balance < spendable ? balance : spendable;
+    return { address, network, token, amount: formatAmount(available.toString(), { grouping: false }), manaLimited: available < balance, observedAt: Date.now() };
+  });
+
   handle("chain:send", async ({ to, amount, token, password, expectedAddress, expectedNetwork }) => {
     // Wallet sends spend only the local earning wallet, independently of
     // producer custody. External producer transfers use producer:prepare.

@@ -903,6 +903,8 @@ async function onUnlock() {
 }
 
 function openSendModal() {
+  const address = S.wallet?.address, network = net().id;
+  let revision = 0;
   showModal({
     title: "Send tokens",
     body: KaiI18n.html`
@@ -910,8 +912,9 @@ function openSendModal() {
         <select id="s-token"><option value="koin">${esc(sym())}</option><option value="vhp">VHP</option></select></label>
       <label class="field"><span>Recipient address</span>
         <input id="s-to" type="text" class="mono" placeholder="1…"></label>
-      <label class="field"><span>Amount</span>
-        <input id="s-amount" type="text" class="mono" placeholder="0.0"></label>
+      <label class="field"><span class="node-send-amount-label">Amount <button id="s-all" type="button" class="btn ghost">Send All</button></span>
+        <input id="s-amount" type="text" inputmode="decimal" class="mono" placeholder="0.0"></label>
+      <p id="s-max-note" class="small muted" role="status" hidden></p>
       <p class="small muted">Transactions consume mana (not a fee — it recharges).</p>`,
     actions: [
       { label: "Cancel", onClick: (close) => close() },
@@ -921,7 +924,9 @@ function openSendModal() {
           const btn = $$(".btn.primary", modal).pop();
           busyButton(btn, true, "Sending…");
           try {
+            if (S.wallet?.address !== address || net().id !== network) throw Error("Wallet or network changed. Open Send again.");
             const res = await call("chain:send", {
+              expectedAddress: address, expectedNetwork: network,
               to: $("#s-to", modal).value.trim(),
               amount: $("#s-amount", modal).value.trim(),
               token: $("#s-token", modal).value,
@@ -936,6 +941,25 @@ function openSendModal() {
         },
       },
     ],
+    onMount: modal => {
+      const token = $("#s-token", modal), amount = $("#s-amount", modal), all = $("#s-all", modal), note = $("#s-max-note", modal);
+      token.addEventListener("change", () => { revision++; amount.value = ""; note.hidden = true; });
+      amount.addEventListener("input", () => { revision++; note.hidden = true; });
+      all.addEventListener("click", async () => {
+        const version = ++revision, selected = token.value;
+        all.disabled = true; note.hidden = false; note.textContent = "Checking available balance…";
+        const current = () => modal.isConnected && version === revision && token.value === selected && S.wallet?.address === address && net().id === network;
+        try {
+          const result = await call("chain:maxSend", { token: selected, expectedAddress: address, expectedNetwork: network });
+          if (!current()) return;
+          if (result?.address !== address || result?.network !== network || result?.token !== selected || typeof result.amount !== "string" || !/^(0|[1-9]\d{0,11})(\.\d{1,8})?$/.test(result.amount) || !Number.isSafeInteger(result.observedAt) || Date.now() - result.observedAt > 30000 || result.observedAt > Date.now() + 5000) throw Error("Available amount could not be verified. Try again.");
+          amount.value = result.amount;
+          note.textContent = result.amount === "0" ? "No tokens are available to send right now." : result.manaLimited ? "Filled the amount available with your current mana, leaving room for the transaction’s resource cost." : "";
+          note.hidden = !note.textContent;
+        } catch (error) { if (current()) { note.hidden = false; note.textContent = error.message; } }
+        finally { if (modal.isConnected) all.disabled = false; }
+      });
+    },
   });
 }
 

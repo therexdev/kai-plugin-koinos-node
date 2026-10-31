@@ -1,9 +1,5 @@
-# Koinos Node 0.3.5
+# Koinos Node 0.3.6
 
-Requires **KAI Core 0.7.3 or later**. Update Core before installing this plugin update.
+The Node wallet’s Send tokens dialog now has **Send All**. It reads a fresh balance for the selected KOIN or VHP token and fills the amount without sending it. KOIN uses the amount currently available after mana headroom; VHP retains the full exact balance. Changing tokens clears the amount, and late balance results cannot fill a different wallet or network.
 
-Alerts and confirmation prompts now use Core’s styled dialogs, and wallet/password popups match the app’s typography, colors and close controls. Existing review, cancellation and wallet safeguards remain in place.
-
-This release includes the 0.3.4 Windows startup repair for generated configuration copied from read-only templates. Existing read-only copies are repaired on start; completed chain migration does not need to be repeated. Migrated chain data, wallets, producer keys, funding records and recovery journals stay in place.
-
-Validation covers deferred and cancelled reviews without live account, payment or node operations. Native plugin services still require full computer/application trust; renderer UI remains sandboxed.
+Wallet password verification and native transfer approval remain required. Tests cover exact amounts, stale reads, token and network changes, and the read-only boundary. No live transfers were made during verification.

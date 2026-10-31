@@ -119,3 +119,21 @@ for(const kind of ["descendant directory","leaf symlink","leaf hardlink"])test(`
  if(kind==="descendant directory")assert.throws(()=>full.create(ctx),/unsafe/);else{const service=full.create(ctx,{createEngine:()=>assert.fail("Unsafe storage reached the engine")});try{await assert.rejects(service.call("node.read",{channel:"app:info"}),/unsafe/);}finally{await service.dispose();}}
  assert.deepEqual(fs.readFileSync(original),bytes);
 });
+
+test("Node Send All uses fresh exact balances, respects mana and cannot move funds", async () => {
+ const f=actualEngineFixture();
+ try {
+  await f.service.call("node.read",{channel:"app:info"});
+  const address=f.ctx.core.account.wallet.address, chain=f.services.chain;
+  chain.transfer=()=>{throw Error("Send All must never transfer");};
+  chain.balances=async()=>({koin:"1000000000",vhp:"18446744073709551615",mana:"250000000"});
+  const read=token=>f.service.call("node.read",{channel:"chain:maxSend",payload:{token,expectedAddress:address,expectedNetwork:"mainnet"}});
+  assert.equal((await read("koin")).amount,"1.5");assert.equal((await read("koin")).manaLimited,true);
+  assert.equal((await read("vhp")).amount,"184467440737.09551615");
+  await assert.rejects(read("eth"),/token/);
+  chain.balances=async()=>({koin:"1",vhp:"1",mana:"1",stale:true});await assert.rejects(read("koin"),/fresh/);
+  let done;chain.balances=()=>new Promise(resolve=>done=resolve);const pending=read("koin");
+  await new Promise(resolve=>setImmediate(resolve));f.services.settings.set("network","harbinger");done({koin:"1",vhp:"1",mana:"1"});
+  await assert.rejects(pending,/changed/);
+ } finally {await f.cleanup();}
+});

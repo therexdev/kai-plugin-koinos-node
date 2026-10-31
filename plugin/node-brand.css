@@ -45,3 +45,5 @@ pre.logs{background:#102441;color:#dcecff;border-color:#284362;border-radius:12p
 @media(max-width:600px){.producer-custody .custody-key-row{align-items:stretch;flex-direction:column}.producer-custody .custody-key-row .btn{align-self:flex-start}.producer-custody .custody-actions .btn{flex:1 1 150px}}
 /* Wallet history keeps the original node table and card language. */
 #node-wallet-history{margin-top:20px}#node-wallet-history .table-wrap{overflow-x:auto}#node-wallet-history td:first-child{max-width:330px;overflow-wrap:anywhere}#node-wallet-history .btn.ghost{padding:3px 7px;font-size:11px}.node-notice-close{margin-left:16px;border:0;background:transparent;color:inherit;font-size:20px;cursor:pointer}
+
+.node-send-amount-label{display:flex!important;align-items:center;justify-content:space-between;gap:12px}.node-send-amount-label .btn{padding:5px 11px;font-size:11px;color:var(--accent,#1763ff);background:#edf3ff;border:1px solid #d6e3ff;border-radius:8px;font-weight:600}
