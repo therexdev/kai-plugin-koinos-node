@@ -1,0 +1,72 @@
+name: Teleno Community plugin
+on:
+  push:
+    branches: [main]
+    paths: ['community/teleno/**', '.github/workflows/teleno-community.yml']
+  pull_request:
+    paths: ['community/teleno/**', '.github/workflows/teleno-community.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: teleno-${{ github.ref }}
+  cancel-in-progress: false
+defaults:
+  run:
+    working-directory: community/teleno
+jobs:
+  verify:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: npm ci --ignore-scripts
+      - run: npm run build
+      - run: git diff --exit-code -- plugin
+      - run: npm test
+      - run: node scripts/verify-package.js --source
+      - run: node scripts/assemble-signed-package.js
+      - run: node scripts/verify-package.js
+      - name: Real pinned Linux runtime smoke (offline databases only)
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          curl --fail --location --max-time 120 "$(node -p 'require("./plugin/service/runtime.json").url')" -o "$RUNNER_TEMP/teleno.tar.gz"
+          node -e 'const fs=require("fs"),c=require("crypto"),p=require("./plugin/service/runtime.json");if(c.createHash("sha256").update(fs.readFileSync(process.argv[1])).digest("hex")!==p.archiveSha256)throw Error("Runtime checksum mismatch")' "$RUNNER_TEMP/teleno.tar.gz"
+          tar -xzf "$RUNNER_TEMP/teleno.tar.gz" -C "$RUNNER_TEMP" teleno-node-1.3.0/bin/teleno_node
+          node scripts/native-smoke.js "$RUNNER_TEMP/teleno-node-1.3.0/bin/teleno_node"
+  release:
+    needs: verify
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: node scripts/assemble-signed-package.js
+      - run: node scripts/verify-package.js
+      - name: Publish the independently signed Community package
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          version=$(node -p 'require("./package.json").version')
+          asset="kai-plugin-teleno-node-$version.kaiplugin"
+          if gh release view "v$version" >/dev/null 2>&1; then
+            mkdir -p "$RUNNER_TEMP/teleno-existing"
+            gh release download "v$version" --pattern "$asset" --dir "$RUNNER_TEMP/teleno-existing"
+            cmp "dist/$asset" "$RUNNER_TEMP/teleno-existing/$asset"
+          else
+            gh release create "v$version" "dist/$asset" --target "$GITHUB_SHA" --title "Teleno Koinos Node $version — Community" --notes-file RELEASE_NOTES.md --latest=false
+          fi

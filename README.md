@@ -47,3 +47,7 @@ Pack the complete plugin using Core's `scripts/core/pack-plugin.js`, keeping the
 CI tests source on `foundation-v1`, pull requests and `main` on Windows, macOS and Linux. It checks any signed asset present for the current version. Publication runs only from `main`, only when that exact signed asset exists, and only after every check passes. Existing release assets must match byte-for-byte and are never overwritten. Branch builds cannot publish releases. Native device/integration checks remain necessary before a release; unit tests do not replace them.
 
 The large 0.3.0 signed asset is stored as bounded binary parts with SHA-256/size metadata in `dist/`. Run `node scripts/assemble-signed-package.js` before verifying it locally. CI assembles these exact bytes before signature verification and release; assembly cannot sign or modify the plugin. The released download remains one ordinary `.kaiplugin` file. `.gitattributes` preserves the signed bytes across operating systems.
+
+## Community alternative: Teleno
+
+[Teleno Koinos Node](community/teleno/README.md) is a separate Community plugin with a monolithic runtime, its own encrypted wallet and databases, and native backup controls. Install it independently from the KAI Core catalog. The existing regular Koinos Node package remains independent.

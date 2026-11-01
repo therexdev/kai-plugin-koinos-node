@@ -1,0 +1,16 @@
+{
+  "name": "kai-plugin-teleno-node",
+  "version": "1.0.0",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "build": "node scripts/vendor-dependencies.js"
+  },
+  "dependencies": {
+    "@noble/hashes": "1.8.0",
+    "@noble/secp256k1": "1.7.2",
+    "ethers": "6.17.0",
+    "koilib": "9.4.0"
+  }
+}
