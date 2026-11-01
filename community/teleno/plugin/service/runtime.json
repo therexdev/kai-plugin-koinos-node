@@ -1,0 +1,8 @@
+{
+  "version": "1.3.0",
+  "source": "2c11229267cff2f9ee39ed8e56ab70af391d85ce",
+  "url": "https://github.com/koinos/teleno/releases/download/teleno-node-v1.3.0/teleno-node-1.3.0-linux-amd64.tar.gz",
+  "archiveSha256": "4e22385ebf3eee9e8675a923ad83b735f87b880cfcf94d35aa6dfc6cda53e009",
+  "binarySha256": "9fcb043727b23ab05d9660701a61f369f9413a82ff646f94f2dbf830fb4de53f",
+  "image": "ghcr.io/koinos/teleno@sha256:40d109f526d4e5922e09137fe6244890e3956e7acd6f9cfb92dc2211b1297b5d"
+}

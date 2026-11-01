@@ -1,0 +1,45 @@
+global:
+  log-level: info
+  log-color: false
+  log-datetime: true
+  fork-algorithm: pob
+chain:
+  verify-blocks: true
+p2p:
+  listen: /ip4/0.0.0.0/tcp/8888
+  seed-reconnect-interval-seconds: 60
+  peer-discovery: true
+  target-peer-count: 20
+  max-peer-candidates: 200
+  max-candidate-dials-per-cycle: 3
+  peer-acquisition-interval-seconds: 5
+  candidate-redial-interval-seconds: 60
+  peer-log-interval-seconds: 60
+  peer:
+    - /ip4/46.62.204.73/tcp/8888/p2p/QmPcF1YrxamfKGpyvP6uAZcPxnmK2WUBC4K4N5ZaWky8Sh
+    - /ip4/37.27.7.221/tcp/8888/p2p/QmY8NBHwoVrxBvrjS3wQoeTmWG4UUKMxmYHss7QYRXktrs
+    - /ip4/95.216.68.185/tcp/8888/p2p/QmeTy5SE79ksZruNZ1DJJqR6UCe1oZvWcYaUnn6MuYE8Ea
+    - /ip4/46.62.245.240/tcp/8888/p2p/QmWmxqE6WhcMWZEKwqUAbu87Qgm6JroZLdM4Xmxouu1Mmi
+    - /ip4/94.130.148.114/tcp/8888/p2p/QmQ841mUuYeCtbZXdEMeKcYCx4CZydgz84zSDqWVCeJ4H8
+jsonrpc:
+  listen: 127.0.0.1:8080
+backup:
+  enabled: false
+  public-restore:
+    enabled: true
+    base-url: https://seed.koinosfoundation.org/backups/prodnet/teleno-bootstrap
+    network: mainnet
+    require-https: true
+    timeout-seconds: 30
+    retries: 3
+features:
+  chain: true
+  mempool: true
+  block_store: true
+  p2p: true
+  jsonrpc: true
+  grpc: false
+  block_producer: false
+  contract_meta_store: false
+  transaction_store: false
+  account_history: false

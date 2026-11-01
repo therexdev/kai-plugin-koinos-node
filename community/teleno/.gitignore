@@ -1,0 +1,4 @@
+/node_modules/
+/dist/*.kaiplugin
+!plugin/service/node_modules/
+!plugin/service/node_modules/**

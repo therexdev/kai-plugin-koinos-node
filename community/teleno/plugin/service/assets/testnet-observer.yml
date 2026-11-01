@@ -1,0 +1,35 @@
+global:
+  log-level: info
+  log-color: false
+  log-datetime: true
+  fork-algorithm: pob
+chain:
+  verify-blocks: true
+p2p:
+  listen: /ip4/0.0.0.0/tcp/18888
+  seed-reconnect-interval-seconds: 10
+  peer-log-interval-seconds: 60
+  peer:
+    - /dns4/testnet.koinosfoundation.org/tcp/8888/p2p/QmYV414G6xRzkSUytntEsBsCSjXrVGubfYJn4vpeER2s2W
+jsonrpc:
+  listen: 127.0.0.1:18122
+backup:
+  enabled: false
+  public-restore:
+    enabled: true
+    base-url: https://testnet.koinosfoundation.org/backups/testnet/teleno-bootstrap
+    network: testnet
+    require-https: true
+    timeout-seconds: 30
+    retries: 3
+features:
+  chain: true
+  mempool: true
+  block_store: true
+  p2p: true
+  jsonrpc: true
+  grpc: false
+  block_producer: false
+  contract_meta_store: true
+  transaction_store: false
+  account_history: false
