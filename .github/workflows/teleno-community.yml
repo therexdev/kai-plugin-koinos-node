@@ -33,7 +33,9 @@ jobs:
       - run: npm test
       - run: node scripts/verify-package.js --source
       - run: node scripts/assemble-signed-package.js
-      - run: node scripts/verify-package.js
+      - name: Verify the exact signed release package
+        if: github.event_name != 'pull_request'
+        run: node scripts/verify-package.js
       - name: Real pinned Linux runtime smoke (offline databases only)
         if: runner.os == 'Linux'
         shell: bash

@@ -3,12 +3,18 @@
   "apiVersion": 3,
   "id": "community.teleno-node",
   "name": "Teleno Koinos Node",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Community alternative powered by Teleno 1.3.0: one Koinos-compatible process instead of the legacy service stack. Native Linux x64 or one Docker container on x64 Windows/macOS/Linux. Separate encrypted wallet, observer/producer controls, native backups and logs. No Alpha database import, bridge funding or automatic reward reburning. Upstream ARM/Pi runtime unavailable.",
   "entry": "index.html",
   "runtime": "native",
   "service": "service/index.js",
-  "permissions": ["native.execute", "storage.read", "storage.write", "desktop.windows", "desktop.preferences"],
+  "permissions": [
+    "native.execute",
+    "storage.read",
+    "storage.write",
+    "desktop.windows",
+    "desktop.preferences"
+  ],
   "provides": [],
   "consumes": []
 }
