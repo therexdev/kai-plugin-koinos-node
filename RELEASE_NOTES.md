@@ -1,10 +1,11 @@
-# 0.3.9 — selected node profile migration (unreleased)
+# KAI Koinos Node 0.3.9 — preserve your existing producer setup
 
 - Review and select chain data, producer/custody settings, the existing production signing key and an optional encrypted wallet.
 - Preserve the producer identity and external custody; keep the cold spending key on its secure device. Existing destination wallets/keys are protected.
-- New transfers retain source chain files and keep production and automatic financial actions off for verification. Interrupted earlier transfers retain their recorded resume behavior.
+- New transfers retain source chain files and leave production off for verification. Importing producer settings, a signing key or a wallet also disables automatic recovery and reward returns; chain-only imports preserve existing destination settings. Interrupted earlier transfers retain their recorded resume behavior.
 - Reconnect external signers after migration. Pending signing requests, funding journals and general Alpha accounts are excluded.
-- Includes migration dialog translations and regression coverage. Requires a new verified publisher-signed package before installation; no release asset is included in this source change.
+- Includes migration dialog translations and regression coverage for changed sources, existing wallets/keys, interrupted copies and recovery.
+- Production stays off after import. Verify the producer address and existing on-chain signing-key registration, then start sync-only before enabling production.
 
 # KAI Koinos Node 0.3.8
 

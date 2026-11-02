@@ -1,6 +1,6 @@
 # Preserve an existing Alpha node
 
-This guide describes the expanded migration in this source branch. It is not available in an installed plugin until a new signed plugin package is published. Older plugin versions offer **chain data only**; do not use that option expecting it to preserve the producer setup.
+These options are included in **KAI Koinos Node 0.3.9**. Update the regular Node plugin before following this guide. Older plugin versions offer **chain data only**; do not use that option expecting it to preserve the producer setup.
 
 ## Before the handoff
 
@@ -20,6 +20,8 @@ Open **KAI Koinos Node → Dashboard or Node → Migrate node to this plugin**. 
 | Producer settings | The existing producer custody mode/address and the custom RPC for the selected network. Automatic recovery and reward returns remain disabled. |
 | Existing production signing key | The existing hot block-production key pair, validated for consistency. No replacement key is generated. |
 | Encrypted wallet | An explicit copy of the compatible Alpha wallet into the plugin's separate wallet storage, keeping its address and password. Existing destination wallets are not overwritten. |
+
+Importing producer settings, a signing key or a wallet disables automatic recovery and reward returns for verification. A chain-only import preserves the destination's existing automation settings; review them separately. Every import leaves node production stopped.
 
 For a local-wallet producer, the destination wallet must match the source producer. Import the matching encrypted wallet when needed; a different wallet cannot silently become the producer. For external/cold custody, the external spending key stays on its existing secure device. The node imports its watch-only producer address and existing hot production key. Reconnect Koin Vault or another external signer afterward; pairing sessions and pending signing requests are not migrated.
 

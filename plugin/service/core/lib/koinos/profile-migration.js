@@ -198,7 +198,9 @@ function createProfileMigration({ manager, journalRoot = path.join(manager.dataR
     const profile = profileImport.inspect({source,network,manager,context:manager.profileContext,selection:selected,profiles:dependencies.profileRoots});
     const value = { available: true, previewId: crypto.randomUUID(), network, source, destination: { root: path.resolve(destination.root), basedir: path.resolve(destination.basedir) }, bytes: info.bytes, files: info.files, mode: "copy", options:selected, components:profile.components, producer:profile.producer, profileReview:profile.plan, resumable: false,
       detail: "Close the old KAI application, including its tray process. Migration stops and removes only its verified Node containers. Original chain, settings, wallet and key files are retained; keep the old app closed after migration.",
-      walletNotice: "KOIN and VHP remain at the same on-chain addresses. Production and automatic rewards stay off. External signing devices must reconnect; pending transactions and session credentials are not imported.",
+      walletNotice: selected.settings || selected.signingKey || selected.wallet
+        ? "KOIN and VHP remain at the same on-chain addresses. Production and automatic rewards stay off. External signing devices must reconnect; pending transactions and session credentials are not imported."
+        : "KOIN and VHP remain at the same on-chain addresses. Node production stays off. This chain-only copy keeps this plugin's existing reward and recovery settings. Wallets, signing keys and custody settings are not imported.",
       containers: owned.map(row => ({ id: row.id, service: row.service, root: row.root, image: row.image })).sort((a, b) => a.id.localeCompare(b.id)) };
     try { profileImport.validate(value,manager.profileContext); } catch(error) { value.available=false;value.selectionError=error.message; }
     return value;
