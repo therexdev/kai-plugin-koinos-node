@@ -1,4 +1,10 @@
-# Koinos Node 0.3.6
+# Koinos Node 0.3.7
+
+Follows the language saved in Core Settings, including changes to open views. Supports English, Spanish, Brazilian Portuguese, French and German with offline catalogs. Core owns the first-run choice; plugin content and identifiers stay literal. Requires Core 0.7.17 or newer.
+
+## Previous release
+
+Koinos Node 0.3.6
 
 The Node wallet’s Send tokens dialog now has **Send All**. It reads a fresh balance for the selected KOIN or VHP token and fills the amount without sending it. KOIN uses the amount currently available after mana headroom; VHP retains the full exact balance. Changing tokens clears the amount, and late balance results cannot fill a different wallet or network.
 

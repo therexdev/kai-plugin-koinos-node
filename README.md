@@ -51,3 +51,7 @@ The large 0.3.0 signed asset is stored as bounded binary parts with SHA-256/size
 ## Community alternative: Teleno
 
 [Teleno Koinos Node](community/teleno/README.md) is a separate Community plugin with a monolithic runtime, its own encrypted wallet and databases, and native backup controls. Install it independently from the KAI Core catalog. The existing regular Koinos Node package remains independent.
+
+## Interface language
+
+This plugin follows the language saved in KAI Core Settings and applies changes to open views. English, Spanish, Brazilian Portuguese, French and German are supported through bundled offline catalogs. User content and identifiers stay literal. These source changes require Core 0.7.17+ for the live locale API; release the Core update before publishing a new signed plugin package and catalog entry. See the [public localization API](https://github.com/therexdev/kai-core/blob/main/docs/foundation/PLUGIN_AUTHOR_GUIDE.md#shared-language-and-localization-core-0717).

@@ -12,7 +12,7 @@ async function main(){
       const dry=JSON.parse(await r.command(r.binary,["--basedir",r.basedir(s),"--config",path.join(r.basedir(s),"config.yml"),"--backup-dry-run","--backup-json"]));assert.equal(dry.issues.some(i=>i.severity==="error"),false);
       for(let restart=0;restart<2;restart++){
         r.launch(s,["--disable","block_producer","grpc","p2p"],"observer");let answer;
-        for(let i=0;i<50;i++){await new Promise(resolve=>setTimeout(resolve,100));if(!r.child)throw Error(r.lastError);try{const response=await fetch(`http://127.0.0.1:${port}`,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({jsonrpc:"2.0",id:1,method:"chain.get_chain_id",params:{}})});answer=await response.json();if(answer.result)break;}catch{}}
+        for(let i=0;i<50;i++){await new Promise(resolve=>setTimeout(resolve,100));if(!r.child)throw Error(r.lastError);try{const response=await fetch(`http://127.0.0.1:${port}`,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({jsonrpc:"2.0",id:1,method:"chain.get_chain_id",params:{}})});answer=await response.json();if(answer.result && /teleno_node ready/.test(r.logs(s)))break;}catch{}}
         assert.equal(answer?.result?.chain_id,id);assert.match(r.logs(s),/teleno_node ready/);await r.stop(s);assert.equal(r.child,null);
       }
       await r.backup(s,"list");await r.completion;assert.equal(r.job.state,"complete");
