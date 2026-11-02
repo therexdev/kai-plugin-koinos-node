@@ -1,3 +1,11 @@
+# 0.3.9 — selected node profile migration (unreleased)
+
+- Review and select chain data, producer/custody settings, the existing production signing key and an optional encrypted wallet.
+- Preserve the producer identity and external custody; keep the cold spending key on its secure device. Existing destination wallets/keys are protected.
+- New transfers retain source chain files and keep production and automatic financial actions off for verification. Interrupted earlier transfers retain their recorded resume behavior.
+- Reconnect external signers after migration. Pending signing requests, funding journals and general Alpha accounts are excluded.
+- Includes migration dialog translations and regression coverage. Requires a new verified publisher-signed package before installation; no release asset is included in this source change.
+
 # KAI Koinos Node 0.3.8
 
 Completes translation coverage for menus, forms, dialogs, tooltips and changing status text in English, Spanish, Brazilian Portuguese, French and German. Open views follow the language saved in Core Settings, including labels created after the view loads. Drafts, names, code and other user content remain intact.

@@ -15,7 +15,9 @@ The seven sections remain: Dashboard, Wallet, Fund node, Burn KOIN → VHP, Node
 
 ## Wallet and storage
 
-**The Node wallet belongs to this plugin and is separate from Core's wallet.** Version 0.3 starts with fresh plugin storage. It does not copy old wallets, connected accounts, funding journals or databases. Old application data is left untouched. An existing wallet may be imported deliberately using its private-key backup; verify the address and chain before sending funds.
+**The Node wallet belongs to this plugin and is separate from Core's wallet.** The plugin starts with fresh storage. The explicitly reviewed node migration can copy selected chain data, supported producer settings, the existing hot production key and an optional encrypted Alpha wallet without replacing an existing destination wallet or key. External spending keys, connected accounts, pending signing requests and funding journals are not imported. An existing wallet can also be imported deliberately using its private-key backup; verify the address and chain before sending funds.
+
+See [Preserve an existing Alpha node](docs/NODE_PROFILE_MIGRATION.md) for the migration choices, external signing handoff and verification steps. These expanded choices require a newly signed plugin release; older versions offer chain-only transfer.
 
 The wallet is encrypted with scrypt and AES-256-GCM. Sends and funding retain password proof and native confirmation. Private-key backup is shown in a native dialog rather than returned to the sandboxed renderer. A plugin-local spend lock serializes Node financial actions. Cancellation and identity checks run before asynchronous signing and broadcast.
 
