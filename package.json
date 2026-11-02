@@ -1,11 +1,12 @@
 {
   "name": "kai-plugin-koinos-node",
-  "version": "0.3.7",
+  "version": "0.3.8",
   "private": true,
   "license": "MIT",
   "scripts": {
     "test": "node --test test/*.test.js",
-    "build": "node scripts/vendor-dependencies.js"
+    "build": "node scripts/vendor-dependencies.js",
+    "build:locales": "node scripts/build-locales.js"
   },
   "dependencies": {
     "@noble/hashes": "1.8.0",
