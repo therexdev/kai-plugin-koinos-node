@@ -812,6 +812,23 @@ class NodeManager {
       //    location become the real one.
       m.phase = "switching";
       emit();
+      // The folder picker selects an existing directory. Windows cannot
+      // rename the verified copy over it, even when it is empty. Recheck at
+      // publication time: another process may have changed it during copying.
+      const destination = await fsp.lstat(target).catch(error => {
+        if (error.code === "ENOENT") return null;
+        throw error;
+      });
+      if (destination) {
+        if (!destination.isDirectory() || destination.isSymbolicLink()) {
+          throw new Error("The destination must still be a real directory. Original data was preserved.");
+        }
+        if ((await fsp.readdir(target)).length) {
+          throw new Error("The destination is no longer empty. Original data and destination contents were preserved.");
+        }
+        // Never recursive: if a file appears after readdir, rmdir must fail.
+        await fsp.rmdir(target);
+      }
       await fsp.rename(temp, target);
       this.dataRoot = target;
       if (typeof onSwitched === "function") await onSwitched(target);

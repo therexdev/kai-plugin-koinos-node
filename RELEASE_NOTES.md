@@ -1,3 +1,10 @@
+# KAI Koinos Node 0.3.10 — Windows data folder moves
+
+- Fixes `EPERM` when moving chain data into an existing empty folder selected by the Windows folder picker.
+- After copy and checksum verification, rechecks the destination and removes only the empty directory before completing the move. Newly added files and directory links are rejected; removal is never recursive.
+- If the final switch fails, the original chain data and saved location are retained. Retry the move from the plugin after updating; choose the intended destination folder itself, such as `D:\Koinosnode2`.
+- Adds regression coverage for Windows rename behavior, changed destinations, directory links, locked folders and retry after a failed rename.
+
 # KAI Koinos Node 0.3.9 — preserve your existing producer setup
 
 - Review and select chain data, producer/custody settings, the existing production signing key and an optional encrypted wallet.
