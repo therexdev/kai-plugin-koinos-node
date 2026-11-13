@@ -25,8 +25,12 @@ function create(api,deps={}) {
   const wallet=deps.wallet||new WalletService(walletDir),electron=deps.electron||require("electron");
   const store=new GuardedStore(path.join(root,"settings.json")),journal=new GuardedStore(path.join(root,"transactions.json"));
   const lifetime=new AbortController();
-  let options=validateSettings(store.get("options",{}),deps.platform||process.platform),closed=false,tail=Promise.resolve(),pending=new Set(),observer=null,disposeTask=null;
-  const runtime=deps.runtime||new Runtime(root),chain=deps.chain||new ChainService({get:(key,fallback)=>key==="network"?options.network:fallback});
+  const savedOptions=store.get("options",{}),hostPlatform=deps.platform||process.platform;
+  // Older installs could create a key/database without saving Settings. Keep
+  // that profile on its old runtime until the explicit preserving switch.
+  if(hostPlatform==="win32"&&!savedOptions.runtime&&fs.existsSync(path.join(root,"chains")))savedOptions.runtime="docker";
+  let options=validateSettings(savedOptions,hostPlatform),closed=false,tail=Promise.resolve(),pending=new Set(),observer=null,disposeTask=null;
+  const runtime=deps.runtime||new Runtime(root,{platform:deps.platform||process.platform}),chain=deps.chain||new ChainService({get:(key,fallback)=>key==="network"?options.network:fallback});
   const local=()=>createProvider([`http://127.0.0.1:${options.rpcPort}`],{timeoutMs:6000});
   // Testnet wallet traffic must use this plugin's port, never the regular node.
   const baseUrls=chain.rpcUrls.bind(chain);chain.rpcUrls=()=>options.network==="harbinger"?[`http://127.0.0.1:${options.rpcPort}`]:baseUrls();
@@ -71,6 +75,10 @@ function create(api,deps={}) {
     });}finally{spending=false;spendChain=null;}
   }
   function producerKey(createKey) {
+    if(runtime.storageReady&&!runtime.storageReady(options)) {
+      if(createKey)throw Error("Install the native Teleno runtime from Overview before creating its block-signing key.");
+      return {exists:false,publicKey:null};
+    }
     const file=path.join(runtime.basedir(options),"block_producer/private.key");safe(file,true,1024);
     if(!fs.existsSync(file)) {
       if(!createKey)return {exists:false,publicKey:null};
@@ -139,7 +147,14 @@ function create(api,deps={}) {
     if(method==="wallet.burn"){amount(input.amount);return money(method,input,signal);}
     if(method==="producer.register"){if(!producerKey(false).exists)throw Error("Create a block-signing key first.");return money(method,input,signal);}
     if(method==="producer.key") {runtime.idle();await confirm("Create Teleno block-signing key","Create a separate hot key used only to sign blocks. It is stored in this plugin's node folder with restricted file permissions. Your spending wallet stays encrypted.",signal);return producerKey(true);}
-    if(method==="runtime.install"){runtime.idle();await confirm("Install Teleno 1.3.0",options.runtime==="docker"?"Download the checksum-pinned Teleno Docker image. Docker must already be running.":"Download and verify the upstream Linux x64 executable. This starts no node and spends no funds.",signal);return runtime.install(options,signal);}
+    if(method==="runtime.setupWsl") {await confirm("Set up WSL2 for Teleno",`Install ${options.wslDistro} through Windows Subsystem for Linux. Windows may request administrator approval and a restart. Finish the Ubuntu user setup in the terminal. This does not install Docker or start a node.`,signal);return runtime.setupWsl(options,signal);}
+    if(method==="runtime.useWsl") {
+      runtime.idle({allowMigration:true});clearPending();const next=validateSettings({...options,runtime:"wsl",autoStart:false},deps.platform||process.platform);
+      await confirm("Switch Teleno to Docker-free Windows runtime",`Use ${next.wslDistro} under WSL2 with the complete upstream Teleno 1.3.0 executable. Copy this plugin's existing chain data and block-signing keys into the Linux filesystem, keeping the original files. The encrypted wallet stays in this plugin. The node will remain stopped; start an observer after the copy.`,signal);
+      await runtime.switchToWsl(options,next,signal);active(signal);store.set("options",next);options=next;runtime.finishWslSwitch();chain.clearCache();observer=null;
+      return {note:"Native WSL2 runtime is ready. Original data was preserved. Choose Start observer to sync; production stays off."};
+    }
+    if(method==="runtime.install"){runtime.idle();await confirm("Install Teleno 1.3.0",options.runtime==="docker"?"Download the checksum-pinned Teleno Docker image. Docker must already be running.":`Download and verify the full upstream Linux x64 executable.${options.runtime==="wsl"?` Run it in ${options.wslDistro} under WSL2, without Docker. Node data stays in the Linux filesystem.`:""} This starts no node and spends no funds.`,signal);return runtime.install(options,signal);}
     if(method==="node.start"){await confirm("Start Teleno observer",`${options.network.toUpperCase()}\nStart an observer in ${runtime.basedir(options)}. JSON-RPC stays on localhost. P2P listens on port ${options.p2pPort}. Block production remains off.`,signal);observer=null;await runtime.start(options,{signal});return runtime.snapshot(options);}
     if(method==="node.stop"){await runtime.stop(options);observer=null;return runtime.snapshot(options);}
     if(method==="producer.start") {
@@ -156,17 +171,20 @@ function create(api,deps={}) {
     }
     if(method==="settings.save") {
       runtime.idle();clearPending();const next=validateSettings(input,deps.platform||process.platform);
-      await confirm("Save Teleno settings",`Network: ${next.network}\nRuntime: ${next.runtime}\nRPC: localhost:${next.rpcPort}\nP2P: ${next.p2pPort}\nStart observer with KAI: ${next.autoStart?"yes":"no"}\nSettings never enable block production.`,signal);
+      if(options.runtime!=="wsl"&&next.runtime==="wsl")throw Error("Use Switch to Docker-free runtime on Overview to preserve existing node data and keys.");
+      if(options.runtime==="wsl"&&next.runtime!=="wsl")throw Error("This profile uses WSL2 storage. Keep WSL2 selected to preserve its current node data and producer key.");
+      if(options.runtime==="wsl"&&runtime.wsl?.meta&&next.wslDistro!==options.wslDistro)throw Error("Keep the WSL distribution containing this plugin's node data selected.");
+      await confirm("Save Teleno settings",`Network: ${next.network}\nRuntime: ${next.runtime}\nRPC: localhost:${next.rpcPort}\nP2P: ${next.p2pPort}\ngRPC: ${next.grpc?"localhost:"+next.grpcPort:"disabled"}\nStart observer with KAI: ${next.autoStart?"yes":"no"}\nSettings never enable block production.`,signal);
       store.set("options",next);options=next;chain.clearCache();observer=null;return {...options};
     }
     if(method==="backup.run") {
-      runtime.idle();if(!["create","list","preflight","restore","bootstrap"].includes(input.action))throw Error("Unknown backup action.");
+      runtime.idle();if(!["validate","create","list","preflight","restore","bootstrap","public-list","public-fetch"].includes(input.action))throw Error("Unknown backup action.");
       await confirm("Teleno backup operation",`${options.network.toUpperCase()}\n${input.action} · ${input.id||"latest"}\nFolder: ${runtime.basedir(options)}\nRestores preserve previous data under .pre-restore and require observer validation. Chain backups exclude wallet and signing keys.`,signal);
       observer=null;return runtime.backup(options,input.action,input.id,signal);
     }
     if(method==="util.copy"){if(typeof input.text!=="string"||input.text.length>100000)throw Error("Invalid clipboard text.");electron.clipboard.writeText(input.text);return true;}
     if(method==="util.open") {
-      const urls={upstream:"https://github.com/koinos/teleno",release:"https://github.com/koinos/teleno/releases/tag/teleno-node-v1.3.0",docker:"https://docs.docker.com/get-started/get-docker/"};
+      const urls={upstream:"https://github.com/koinos/teleno",release:"https://github.com/koinos/teleno/releases/tag/teleno-node-v1.3.0",docker:"https://docs.docker.com/get-started/get-docker/",wsl:"https://learn.microsoft.com/en-us/windows/wsl/install",manual:"https://github.com/koinos/teleno/blob/main/docs/README.md"};
       if(!urls[input.page])throw Error("Unknown help page.");await confirm("Open help",urls[input.page],signal);await electron.shell.openExternal(urls[input.page]);return true;
     }
     throw Error("Unknown Teleno method.");

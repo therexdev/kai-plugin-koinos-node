@@ -44,8 +44,37 @@ jobs:
           node -e 'const fs=require("fs"),c=require("crypto"),p=require("./plugin/service/runtime.json");if(c.createHash("sha256").update(fs.readFileSync(process.argv[1])).digest("hex")!==p.archiveSha256)throw Error("Runtime checksum mismatch")' "$RUNNER_TEMP/teleno.tar.gz"
           tar -xzf "$RUNNER_TEMP/teleno.tar.gz" -C "$RUNNER_TEMP" teleno-node-1.3.0/bin/teleno_node
           node scripts/native-smoke.js "$RUNNER_TEMP/teleno-node-1.3.0/bin/teleno_node"
+          node scripts/wsl-smoke.js "$RUNNER_TEMP/teleno-node-1.3.0/bin/teleno_node" --local-transport --archive "$RUNNER_TEMP/teleno.tar.gz"
+  windows-wsl:
+    runs-on: windows-2025
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Prepare Ubuntu 24.04 under WSL2
+        shell: pwsh
+        run: |
+          wsl --version
+          wsl --install --distribution Ubuntu-24.04 --no-launch
+          if ($LASTEXITCODE -ne 0) { throw "WSL installation failed on the Windows runner." }
+          wsl --list --verbose
+          wsl --distribution Ubuntu-24.04 --exec uname -m
+          if ($LASTEXITCODE -ne 0) { throw "The Windows runner cannot start WSL2. Actual Windows qualification is still required." }
+      - name: Real pinned Windows WSL2 runtime smoke (offline databases only)
+        shell: pwsh
+        run: |
+          $pin = Get-Content plugin/service/runtime.json | ConvertFrom-Json
+          $archive = Join-Path $env:RUNNER_TEMP "teleno.tar.gz"
+          Invoke-WebRequest -Uri $pin.url -OutFile $archive
+          if ((Get-FileHash $archive -Algorithm SHA256).Hash.ToLower() -ne $pin.archiveSha256) { throw "Runtime checksum mismatch" }
+          tar -xzf $archive -C $env:RUNNER_TEMP teleno-node-1.3.0/bin/teleno_node
+          if ($LASTEXITCODE -ne 0) { throw "Native archive extraction failed" }
+          node scripts/wsl-smoke.js (Join-Path $env:RUNNER_TEMP "teleno-node-1.3.0/bin/teleno_node") --archive $archive
+          if ($LASTEXITCODE -ne 0) { throw "Windows WSL2 runtime qualification failed" }
   release:
-    needs: verify
+    needs: [verify, windows-wsl]
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 10

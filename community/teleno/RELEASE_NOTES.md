@@ -1,3 +1,33 @@
+# Teleno Koinos Node 1.1.0 — Docker-free Windows runtime
+
+Windows now runs the complete, unchanged upstream Teleno 1.3.0 executable through
+WSL2 / Ubuntu 24.04. Docker is not needed for new Windows profiles. Overview
+includes WSL setup, runtime verification and a preserving switch for old Docker
+profiles. Linux continues to run natively; optional Docker support remains.
+
+Node data and producer keys live in the Linux filesystem. A resumable verified
+copy preserves existing Teleno files and the separate encrypted wallet. Process
+ownership checks, Linux filesystem locking and recovery records handle launcher
+crashes and immediate cancellation without shutting down WSL or unrelated nodes.
+Switching and restoring leave production off until the observer validation gate
+and explicit producer review succeed.
+
+Adds optional localhost gRPC, backup configuration validation, public snapshot
+listing and download. Public restore now honors the selected snapshot ID.
+
+Validation: 31 plugin tests and package-source verification on Windows, Linux
+and macOS; actual Linux native smoke; and the exact upstream executable on
+Windows Server 2025 / Ubuntu 24.04 WSL2. Both networks passed installation,
+preserving data copy, JSON-RPC, HTTP/2 gRPC health checks, reopen, ownership,
+cancellation and backup checks. A Linux transport simulation additionally
+verifies launcher-crash recovery. [Windows evidence](https://github.com/therexdev/kai-plugin-koinos-node/actions/runs/43452980942/job/131979740683).
+Update the independent Teleno Community plugin to 1.1.0, then use **Switch to
+Docker-free runtime** for an existing Windows Docker profile. A Core update is
+not required. Finish Ubuntu setup and any requested Windows restart first.
+No live wallet, burn, registration, transfer or funded production was tested.
+
+## Previous release
+
 # Teleno Koinos Node 1.0.1 — Community
 
 Follows the language saved in Core Settings, including changes to open views. Supports English, Spanish, Brazilian Portuguese, French and German with offline catalogs. Core owns the first-run choice; plugin content and identifiers stay literal. Requires Core 0.7.17 or newer.
