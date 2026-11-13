@@ -1,0 +1,172 @@
+"""Own one native Teleno child inside WSL; never terminate the distribution.
+
+Executed by python3, which is included in Ubuntu 24.04. A Linux flock outlives
+the Windows launcher and protects the database even if KAI exits unexpectedly.
+"""
+import argparse
+import fcntl
+import json
+import os
+from pathlib import Path
+import re
+import signal
+import subprocess
+import sys
+import tempfile
+import time
+
+
+def proc(pid):
+    try:
+        base = Path('/proc') / str(pid)
+        stat = (base / 'stat').read_text().rsplit(')', 1)[1].split()
+        if stat[0] == 'Z':
+            return None
+        return {
+            'start': stat[19],
+            'exe': os.readlink(base / 'exe'),
+            'args': (base / 'cmdline').read_bytes().decode().rstrip('\0').split('\0'),
+        }
+    except FileNotFoundError:
+        return None
+
+
+def atomic(file, value):
+    fd, name = tempfile.mkstemp(prefix=file.name + '.', dir=file.parent)
+    try:
+        with os.fdopen(fd, 'w', encoding='utf8') as stream:
+            json.dump(value, stream)
+            stream.flush()
+            os.fsync(stream.fileno())
+        os.replace(name, file)
+    finally:
+        Path(name).unlink(missing_ok=True)
+
+
+def checked_record(file, args):
+    if file.is_symlink():
+        raise RuntimeError('Unsafe WSL process record; data preserved.')
+    if not file.exists():
+        return None
+    record = json.loads(file.read_text())
+    if record.get('owner') != args.owner or record.get('token') != args.token:
+        raise RuntimeError('WSL process ownership changed; no process was stopped.')
+    expected_base = str(Path(args.root) / 'chains' / record.get('network', ''))
+    if record.get('network') not in ('mainnet', 'harbinger') or record.get('basedir') != expected_base:
+        raise RuntimeError('Invalid WSL process directory; data preserved.')
+    current = proc(record['pid'])
+    if current:
+        expected_binary = str(Path(args.root) / 'runtime' / 'teleno_node')
+        argv = current['args']
+        if (current['start'] != record.get('start') or current['exe'] != expected_binary
+                or '--basedir' not in argv or argv[argv.index('--basedir') + 1] != expected_base):
+            raise RuntimeError('WSL process identity changed; no unrelated process was stopped.')
+    return record if current else None
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('action', choices=['run', 'stop', 'idle'])
+    parser.add_argument('--root', required=True)
+    parser.add_argument('--owner', required=True)
+    parser.add_argument('--token', default='')
+    parser.add_argument('--network', choices=['mainnet', 'harbinger'])
+    args, extra = parser.parse_known_args()
+    if args.token and not re.fullmatch(r'[a-f0-9-]{36}', args.token):
+        raise RuntimeError('Invalid process token.')
+    root = Path(args.root)
+    if not root.is_absolute() or root.is_symlink() or root.name != args.owner:
+        raise RuntimeError('Invalid WSL runtime root.')
+    os.umask(0o077)
+    record_file = root / 'native-process.json'
+    lock_file = root / 'native-process.lock'
+    cancel_file = root / ('cancel-' + args.token)
+    if lock_file.is_symlink():
+        raise RuntimeError('Unsafe WSL process lock.')
+    with open(lock_file, 'a') as lock:
+        if args.action == 'stop':
+            # Handles Stop immediately after Windows starts wsl.exe, before
+            # the Linux runner has acquired its lock or published a child PID.
+            if args.token:
+                fd = os.open(cancel_file, os.O_CREAT | os.O_WRONLY | os.O_NOFOLLOW, 0o600)
+                os.close(fd)
+            deadline = time.monotonic() + 45
+            signalled = None
+            while True:
+                record = checked_record(record_file, args)
+                if record and signalled != record['pid']:
+                    os.kill(record['pid'], signal.SIGTERM)
+                    signalled = record['pid']
+                try:
+                    fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+                    break
+                except BlockingIOError:
+                    if time.monotonic() >= deadline:
+                        raise RuntimeError('Teleno is still stopping. Its data was preserved.')
+                    time.sleep(0.1)
+            # Child holds this lock too, so acquiring it proves no owned child
+            # can still be writing, even if the runner was interrupted.
+            record_file.unlink(missing_ok=True)
+            if signalled:
+                cancel_file.unlink(missing_ok=True)
+            print('Teleno stopped; database preserved.')
+            return
+        try:
+            fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except BlockingIOError:
+            raise RuntimeError('Teleno is already using this WSL data directory. Stop it first.')
+        if record_file.exists():
+            raise RuntimeError('Previous WSL process needs recovery. Use Stop node first.')
+        if args.action == 'idle':
+            return
+        if cancel_file.exists():
+            cancel_file.unlink()
+            return
+        if not args.network or not args.token or (extra and extra[0] != '--'):
+            raise RuntimeError('Invalid native launch arguments.')
+        binary = root / 'runtime' / 'teleno_node'
+        basedir = root / 'chains' / args.network
+        command = [str(binary), '--basedir', str(basedir), '--config', str(basedir / 'config.yml'), *extra[1:]]
+        child = None
+        stopping = False
+
+        def stop(_signum, _frame):
+            nonlocal stopping
+            stopping = True
+            if child and child.poll() is None:
+                child.terminate()
+
+        signal.signal(signal.SIGTERM, stop)
+        signal.signal(signal.SIGINT, stop)
+        signal.signal(signal.SIGHUP, stop)
+        try:
+            child = subprocess.Popen(command, pass_fds=(lock.fileno(),))
+            info = proc(child.pid)
+            if info:
+                atomic(record_file, dict(pid=child.pid, start=info['start'], owner=args.owner,
+                                        token=args.token, network=args.network, basedir=str(basedir)))
+            if stopping or cancel_file.exists():
+                child.terminate()
+            code = child.wait()
+            record_file.unlink(missing_ok=True)
+            cancel_file.unlink(missing_ok=True)
+            sys.exit(code if code >= 0 else 128 - code)
+        except BaseException:
+            if child and child.poll() is None:
+                child.terminate()
+                try:
+                    child.wait(timeout=45)
+                except subprocess.TimeoutExpired:
+                    # Keep its identity and inherited lock for explicit recovery.
+                    raise RuntimeError('Native child is still stopping; recovery record retained.')
+            if child and child.poll() is not None:
+                record_file.unlink(missing_ok=True)
+            raise
+
+
+if __name__ == '__main__':
+    try:
+        main()
+    except Exception as error:
+        print(str(error), file=sys.stderr)
+        sys.exit(1)

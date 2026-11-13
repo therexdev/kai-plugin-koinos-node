@@ -1,12 +1,15 @@
 "use strict";
 const fs = require("node:fs"), path = require("node:path");
-const DEFAULTS = Object.freeze({network:"mainnet",runtime:"native",rpcPort:18085,p2pPort:18890,logLevel:"info",history:true,autoStart:false});
+const {DEFAULT_DISTRO,validDistro}=require("./wsl");
+const DEFAULTS = Object.freeze({network:"mainnet",runtime:"native",wslDistro:DEFAULT_DISTRO,rpcPort:18085,p2pPort:18890,grpc:false,grpcPort:18086,logLevel:"info",history:true,autoStart:false});
 function settings(input, platform = process.platform) {
-  const value = {...DEFAULTS, runtime:platform === "linux" ? "native" : "docker", ...input};
-  if (Object.keys(value).some(k => !Object.hasOwn(DEFAULTS,k)) || !["mainnet","harbinger"].includes(value.network) || !["native","docker"].includes(value.runtime) || !["info","debug","warn","error"].includes(value.logLevel)) throw Error("Invalid Teleno settings.");
-  if (![value.rpcPort,value.p2pPort].every(p => Number.isInteger(p) && p >= 1024 && p <= 65535) || value.rpcPort === value.p2pPort) throw Error("Use different RPC and P2P ports between 1024 and 65535.");
-  if (typeof value.history !== "boolean" || typeof value.autoStart !== "boolean") throw Error("Invalid Teleno option.");
-  if (value.runtime === "native" && platform !== "linux") throw Error("The published native runtime requires Linux x64. Select Docker on Windows or macOS.");
+  const value = {...DEFAULTS, runtime:platform === "linux" ? "native" : platform === "win32" ? "wsl" : "docker", ...input};
+  if (Object.keys(value).some(k => !Object.hasOwn(DEFAULTS,k)) || !["mainnet","harbinger"].includes(value.network) || !["native","wsl","docker"].includes(value.runtime) || !["info","debug","warn","error"].includes(value.logLevel) || !validDistro(value.wslDistro)) throw Error("Invalid Teleno settings.");
+  const ports=[value.rpcPort,value.p2pPort,...(value.grpc?[value.grpcPort]:[])];
+  if (![...ports,value.grpcPort].every(p => Number.isInteger(p) && p >= 1024 && p <= 65535) || new Set(ports).size!==ports.length) throw Error("Use different RPC, gRPC and P2P ports between 1024 and 65535.");
+  if ([value.history,value.autoStart,value.grpc].some(v=>typeof v!=="boolean")) throw Error("Invalid Teleno option.");
+  if (value.runtime === "wsl" && platform !== "win32") throw Error("WSL2 runtime is for Windows. Select native on Linux.");
+  if (value.runtime === "native" && platform !== "linux") throw Error("The native executable requires Linux x64. Select WSL2 on Windows; Intel macOS can use the optional Docker runtime.");
   return value;
 }
 function generate(options, basedir, producer = null) {
@@ -20,6 +23,7 @@ function generate(options, basedir, producer = null) {
     .replace(/  contract_meta_store: (?:true|false)/,"  contract_meta_store: true")
     .replace(/  transaction_store: false/,"  transaction_store: " + options.history)
     .replace(/  account_history: false/,"  account_history: " + options.history);
+  if(options.grpc)text=text.replace(/  grpc: false/,"  grpc: true")+`\ngrpc:\n  listen: ${options.runtime==="docker"?"0.0.0.0":"127.0.0.1"}:${options.grpcPort}\n`;
   // Only the explicit producer-start path supplies this argument. All ordinary
   // starts, backup commands and restores regenerate an observer configuration.
   if (producer) {

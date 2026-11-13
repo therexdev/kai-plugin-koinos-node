@@ -6,7 +6,7 @@ function fixture(t,{approve=true,runtime,chain}={}) {
   const signal=new AbortController(),reviews=[];
   const api={version:1,plugin:{id:"community.teleno-node",version:"1.0.0",dataDir:path.join(root,"community.teleno-node")},signal:signal.signal,
     desktop:{confirm:async(title,detail)=>{reviews.push({title,detail});return approve;},hostWindowId:()=>1}};
-  const service=create(api,{electron:{clipboard:{writeText(){}},dialog:{showMessageBox:async()=>({response:0})},BrowserWindow:{fromId:()=>({})}},runtime,chain});
+  const service=create(api,{platform:"linux",electron:{clipboard:{writeText(){}},dialog:{showMessageBox:async()=>({response:0})},BrowserWindow:{fromId:()=>({})}},runtime,chain});
   t.after(async()=>{signal.abort();await service.dispose();});return {root,api,service,reviews,signal};
 }
 const MAINNET="EiBZK_GGVP0H_fXVAM3j6EAuz3-B-l3ejxRSewi7qIBfSA==";
