@@ -1,3 +1,33 @@
+# Teleno Koinos Node 1.1.3 — Complete setup and transaction confirmation
+
+Overview now guides the full path from WSL2/runtime installation through a
+separate wallet, offline wallet backup, block-signing key, observer sync,
+funding/VHP, key registration and explicitly enabled production. The next step
+is highlighted; completed steps collapse. Observer-only instructions skip the
+wallet and production steps. Wallet and key creation come before startup, with
+a Stop action for profiles that already have an observer running.
+
+Backup completion requires an explicit Saved offline choice in the native key
+dialog. Private keys remain outside the renderer. Progress is tied to the
+wallet, network and signing public key; failed or stale balance/registration
+checks never appear as completed setup. Production still requires its original
+native review and live readiness checks.
+
+Pending transactions are checked automatically while the plugin is visible.
+The UI distinguishes waiting for inclusion, waiting for irreversibility,
+unavailable confirmation, confirmed execution and reverted execution. The last
+verified result and block height survive reopening, even if the separate
+account-history service returns no entries. Checks never sign or resubmit and
+do not block Stop node. Uncertain records continue to block another spend.
+
+Validation: 50 plugin tests, full browser setup and confirmation scenarios,
+real-executable Linux/WSL smoke checks and exact signed-package verification.
+An isolated read-only mainnet check also confirmed a previously submitted
+registration; no live transaction was signed or broadcast during testing.
+Requires Core 0.7.17 or later; no new Core release is needed.
+
+## Previous release
+
 # Teleno Koinos Node 1.1.2 — Resume Ubuntu setup
 
 Set up WSL2 now reopens an already installed Ubuntu distribution so interrupted

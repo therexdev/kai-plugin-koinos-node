@@ -64,21 +64,21 @@ class Runtime {
     if(!version.startsWith("teleno_node 1.3.0+2c11229267cf"))throw Error("Unexpected Teleno container identity.");return version;
   }
   async setupStatus(options,signal) {
-    if(this.platform!=="win32")return null;
-    const next={...options,runtime:"wsl"},support=this.support(next);
+    const next=this.platform==="win32"?{...options,runtime:"wsl"}:{...options},support=this.support(next);
     if(!support.supported)return {supported:false,wslReady:false,runtimeReady:false,message:support.reason};
     const checked=AbortSignal.any([signal||new AbortController().signal,AbortSignal.timeout(15000)]);
     let wslReady=false;
     try {
-      await this.wsl.check(next,checked);wslReady=true;
-      // WSL being installed, or having a saved storage record, does not prove
-      // that the executable download and verification completed successfully.
-      if(!this.wsl.ready(next))return {supported:true,wslReady:true,runtimeReady:false,message:"Ubuntu is ready. Install the Teleno runtime next."};
+      if(next.runtime==="wsl") {
+        await this.wsl.check(next,checked);wslReady=true;
+        // Saved storage is not proof of a successfully verified executable.
+        if(!this.wsl.ready(next))return {supported:true,wslReady:true,runtimeReady:false,message:"Ubuntu is ready. Install the Teleno runtime next."};
+      }
       await this.installed(next,checked);
-      return {supported:true,wslReady:true,runtimeReady:true,message:"WSL2 and the Teleno runtime are ready."};
+      return {supported:true,wslReady,runtimeReady:true,message:next.runtime==="wsl"?"WSL2 and the Teleno runtime are ready.":"The Teleno runtime is ready."};
     } catch(error) {
       signal?.throwIfAborted();
-      return {supported:true,wslReady,runtimeReady:false,message:checked.aborted?"The setup check timed out. Finish Ubuntu setup and any requested Windows restart, then check again.":redact(error.message)};
+      return {supported:true,wslReady,runtimeReady:false,message:checked.aborted?(next.runtime==="wsl"?"The setup check timed out. Finish Ubuntu setup and any requested Windows restart, then check again.":"The runtime check timed out. Check the runtime and try again."):redact(error.message)};
     }
   }
   async install(options,signal,{resumeMigration=false}={}) {

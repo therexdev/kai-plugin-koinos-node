@@ -1,12 +1,12 @@
 "use strict";
 const test=require("node:test"),assert=require("node:assert/strict"),fs=require("node:fs"),os=require("node:os"),path=require("node:path");
 const {create,amount}=require("../plugin/service");
-function fixture(t,{approve=true,runtime,chain}={}) {
+function fixture(t,{approve=true,runtime,chain,electron}={}) {
   const root=fs.mkdtempSync(path.join(os.tmpdir(),"kai-teleno-test-"));t.after(()=>fs.rmSync(root,{recursive:true,force:true}));
   const signal=new AbortController(),reviews=[];
   const api={version:1,plugin:{id:"community.teleno-node",version:"1.0.0",dataDir:path.join(root,"community.teleno-node")},signal:signal.signal,
     desktop:{confirm:async(title,detail)=>{reviews.push({title,detail});return approve;},hostWindowId:()=>1}};
-  const service=create(api,{platform:"linux",electron:{clipboard:{writeText(){}},dialog:{showMessageBox:async()=>({response:0})},BrowserWindow:{fromId:()=>({})}},runtime,chain});
+  const service=create(api,{platform:"linux",electron:electron||{clipboard:{writeText(){}},dialog:{showMessageBox:async()=>({response:0})},BrowserWindow:{fromId:()=>({})}},runtime,chain});
   t.after(async()=>{signal.abort();await service.dispose();});return {root,api,service,reviews,signal};
 }
 const MAINNET="EiBZK_GGVP0H_fXVAM3j6EAuz3-B-l3ejxRSewi7qIBfSA==";
@@ -45,7 +45,26 @@ test("shutdown revokes queued mutations",async t=>{
   const {service,signal}=fixture(t);signal.abort();await assert.rejects(service.call("wallet.create",{password:"test-password-123"}));
 });
 test("native key backup never returns private data to renderer",async t=>{
-  const {service}=fixture(t);await service.call("wallet.create",{password:"test-password-123"});assert.deepEqual(await service.call("wallet.backup",{password:"test-password-123"}),{nativeShown:true});
+  const {service}=fixture(t);await service.call("wallet.create",{password:"test-password-123"});assert.deepEqual(await service.call("wallet.backup",{password:"test-password-123"}),{nativeShown:true});assert.equal((await service.call("status")).setup.walletBackupSaved,false);
+});
+test("wallet backup completes only after explicit native acknowledgement and survives reopen",async t=>{
+  const answers=[1,2];let copied;
+  const electron={clipboard:{writeText:value=>{copied=value;}},dialog:{showMessageBox:async()=>({response:answers.shift()})},BrowserWindow:{fromId:()=>({})}};
+  const {service,api}=fixture(t,{electron});await service.call("wallet.create",{password:"test-password-123"});
+  const result=await service.call("wallet.backup",{password:"test-password-123"});assert.equal(result.nativeShown,true);assert.ok(copied);assert.equal(JSON.stringify(result).includes(copied),false);
+  assert.equal((await service.call("status")).setup.walletBackupSaved,true);
+  await service.dispose();const reopened=create(api,{platform:"linux",electron});
+  try{const status=await reopened.call("status");assert.equal(status.setup.walletBackupSaved,true);assert.equal(JSON.stringify(status).includes(copied),false);}finally{await reopened.dispose();}
+});
+test("changing setup instructions does not create a wallet or start production",async t=>{
+  const {service}=fixture(t);await service.call("setup.goal",{goal:"observer"});const status=await service.call("status");
+  assert.equal(status.setup.goal,"observer");assert.equal(status.runtime.mode,"stopped");assert.equal(status.wallet.exists,false);
+  await assert.rejects(service.call("setup.goal",{goal:"automatic-production"}),/Choose observer/);
+});
+test("production setup reports read failures as unavailable rather than empty balances",async t=>{
+  const fake=fakeChain();fake.chain.balances=async()=>{throw Error("RPC temporarily unavailable");};fake.chain.registeredPublicKey=async()=>null;
+  const {service}=fixture(t,{chain:fake.chain});await service.call("wallet.create",{password:"test-password-123"});await service.call("producer.key");
+  const checked=await service.call("setup.productionStatus");assert.equal(checked.balances,null);assert.match(checked.balancesError,/unavailable/);assert.equal(checked.registered,null);assert.equal(fake.sends(),0);
 });
 test("uncertain wallet submission is persisted before transport and blocks duplicates",async t=>{
   const fake=fakeChain({fail:true}),{service,api}=fixture(t,{chain:fake.chain});await service.call("wallet.create",{password:"test-password-123"});

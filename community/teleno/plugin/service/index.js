@@ -42,7 +42,7 @@ function create(api,deps={}) {
   const record=()=>journal.get("pending",null);
   const clearPending=()=>{if(record())throw Error("A submitted wallet transaction needs confirmation. Check it in Wallet before another transaction or settings change.");};
   const baseProvider=chain.provider.bind(chain);
-  let spending=false,spendChain=null;
+  let spending=false,spendChain=null,spendingKind=null,pendingCheck=null,reconcileTask=null;
   chain.provider=(urls)=>{
     const provider=baseProvider(urls);
     if(!spending)return provider;
@@ -51,7 +51,7 @@ function create(api,deps={}) {
       return async(transaction,...args)=>{
         active();clearPending();
         if(!transaction?.id||!transaction?.signatures?.length||transaction.header?.chain_id!==spendChain)throw Error("A signed transaction matching the reviewed chain identity is required.");
-        journal.set("pending",{network:options.network,address:wallet.address,txId:transaction.id,transaction,createdAt:Date.now()});
+        journal.set("pending",{network:options.network,address:wallet.address,txId:transaction.id,transaction,kind:spendingKind,createdAt:Date.now()});pendingCheck=null;
         return value.call(receiver,transaction,...args);
       };
     }});
@@ -66,13 +66,13 @@ function create(api,deps={}) {
     const summary=method==="wallet.send"?`Send ${input.amount} ${input.token.toUpperCase()} from ${wallet.address} to ${input.to}.`:method==="wallet.burn"?`Burn ${input.amount} KOIN from ${wallet.address} into VHP at that same address. Burning is irreversible.`:`Register Teleno's separate block-signing key ${publicKey} for ${wallet.address}. This replaces any currently registered producer key for this address.`;
     await confirm("Review Teleno transaction",`${options.network.toUpperCase()}\n${summary}`,signal,id);
     const guarded=new Proxy(signer,{get(target,key,receiver){const value=Reflect.get(target,key,receiver);if(typeof value!=="function")return value;return(...args)=>{if(["signHash","signTransaction","signMessage","sign","sendTransaction","getPrivateKey"].includes(key))check();return value.apply(receiver,args);};}});
-    spending=true;
+    spending=true;spendingKind=method;
     try{return await runOperation(check,async()=>{spendChain=await checkNetwork();check();if(publicKey&&producerKey(false).publicKey!==publicKey)throw Error("Producer key changed during review.");let result;
       if(method==="wallet.send")result=await chain.transfer(guarded,{to:input.to,amountSat:amount(input.amount),token:input.token,assertContext:check});
       else if(method==="wallet.burn")result=await chain.burn(guarded,amount(input.amount));
       else result=await chain.registerProducerKey(guarded,publicKey);
-      check();return {...result,note:"Submitted to the chain. Use Check pending transaction to verify irreversible confirmation before another spend."};
-    });}finally{spending=false;spendChain=null;}
+      check();return {...result,note:"Submitted to the chain. Confirmation will be checked automatically. Wait for irreversible confirmation before another transaction."};
+    });}finally{spending=false;spendChain=null;spendingKind=null;}
   }
   function producerKey(createKey) {
     if(runtime.storageReady&&!runtime.storageReady(options)) {
@@ -87,49 +87,83 @@ function create(api,deps={}) {
     const signer=Signer.fromWif(fs.readFileSync(file,"utf8").trim());
     return {exists:true,publicKey:Buffer.from(signer.publicKey).toString("base64url")};
   }
+  function setupProgress() {
+    return {goal:store.get("setup.goal","producer")==="observer"?"observer":"producer",
+      walletBackupSaved:!!wallet.address&&store.get("setup.walletBackup.address",null)===wallet.address};
+  }
+  async function productionSetup(signal) {
+    const id=identity(),check=context(signal,id),key=producerKey(false);
+    if(!wallet.address)return {balances:null,registered:null};
+    await checkNetwork();check();
+    const [balances,registration]=await Promise.allSettled([chain.balances(wallet.address),key.exists?chain.registeredPublicKey(wallet.address,{strict:true}):Promise.resolve(null)]);check();
+    return {balances:balances.status==="fulfilled"?balances.value:null,registered:registration.status==="fulfilled"?registration.value:null,
+      balancesError:balances.status==="rejected"?redact(balances.reason.message):null,registrationError:registration.status==="rejected"?redact(registration.reason.message):null};
+  }
   async function status(signal) {
-    active(signal);const base={settings:{...options},wallet:wallet.status(),runtime:runtime.snapshot(options),producer:producerKey(false),pending:record()?{txId:record().txId,network:record().network}:null};
+    active(signal);const saved=record(),last=journal.get("last",null);
+    const base={settings:{...options},wallet:wallet.status(),runtime:runtime.snapshot(options),producer:producerKey(false),setup:setupProgress(),
+      pending:saved?{txId:saved.txId,network:saved.network,kind:saved.kind,createdAt:saved.createdAt,...(pendingCheck?.txId===saved.txId?pendingCheck:{state:"submitted"})}:null,
+      lastTransaction:last?.network===options.network&&last?.address===wallet.address?last:null};
     if(!runtime.child||runtime.mode==="maintenance")return base;
     try{
       const provider=local(),[head,chainId]=await Promise.all([provider.getHeadInfo(),checkNetwork(provider)]);active(signal);
       const height=Number(head.head_topology?.height),timestamp=Number(head.head_block_time);
       if(!Number.isSafeInteger(height)||height<0||!Number.isFinite(timestamp))throw Error("Invalid local head response.");
       const previous=observer;const advancing=!!previous&&previous.network===options.network&&previous.chainId===chainId&&height>previous.height;
-      if(runtime.mode==="observer")observer={network:options.network,chainId,height,at:Date.now(),advancing:advancing||!!previous?.advancing};
+      if(["observer","producer"].includes(runtime.mode))observer={network:options.network,chainId,height,at:Date.now(),advancing:advancing||!!previous?.advancing};
       base.head={height,time:timestamp,lib:Number(head.last_irreversible_block),recent:Date.now()-timestamp<90000&&timestamp<=Date.now()+30000,advancing:observer?.advancing||false};
       base.peers=runtime.snapshot(options).peers;
     }catch(e){base.rpcError=redact(e.message);}return base;
   }
   async function reconcile(signal) {
-    const r=record();if(!r)return {pending:false};
+    const r=record();if(!r)return {pending:false,note:"No pending transaction."};
+    const check=context(signal,identity());
+    const waiting=(state,note,extra={})=>{pendingCheck={txId:r.txId,state,note,checkedAt:Date.now(),...extra};return {pending:true,...pendingCheck};};
     if(r.address!==wallet.address||r.network!==options.network)throw Error("Restore the initiating wallet and network; pending transaction was preserved.");
     const p=chain.provider();await checkNetwork(p);active(signal);
     const result=await p.call("transaction_store.get_transactions_by_id",{transaction_ids:[r.txId]});active(signal);
     const tx=result?.transactions?.find(t=>t.transaction?.id===r.txId);
-    if(!tx?.containing_blocks?.length)return {pending:true,txId:r.txId,note:"Not irreversibly confirmed. The saved transaction remains protected; no new payment was sent."};
+    if(!tx?.containing_blocks?.length)return waiting("submitted","Waiting for block inclusion. Confirmation is checked automatically; the saved transaction will not be sent again.");
     const head=await p.getHeadInfo();active(signal);
+    let included=null;
     for(const blockId of tx.containing_blocks.slice(0,8)) {
       const response=await p.call("block_store.get_blocks_by_id",{block_ids:[blockId],return_block:true,return_receipt:true});active(signal);
       const b=response?.block_items?.find(b=>b.block_id===blockId&&b.block?.id===blockId);
-      if(!b?.block?.transactions?.some(t=>t.id===r.txId)||BigInt(b.block_height||b.block?.header?.height||"0")>BigInt(head.last_irreversible_block||"0"))continue;
+      if(!b?.block?.transactions?.some(t=>t.id===r.txId&&t.header?.chain_id===r.transaction.header.chain_id))continue;
       const receipt=b.receipt?.transaction_receipts?.find(t=>t.id===r.txId);if(!receipt)continue;
       // Verify the finalized block is on the canonical branch before release.
       const height=String(b.block_height||b.block.header.height);
       const canonical=await p.call("block_store.get_blocks_by_height",{head_block_id:head.head_topology.id,ancestor_start_height:height,num_blocks:1,return_block:false,return_receipt:false});active(signal);
       if(!canonical?.block_items?.some(item=>item.block_id===blockId))continue;
-      journal.set("last",{txId:r.txId,network:r.network,reverted:receipt.reverted===true,confirmedAt:Date.now()});journal.set("pending",null);
-      return {pending:false,confirmed:true,reverted:receipt.reverted===true,txId:r.txId};
+      if(BigInt(height)>BigInt(head.last_irreversible_block||"0")){included={blockHeight:height,irreversibleHeight:String(head.last_irreversible_block||"0")};continue;}
+      check();if(record()?.txId!==r.txId)throw Error("The saved transaction changed during confirmation. Its current record was preserved.");
+      journal.set("last",{txId:r.txId,network:r.network,address:r.address,kind:r.kind,reverted:receipt.reverted===true,confirmedAt:Date.now(),blockHeight:height,blockId});journal.set("pending",null);pendingCheck=null;
+      return {pending:false,confirmed:true,reverted:receipt.reverted===true,txId:r.txId,blockHeight:height,note:receipt.reverted===true?"Transaction confirmed but execution reverted. Review the result before trying again.":`Transaction confirmed in block ${height}.`};
     }
-    return {pending:true,txId:r.txId,note:"Included but not yet irreversibly confirmed."};
+    return included?waiting("included",`Included in block ${included.blockHeight}; waiting for irreversible confirmation.`,included):waiting("unverified","The transaction was found, but its canonical block and execution receipt could not yet be verified. Confirmation will be checked again.");
   }
   async function invoke(method,input,signal) {
     active(signal);if(!input||typeof input!=="object"||Array.isArray(input))throw Error("Invalid Teleno input.");
     if(method==="status")return status(signal);
     if(method==="runtime.setupStatus")return runtime.setupStatus({...options},signal);
+    if(method==="setup.productionStatus")return productionSetup(signal);
+    if(method==="setup.goal") {
+      if(!["observer","producer"].includes(input.goal))throw Error("Choose observer or block producer instructions.");
+      if(store.get("setup.goal","producer")!==input.goal)store.set("setup.goal",input.goal);
+      return {note:input.goal==="observer"?"Showing observer instructions. This does not stop an active producer.":"Showing the complete wallet and block production setup."};
+    }
     if(method==="logs")return runtime.logs(options);
     if(method==="wallet.balances"){if(!wallet.address)return null;await checkNetwork();const result=await chain.balances(wallet.address);active(signal);return result;}
     if(method==="wallet.history")return history.read(input);
-    if(method==="wallet.pending")return reconcile(signal);
+    if(method==="wallet.pending") {
+      // Share confirmation reads without occupying the node-control queue.
+      // Pending spends/settings remain blocked by the saved transaction, and
+      // reconcile checks its identity again immediately before finalizing it.
+      if(reconcileTask)return reconcileTask;
+      const task=(async()=>{try{return await reconcile(signal);}catch(error){active(signal);const saved=record();if(!saved)throw error;
+        pendingCheck={txId:saved.txId,state:"unavailable",checkedAt:Date.now(),note:"Confirmation is temporarily unavailable: "+redact(error.message)+". The saved transaction is preserved; it will be checked again without resubmitting."};return {pending:true,...pendingCheck};}})();
+      reconcileTask=task;try{return await task;}finally{if(reconcileTask===task)reconcileTask=null;}
+    }
     if(method==="producer.status")return {...producerKey(false),registered:wallet.address?await chain.registeredPublicKey(wallet.address,{strict:true}):null};
     if(method==="wallet.unlock")return wallet.unlock(input.password);
     if(method==="wallet.lock"){wallet.lock();return wallet.status();}
@@ -140,9 +174,13 @@ function create(api,deps={}) {
       return wallet.status();
     }
     if(method==="wallet.backup") {
-      const result=wallet.revealWif(input.password);await confirm("Back up Teleno wallet",`Show the private backup key for ${wallet.address} in a native dialog. Store it offline.`,signal);
-      const answer=await electron.dialog.showMessageBox(electron.BrowserWindow.fromId(api.desktop.hostWindowId()),{type:"warning",title:"Teleno wallet backup",message:"Keep this private key offline. Never share it.",detail:typeof result==="string"?result:result.wif,buttons:["Close","Copy private key"],defaultId:0,cancelId:0,noLink:true});active(signal);
-      if(answer.response===1)electron.clipboard.writeText(typeof result==="string"?result:result.wif);return {nativeShown:true};
+      const id=identity(),check=context(signal,id),result=wallet.revealWif(input.password);await confirm("Back up Teleno wallet",`Show the private backup key for ${wallet.address} in a native dialog. Store it offline.`,signal,id);
+      for(;;) {
+        const answer=await electron.dialog.showMessageBox(electron.BrowserWindow.fromId(api.desktop.hostWindowId()),{type:"warning",title:"Teleno wallet backup",message:"Store this private key offline. Never share it. Choose Saved offline only after you have saved your backup.",detail:typeof result==="string"?result:result.wif,buttons:["Close","Copy private key","Saved offline"],defaultId:0,cancelId:0,noLink:true});check();
+        if(answer.response===1){electron.clipboard.writeText(typeof result==="string"?result:result.wif);continue;}
+        if(answer.response===2){store.set("setup.walletBackup",{address:wallet.address,confirmedAt:Date.now()});return {nativeShown:true,note:"You confirmed that your wallet backup is saved offline. Return to Overview for the next step."};}
+        return {nativeShown:true};
+      }
     }
     if(method==="wallet.send") {if(!["koin","vhp"].includes(input.token)||!chain.isValidAddress(input.to))throw Error("Choose KOIN or VHP and a valid destination address.");amount(input.amount);return money(method,input,signal);}
     if(method==="wallet.burn"){amount(input.amount);return money(method,input,signal);}
@@ -190,7 +228,7 @@ function create(api,deps={}) {
     }
     throw Error("Unknown Teleno method.");
   }
-  const reads=new Set(["status","runtime.setupStatus","logs","wallet.balances","wallet.history","producer.status"]);
+  const reads=new Set(["status","runtime.setupStatus","setup.productionStatus","logs","wallet.balances","wallet.history","wallet.pending","producer.status"]);
   return {
     call(method,input={},signal) {
       const frozen=structuredClone(input),combined=AbortSignal.any([api.signal,lifetime.signal,...(signal?[signal]:[])]);

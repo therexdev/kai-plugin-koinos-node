@@ -4,17 +4,32 @@ An independently installable KAI Core plugin for [Teleno](https://github.com/koi
 
 Install **Teleno Koinos Node** from KAI Core's Community catalog. Its signed package is independent from the regular node, even though both source trees live in this repository. Requires KAI Core 0.7.17 or later.
 
-The Docker-free Windows runtime is included from **1.1.0**. Version **1.1.1** puts
-a three-step setup guide at the top of Overview: finish WSL2/Ubuntu setup and
-choose **Check setup**, install Teleno (or switch an existing Docker profile),
-then **Start observer**. Later steps stay disabled until their prerequisites are
-ready. The guide disappears once Ubuntu and the runtime have been verified.
-A Core application update is not required.
+The Docker-free Windows runtime is included from **1.1.0**. **1.1.3** adds a
+complete front-page checklist with verified progress. Follow the highlighted
+step; completed steps collapse and the guide closes after setup. Choose
+**Observer only** to sync without a wallet, signing key or funds, or use the
+**Block producer guide** for the full sequence below. A Core update is not required.
 
-From **1.1.2**, **Set up WSL2** reopens Ubuntu when it is already installed,
-including after interrupted username/password setup. Complete any prompts, or
-return to **Check setup** if Ubuntu already opens at a command prompt. Existing
-Ubuntu files are preserved; restarting setup does not reinstall the distribution.
+On Windows, **Set up WSL2** reopens an existing Ubuntu installation, including
+after interrupted username/password setup. Complete any prompts, or return to
+**Check setup** if Ubuntu opens at a command prompt. Ubuntu files are preserved.
+
+### Complete setup order
+
+1. **Set up WSL2 and Ubuntu** (Windows only), finish the Ubuntu prompts and any requested restart, then **Check setup**.
+2. **Install Teleno**, or use the preserving switch for an existing Docker profile.
+3. **Create your Teleno wallet** with a password, or deliberately restore your own Teleno backup. The wallet is separate from Core and other node plugins.
+4. **Save your wallet backup**: enter the password in Wallet, choose **Show backup key**, save it privately offline, and choose **Saved offline** in the native dialog. Merely opening the dialog does not complete the step. The password alone cannot recover a lost wallet.
+5. **Create a block-signing key** while the node is stopped. This separate hot key signs blocks; it is not the spending-wallet backup key.
+6. **Start an observer and sync** until the head is recent and advancing with connected peers. Optional public bootstrap instructions are in Backups.
+7. **Fund your wallet and get VHP** on the selected network. Receive KOIN at the displayed Teleno address, keep KOIN available for mana, and review any chosen irreversible burn into VHP. Receiving VHP is also supported; the guide recognizes existing balances.
+8. **Register your signing key** in Producer using the wallet password, review the network/address/public key, and wait for irreversible confirmation.
+9. **Enable block production** through a separate native review. This requires a synced observer, peers, VHP and matching registration. Locking the wallet does not stop production; use **Stop node**. Restarting Core can start only an observer, so production needs a new review after restart.
+
+If an observer is already running before a wallet or key has been created, the
+guide offers **Stop node** before that step. Wallet backup confirmation is tied
+to the wallet; balances and registration are checked separately for each network
+and key. Unavailable RPC results are shown as unverified, not zero balances.
 
 ## Differences from the regular node
 
@@ -35,7 +50,7 @@ The plugin does not provide AI capacity, distribute the KAI reward pool, import 
 
 ## Pages and setup
 
-1. **Overview** — Windows defaults to **Native through WSL2 (no Docker)**. Follow the guide at the top: **Set up WSL2**, finish Ubuntu's username/password setup and restart Windows if requested, then **Check setup → Install Teleno → Start observer**. Opening the Ubuntu installer alone does not complete setup. The guide is hidden only after successful runtime verification; failed or interrupted downloads leave the next step available to retry. Linux runs the executable directly. Existing Windows Docker profiles show **Switch to Docker-free runtime** in step 2, which copies this plugin’s chain data and producer keys into Linux storage and preserves the originals. Existing Docker controls remain in a collapsed section below the guide.
+1. **Overview** — the complete checklist above appears first on Windows and Linux, highlights the next action and links directly to the relevant page. Completed steps collapse. Missing prerequisites, failed downloads and interrupted migrations remain retryable. Existing Windows Docker profiles use **Switch to Docker-free runtime**, which preserves original data and keys. Observer-only instructions omit wallet and production requirements.
 2. **Wallet** — create a new wallet with a password, save its private-key backup offline, receive KOIN, view KOIN/VHP/Mana and activity, send tokens, or burn a chosen amount into VHP. Import is for deliberately restoring this wallet's backup; do not reuse Core, regular-node, or Master-node keys. No automatic wallet discovery or migration occurs.
 3. **Producer** — create a separate hot key while stopped, register that public key with the Teleno wallet, then start and validate an observer. Production needs an advancing recent head, a current peer reading, VHP, matching on-chain registration, and explicit native review. Each chain mutation requires the wallet password. A locked spending wallet does not stop an active producer.
 4. **Backups** — stop the node, create/list snapshots, check a restore, restore a local snapshot, or fetch the upstream network's public HTTPS bootstrap. Native restore preserves previous databases under `.pre-restore/`. It never imports a legacy snapshot or enables production. Start and validate an observer afterward. Chain snapshots exclude wallet and producer keys: back those up separately.
@@ -47,7 +62,9 @@ Default RPC is **127.0.0.1:18085** and P2P is **18890**. RPC is never published 
 
 Starting Core can resume an observer only when explicitly enabled. A node crash preserves the database and displays an error; Stop checks ownership before retiring a stale process. It does not delete chain data or repeatedly restart a producer. Stop a running node before changing runtime or network. Disabling/uninstalling the plugin stops its process and retains its saved data.
 
-Transactions are password-reviewed and serialized. A signed submission is recorded before transport. An uncertain submission remains pending and blocks another spend or network change. **Check pending transaction** verifies canonical irreversible inclusion and receipts; it never resubmits or substitutes a new transaction. If the selected RPC has no transaction history, the journal remains preserved until that service is available.
+Transactions are password-reviewed and serialized. A signed submission is recorded before transport. An uncertain submission remains pending and blocks another spend or network change. While the plugin is visible, pending confirmation is checked automatically every 15 seconds, with one shared check at a time; **Check pending transaction** also remains available. Checks never sign or resubmit. Canonical block inclusion, an execution receipt and irreversible height are required before releasing the pending record. RPC failures preserve the record and display an explanation. These reads do not hold up Stop node.
+
+The latest verified result remains visible after confirmation and after reopening the plugin, including reverted execution and block height. The account-history feed is separate: an empty feed does not erase a locally verified result or imply that the transaction failed. If transaction/block-store evidence is unavailable, the pending record remains protected until it can be verified.
 
 ## Runtime provenance and validation limits
 
@@ -55,7 +72,7 @@ This package pins Teleno **1.3.0**, source `2c11229267cff2f9ee39ed8e56ab70af391d
 
 Upstream has published observer qualification, not a guarantee of unlimited mainnet producer uptime. See [release evidence and remaining work](https://github.com/koinos/teleno/releases/tag/teleno-node-v1.3.0). Local checks cover the real Linux executable's offline startup, genesis identity, clean reopen, backup configuration/listing and refusal of an empty-chain backup, plus wallet/lifecycle tests.
 
-The [actual Windows Server 2025 / Ubuntu 24.04 WSL2 test](https://github.com/therexdev/kai-plugin-koinos-node/actions/runs/43452980942/job/131979740683) passed for both Mainnet and Harbinger offline databases: exact binary installation, preserving Windows-to-Linux data copy, JSON-RPC, a complete HTTP/2 gRPC health request, clean reopen, process-identity checks, immediate cancellation and backup validation/list/refusal. The Linux transport simulation additionally verifies launcher crashes and orphan recovery. All 31 plugin tests and package-source verification passed on Windows, Linux and macOS. This does not qualify every Windows desktop configuration. Windows/macOS Docker operation and live funded mainnet production still need hardware/operator testing. No live wallet, burn, registration or production is exercised by the test suite.
+The [actual Windows Server 2025 / Ubuntu 24.04 WSL2 test](https://github.com/therexdev/kai-plugin-koinos-node/actions/runs/43452980942/job/131979740683) passed for both Mainnet and Harbinger offline databases: exact binary installation, preserving Windows-to-Linux data copy, JSON-RPC, a complete HTTP/2 gRPC health request, clean reopen, process-identity checks, immediate cancellation and backup validation/list/refusal. The Linux transport simulation additionally verifies launcher crashes and orphan recovery. All 50 plugin tests and package-source verification pass on Windows, Linux and macOS. This does not qualify every Windows desktop configuration. Windows/macOS Docker operation and live funded mainnet production still need hardware/operator testing. No live wallet, burn, registration or production is exercised by the test suite.
 
 This is a full-trust native plugin. A separate data directory is not an operating-system security sandbox. It uses the public Foundation SDK and bundles its own dependencies. It does not read Core internals, another installed plugin, legacy wallets, or OS account secrets.
 
