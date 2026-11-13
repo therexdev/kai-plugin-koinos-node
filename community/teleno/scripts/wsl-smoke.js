@@ -29,12 +29,25 @@ async function main(){
     const rpc=async()=>{const response=await fetch(`http://127.0.0.1:${port}`,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({jsonrpc:"2.0",id:1,method:"chain.get_chain_id",params:{}}),signal:AbortSignal.timeout(2000)});return (await response.json()).result?.chain_id;};
     async function ready(){for(let i=0;i<100;i++){if(!r.child)throw Error(r.lastError);try{if(await rpc()===id&&/teleno_node ready/.test(r.logs(s)))return;}catch{}await pause(100);}throw Error("Observer did not become ready");}
     try{
-      if(archive)await r.install(s);
+      if(archive){
+        const source=path.join(root,"chains",network,"migration-check.txt");fs.mkdirSync(path.dirname(source),{recursive:true});fs.writeFileSync(source,"native-data-copy-fixture");
+        // Exercises the real Windows-to-Linux filesystem copy without needing
+        // Docker: no previous database or container has ever been created.
+        await r.switchToWsl({...s,runtime:"docker"},s);r.finishWslSwitch();
+        assert.equal(fs.readFileSync(source,"utf8"),"native-data-copy-fixture");
+        assert.equal(fs.readFileSync(path.join(r.basedir(s),"migration-check.txt"),"utf8"),"native-data-copy-fixture");
+      }
       else {await r.wsl.initialize(s);fs.copyFileSync(executable,r.wsl.binaryHost(s));await r.wsl.exec(s,["chmod","700",r.wsl.paths(s).binary]);}
       await r.installed(s);r.prepare(s);
       for(let restart=0;restart<2;restart++){
         r.launch(s,["--disable","block_producer","p2p"],"observer");await ready();assert.equal(await rpc(),id);
-        await new Promise((resolve,reject)=>{const socket=net.connect(s.grpcPort,"127.0.0.1");socket.once("connect",()=>{socket.end();resolve();});socket.once("error",reject);});
+        // WSL discovers each loopback listener independently. JSON-RPC being
+        // reachable does not mean its separate gRPC forward is already ready.
+        let grpcReady=false;
+        for(let i=0;i<100&&!grpcReady;i++){
+          try{await new Promise((resolve,reject)=>{const socket=net.connect(s.grpcPort,"127.0.0.1");socket.setTimeout(1000,()=>socket.destroy(Error("gRPC connection timed out")));socket.once("connect",()=>{socket.destroy();resolve();});socket.once("error",reject);});grpcReady=true;}
+          catch(error){if(i===99)throw error;await pause(100);}
+        }
         await assert.rejects(r.wsl.idle(s),/already using/);
         // Recovery must refuse a reused PID/changed process identity.
         const recordPath=r.wsl.hostPath(s.wslDistro,path.posix.join(r.wsl.meta.linuxRoot,"native-process.json"));
@@ -51,7 +64,7 @@ async function main(){
       for(const action of ["validate","list"]){await r.backup(s,action);await r.completion;assert.equal(r.job.state,"complete");}
       await r.backup(s,"create");await assert.rejects(r.completion,/exited/);assert.equal(r.job.state,"failed");await r.stop(s);
       assert.ok(fs.existsSync(path.join(r.basedir(s),"db")));assert.equal(calls.includes("docker"),false);
-      console.log(`${network}: ${local?"Linux transport simulation":"actual Windows WSL2"}; exact binary, RPC/gRPC, clean reopen, process ownership, cancellation, backup validation/list/refusal passed`);
+      console.log(`${network}: ${local?"Linux transport simulation":"actual Windows WSL2"}; exact binary install, preserving data copy, RPC/gRPC, clean reopen, process ownership, cancellation, backup validation/list/refusal passed`);
     }catch(e){console.error(r.logs(s).slice(-6000));throw e;}
     finally{
       await r.stop(s);
