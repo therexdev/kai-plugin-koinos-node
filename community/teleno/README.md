@@ -4,6 +4,10 @@ An independently installable KAI Core plugin for [Teleno](https://github.com/koi
 
 Install **Teleno Koinos Node** from KAI Core's Community catalog. Its signed package is independent from the regular node, even though both source trees live in this repository. Requires KAI Core 0.7.17 or later.
 
+The Docker-free Windows changes below are prepared for **1.1.0**. Publisher
+signing and catalog publication are still pending; this source branch does not
+update an already installed plugin.
+
 ## Differences from the regular node
 
 | | Teleno Community | Regular KAI Koinos Node |
@@ -41,7 +45,9 @@ Transactions are password-reviewed and serialized. A signed submission is record
 
 This package pins Teleno **1.3.0**, source `2c11229267cff2f9ee39ed8e56ab70af391d85ce`. Archive, native executable and Docker image hashes are in [`plugin/service/runtime.json`](plugin/service/runtime.json). Downloads are checked before execution; no rolling `latest` tag is used. New upstream binaries require a reviewed plugin release. Upstream artifacts are unsigned; checksum pins here are covered by the KAI publisher's package signature.
 
-Upstream has published observer qualification, not a guarantee of unlimited mainnet producer uptime. See [release evidence and remaining work](https://github.com/koinos/teleno/releases/tag/teleno-node-v1.3.0). Local checks cover the real Linux executable's offline startup, genesis identity, clean reopen, backup configuration/listing and refusal of an empty-chain backup, plus wallet/lifecycle tests. The WSL command adapter and Linux process supervisor have offline qualification with the real pinned binary through a Linux transport simulation, including launcher crashes, orphan recovery, immediate cancellation, RPC/gRPC, reopen and backups. This does not substitute for actual Windows/WSL2 qualification. Windows/macOS Docker operation and live funded mainnet production also need hardware/operator testing. No live wallet, burn, registration or production is exercised by the test suite.
+Upstream has published observer qualification, not a guarantee of unlimited mainnet producer uptime. See [release evidence and remaining work](https://github.com/koinos/teleno/releases/tag/teleno-node-v1.3.0). Local checks cover the real Linux executable's offline startup, genesis identity, clean reopen, backup configuration/listing and refusal of an empty-chain backup, plus wallet/lifecycle tests.
+
+The [actual Windows Server 2025 / Ubuntu 24.04 WSL2 test](https://github.com/therexdev/kai-plugin-koinos-node/actions/runs/43452980942/job/131979740683) passed for both Mainnet and Harbinger offline databases: exact binary installation, preserving Windows-to-Linux data copy, JSON-RPC, a complete HTTP/2 gRPC health request, clean reopen, process-identity checks, immediate cancellation and backup validation/list/refusal. The Linux transport simulation additionally verifies launcher crashes and orphan recovery. All 31 plugin tests and package-source verification passed on Windows, Linux and macOS. This does not qualify every Windows desktop configuration. Windows/macOS Docker operation and live funded mainnet production still need hardware/operator testing. No live wallet, burn, registration or production is exercised by the test suite.
 
 This is a full-trust native plugin. A separate data directory is not an operating-system security sandbox. It uses the public Foundation SDK and bundles its own dependencies. It does not read Core internals, another installed plugin, legacy wallets, or OS account secrets.
 

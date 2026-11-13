@@ -15,10 +15,14 @@ and explicit producer review succeed.
 Adds optional localhost gRPC, backup configuration validation, public snapshot
 listing and download. Public restore now honors the selected snapshot ID.
 
-Validation: automated plugin tests, package-source verification, actual Linux
-native smoke and a Linux transport simulation of the WSL controller using the
-exact upstream executable. Actual Windows/WSL2 qualification and signed release
-publication are still required; this source change is not an installed update.
+Validation: 31 plugin tests and package-source verification on Windows, Linux
+and macOS; actual Linux native smoke; and the exact upstream executable on
+Windows Server 2025 / Ubuntu 24.04 WSL2. Both networks passed installation,
+preserving data copy, JSON-RPC, HTTP/2 gRPC health checks, reopen, ownership,
+cancellation and backup checks. A Linux transport simulation additionally
+verifies launcher-crash recovery. [Windows evidence](https://github.com/therexdev/kai-plugin-koinos-node/actions/runs/43452980942/job/131979740683).
+Publisher signing and release/catalog publication are still pending; this
+source change is not an installed update.
 No live wallet, burn, registration, transfer or funded production was tested.
 
 ## Previous release
