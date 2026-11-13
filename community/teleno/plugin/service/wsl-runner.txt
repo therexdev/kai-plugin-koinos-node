@@ -4,16 +4,104 @@ Executed by python3, which is included in Ubuntu 24.04. A Linux flock outlives
 the Windows launcher and protects the database even if KAI exits unexpectedly.
 """
 import argparse
+from concurrent.futures import ThreadPoolExecutor
 import fcntl
 import json
 import os
 from pathlib import Path
 import re
+import select
 import signal
+import socket
 import subprocess
 import sys
 import tempfile
+import threading
 import time
+
+
+class GrpcLoopback:
+    """Bounded byte relay: AF_INET localhost is discoverable by WSL forwarding.
+
+    The upstream gRPC server listens on ::1 at the same port. Neither listener
+    accepts LAN connections. Preserve HTTP/2 bytes, backpressure and half-closes.
+    """
+    def __init__(self, port):
+        self.port = port
+        self.stopped = threading.Event()
+        self.slots = threading.BoundedSemaphore(32)
+        self.pool = ThreadPoolExecutor(max_workers=32)
+        self.listener = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.listener.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        try:
+            self.listener.bind(('127.0.0.1', port))
+            self.listener.listen(32)
+            self.listener.settimeout(0.2)
+        except BaseException:
+            self.listener.close()
+            self.pool.shutdown()
+            raise
+        self.thread = threading.Thread(target=self.accept, daemon=True)
+        self.thread.start()
+
+    def accept(self):
+        while not self.stopped.is_set():
+            try:
+                client, _ = self.listener.accept()
+            except socket.timeout:
+                continue
+            except OSError:
+                return
+            if not self.slots.acquire(blocking=False):
+                client.close()
+                continue
+            self.pool.submit(self.relay, client)
+
+    def relay(self, client):
+        upstream = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
+        try:
+            upstream.settimeout(2)
+            upstream.connect(('::1', self.port))
+            peers = {client: upstream, upstream: client}
+            pending = {client: bytearray(), upstream: bytearray()}
+            reading, finished = set(peers), set()
+            for sock in peers:
+                sock.setblocking(False)
+            while not self.stopped.is_set() and (reading or any(pending.values())):
+                readers = [sock for sock in reading if len(pending[peers[sock]]) < 65536]
+                writers = [sock for sock in peers if pending[sock]]
+                ready, writable, _ = select.select(readers, writers, [], 0.2)
+                for sock in ready:
+                    try:
+                        data = sock.recv(65536 - len(pending[peers[sock]]))
+                    except BlockingIOError:
+                        continue
+                    if data:
+                        pending[peers[sock]].extend(data)
+                    else:
+                        reading.remove(sock)
+                for sock in writable:
+                    try:
+                        size = sock.send(pending[sock])
+                    except BlockingIOError:
+                        continue
+                    del pending[sock][:size]
+                for sock in peers:
+                    if peers[sock] not in reading and not pending[sock] and sock not in finished:
+                        sock.shutdown(socket.SHUT_WR)
+                        finished.add(sock)
+        except OSError:
+            pass  # Client cancellation or native server starting/stopping.
+        finally:
+            client.close()
+            upstream.close()
+            self.slots.release()
+
+    def close(self):
+        self.stopped.set()
+        self.listener.close()
+        self.thread.join()
+        self.pool.shutdown(wait=True)
 
 
 def proc(pid):
@@ -71,9 +159,12 @@ def main():
     parser.add_argument('--owner', required=True)
     parser.add_argument('--token', default='')
     parser.add_argument('--network', choices=['mainnet', 'harbinger'])
+    parser.add_argument('--grpc-port', type=int, default=0)
     args, extra = parser.parse_known_args()
     if args.token and not re.fullmatch(r'[a-f0-9-]{36}', args.token):
         raise RuntimeError('Invalid process token.')
+    if args.grpc_port and not 1024 <= args.grpc_port <= 65535:
+        raise RuntimeError('Invalid gRPC loopback port.')
     root = Path(args.root)
     if not root.is_absolute() or root.is_symlink() or root.name != args.owner:
         raise RuntimeError('Invalid WSL runtime root.')
@@ -128,6 +219,7 @@ def main():
         basedir = root / 'chains' / args.network
         command = [str(binary), '--basedir', str(basedir), '--config', str(basedir / 'config.yml'), *extra[1:]]
         child = None
+        relay = None
         stopping = False
 
         def stop(_signum, _frame):
@@ -140,6 +232,8 @@ def main():
         signal.signal(signal.SIGINT, stop)
         signal.signal(signal.SIGHUP, stop)
         try:
+            if args.grpc_port:
+                relay = GrpcLoopback(args.grpc_port)
             child = subprocess.Popen(command, pass_fds=(lock.fileno(),))
             info = proc(child.pid)
             if info:
@@ -162,6 +256,9 @@ def main():
             if child and child.poll() is not None:
                 record_file.unlink(missing_ok=True)
             raise
+        finally:
+            if relay:
+                relay.close()
 
 
 if __name__ == '__main__':

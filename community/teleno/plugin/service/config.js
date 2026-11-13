@@ -23,7 +23,9 @@ function generate(options, basedir, producer = null) {
     .replace(/  contract_meta_store: (?:true|false)/,"  contract_meta_store: true")
     .replace(/  transaction_store: false/,"  transaction_store: " + options.history)
     .replace(/  account_history: false/,"  account_history: " + options.history);
-  if(options.grpc)text=text.replace(/  grpc: false/,"  grpc: true")+`\ngrpc:\n  listen: ${options.runtime==="docker"?"0.0.0.0":"127.0.0.1"}:${options.grpcPort}\n`;
+  // gRPC creates IPv4-mapped IPv6 sockets even for 127.0.0.1. WSL's host
+  // forwarder misses these. Its supervisor bridges IPv4 loopback to ::1.
+  if(options.grpc)text=text.replace(/  grpc: false/,"  grpc: true")+`\ngrpc:\n  listen: ${JSON.stringify((options.runtime==="wsl"?"[::1]":options.runtime==="docker"?"0.0.0.0":"127.0.0.1")+":"+options.grpcPort)}\n`;
   // Only the explicit producer-start path supplies this argument. All ordinary
   // starts, backup commands and restores regenerate an observer configuration.
   if (producer) {

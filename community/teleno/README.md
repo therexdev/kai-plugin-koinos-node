@@ -77,7 +77,10 @@ Node databases, native backups and the separate producer hot key live under
 `~/.local/share/kai-teleno/<profile-id>/chains/<network>` inside the selected
 WSL distribution. Windows accesses those files through `\\wsl.localhost`.
 Linux execution never uses a Windows/NTFS database directory. RPC and optional
-gRPC use WSL localhost forwarding; P2P connects outbound without a public port
+gRPC use WSL localhost forwarding. For gRPC, the supervisor relays IPv4 loopback
+to the upstream IPv6 loopback listener, avoiding WSL's IPv4-mapped IPv6 forwarding
+limitation. The byte relay preserves HTTP/2, caps connections at 32 and buffers at
+64 KiB per direction, and shuts down with the node. P2P connects outbound without a public port
 forward. Inbound P2P reachability depends on the operator’s WSL networking and
 firewall configuration.
 

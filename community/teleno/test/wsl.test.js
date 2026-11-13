@@ -25,7 +25,7 @@ test("WSL1 and missing Linux distributions give setup errors without invoking Do
 });
 test("native WSL settings generate Linux paths and optional loopback gRPC",()=>{
   const options=settings({grpc:true},"win32"),config=generate(options,"/home/alice/.local/share/kai-teleno/profile/chains/mainnet");
-  assert.match(config,/listen: 127\.0\.0\.1:18085/);assert.match(config,/listen: 127\.0\.0\.1:18086/);
+  assert.match(config,/listen: 127\.0\.0\.1:18085/);assert.match(config,/listen: "\[::1\]:18086"/);
   assert.match(config,/grpc: true/);assert.match(config,/block_producer: false/);assert.doesNotMatch(config,/\\\\wsl|C:|0\.0\.0\.0:1808/);
   assert.throws(()=>settings({grpc:true,grpcPort:18085},"win32"),/different/);
 });

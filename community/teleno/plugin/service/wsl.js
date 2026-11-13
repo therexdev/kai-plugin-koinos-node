@@ -90,7 +90,8 @@ class WslRuntime {
     const m=this.require(options),code=fs.readFileSync(path.join(__dirname,"wsl-runner.txt"),"utf8");
     // Code comes from the signed plugin and is one literal argv element. No
     // shell interpolation or installed helper that can become stale on update.
-    return this.spec(options,["python3","-c",code,action,"--root",m.linuxRoot,"--owner",this.owner,"--token",token,"--network",network,...(action==="run"?["--",...extra]:[])]);
+    const grpc=action==="run"&&options.grpc&&!extra.some(arg=>arg.startsWith("--backup-"));
+    return this.spec(options,["python3","-c",code,action,"--root",m.linuxRoot,"--owner",this.owner,"--token",token,"--network",network,...(grpc?["--grpc-port",String(options.grpcPort)]:[]),...(action==="run"?["--",...extra]:[])]);
   }
   async idle(options,signal) {const s=this.helper(options,"idle");await this.command(s.file,s.args,{signal});}
   async stop(options,record) {
