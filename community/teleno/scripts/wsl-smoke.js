@@ -21,6 +21,8 @@ async function main(){
     const deps=local?{wslHostPathImpl:(_d,p)=>p,commandImpl:async(file,args,options)=>{
       if(file==="wsl.exe"&&args[0]==="--list"){calls.push(file);return "Ubuntu-24.04 Running 2";}
       const s=translate(file,args);const result=await command(s.file,s.args,options);
+      // Windows tar.exe prints CRLF; exercise that host-side archive listing.
+      if(file==="tar"&&args[0]==="-tzf")return result.replace(/\r?\n/g,"\r\n");
       if(s.file==="sh"&&s.args[0]==="-c"&&s.args[1].includes("$(id -un)")){const lines=result.split("\n");lines[1]=home;return lines.join("\n");}return result;
     },spawnImpl:(file,args,options)=>{const s=translate(file,args);return spawn(s.file,s.args,options);}}:{};
     const r=new Runtime(root,{platform:"win32",arch:"x64",...deps,...(archive?{fetchImpl:async()=>new Response(fs.readFileSync(archive))}:{})}),s=settings({network,rpcPort:port,p2pPort:port+1,grpc:true,grpcPort:port+2},"win32");

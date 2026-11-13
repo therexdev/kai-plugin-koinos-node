@@ -81,7 +81,7 @@ class Runtime {
       if(!response?.ok || !response.body)throw Error("Teleno runtime download failed.");
       const chunks=[];let bytes=0;for await(const chunk of response.body){signal?.throwIfAborted();bytes+=chunk.length;if(bytes>32*1024*1024)throw Error("Teleno download exceeds the release size limit.");chunks.push(chunk);}
       const data=Buffer.concat(chunks);if(hash(data)!==PIN.archiveSha256)throw Error("Teleno download checksum mismatch.");fs.writeFileSync(archive,data,{flag:"wx",mode:0o600});
-      const entries=(await this.command("tar",["-tzf",archive],{signal})).split("\n");
+      const entries=(await this.command("tar",["-tzf",archive],{signal})).split(/\r?\n/);
       if(entries.some(p=>p.startsWith("/")||p.includes("\\")||p.split("/").includes("..")))throw Error("Unsafe runtime archive.");
       const executable=entries.filter(p=>p.endsWith("/teleno_node"));if(executable.length!==1)throw Error("Unexpected runtime archive layout.");
       await this.command("tar",["-xzf",archive,"-C",staging,executable[0]],{signal});
