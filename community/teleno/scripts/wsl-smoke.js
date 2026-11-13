@@ -41,6 +41,7 @@ async function main(){
     const rpc=async()=>{const response=await fetch(`http://127.0.0.1:${port}`,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({jsonrpc:"2.0",id:1,method:"chain.get_chain_id",params:{}}),signal:AbortSignal.timeout(2000)});return (await response.json()).result?.chain_id;};
     async function ready(){for(let i=0;i<100;i++){if(!r.child)throw Error(r.lastError);try{if(await rpc()===id&&/teleno_node ready/.test(r.logs(s)))return;}catch{}await pause(100);}throw Error("Observer did not become ready");}
     try{
+      const before=await r.setupStatus(s);assert.equal(before.wslReady,true);assert.equal(before.runtimeReady,false);assert.equal(r.wsl.meta,null);
       if(archive){
         const source=path.join(root,"chains",network,"migration-check.txt");fs.mkdirSync(path.dirname(source),{recursive:true});fs.writeFileSync(source,"native-data-copy-fixture");
         // Exercises the real Windows-to-Linux filesystem copy without needing
@@ -51,6 +52,7 @@ async function main(){
       }
       else {await r.wsl.initialize(s);fs.copyFileSync(executable,r.wsl.binaryHost(s));await r.wsl.exec(s,["chmod","700",r.wsl.paths(s).binary]);}
       await r.installed(s);r.prepare(s);
+      const after=await r.setupStatus(s);assert.equal(after.wslReady,true);assert.equal(after.runtimeReady,true);
       for(let restart=0;restart<2;restart++){
         r.launch(s,["--disable","block_producer","p2p"],"observer");await ready();assert.equal(await rpc(),id);
         // Exercise actual HTTP/2 and the upstream gRPC health service through

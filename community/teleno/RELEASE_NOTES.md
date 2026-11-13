@@ -1,3 +1,22 @@
+# Teleno Koinos Node 1.1.1 — Guided Windows setup
+
+Overview now starts with three ordered setup steps: set up WSL2/Ubuntu, install
+Teleno or switch an existing Docker profile, then start an observer. A read-only
+check detects Ubuntu and verifies the runtime before enabling later steps. The
+guide disappears when setup is complete and returns if a new session detects a
+missing prerequisite. Opening the installer alone does not mark setup complete.
+
+Failed downloads remain retryable. Disabled steps stay disabled after opening
+help or completing another action. Existing Docker controls remain available
+below the guide; node data, wallets and runtime pins are unchanged.
+
+Validation includes 33 plugin tests, package verification, browser checks of
+missing/ready Ubuntu, failed download/retry, completed setup/reopen, migration
+and narrow layouts, plus real-executable setup checks in the Linux and Windows
+WSL2 smoke tests. Requires Core 0.7.17+; no new Core release is needed.
+
+## Previous release
+
 # Teleno Koinos Node 1.1.0 — Docker-free Windows runtime
 
 Windows now runs the complete, unchanged upstream Teleno 1.3.0 executable through

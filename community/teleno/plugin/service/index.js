@@ -125,6 +125,7 @@ function create(api,deps={}) {
   async function invoke(method,input,signal) {
     active(signal);if(!input||typeof input!=="object"||Array.isArray(input))throw Error("Invalid Teleno input.");
     if(method==="status")return status(signal);
+    if(method==="runtime.setupStatus")return runtime.setupStatus({...options},signal);
     if(method==="logs")return runtime.logs(options);
     if(method==="wallet.balances"){if(!wallet.address)return null;await checkNetwork();const result=await chain.balances(wallet.address);active(signal);return result;}
     if(method==="wallet.history")return history.read(input);
@@ -189,7 +190,7 @@ function create(api,deps={}) {
     }
     throw Error("Unknown Teleno method.");
   }
-  const reads=new Set(["status","logs","wallet.balances","wallet.history","producer.status"]);
+  const reads=new Set(["status","runtime.setupStatus","logs","wallet.balances","wallet.history","producer.status"]);
   return {
     call(method,input={},signal) {
       const frozen=structuredClone(input),combined=AbortSignal.any([api.signal,lifetime.signal,...(signal?[signal]:[])]);

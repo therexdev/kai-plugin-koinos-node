@@ -4,9 +4,12 @@ An independently installable KAI Core plugin for [Teleno](https://github.com/koi
 
 Install **Teleno Koinos Node** from KAI Core's Community catalog. Its signed package is independent from the regular node, even though both source trees live in this repository. Requires KAI Core 0.7.17 or later.
 
-The Docker-free Windows runtime is included in **1.1.0**. Update this plugin from
-the Community catalog, then use **Switch to Docker-free runtime** for an existing
-Windows Docker profile. A Core application update is not required.
+The Docker-free Windows runtime is included from **1.1.0**. Version **1.1.1** puts
+a three-step setup guide at the top of Overview: finish WSL2/Ubuntu setup and
+choose **Check setup**, install Teleno (or switch an existing Docker profile),
+then **Start observer**. Later steps stay disabled until their prerequisites are
+ready. The guide disappears once Ubuntu and the runtime have been verified.
+A Core application update is not required.
 
 ## Differences from the regular node
 
@@ -27,7 +30,7 @@ The plugin does not provide AI capacity, distribute the KAI reward pool, import 
 
 ## Pages and setup
 
-1. **Overview** — Windows defaults to **Native through WSL2 (no Docker)**. Use **Set up WSL2**, finish Ubuntu setup and restart Windows if requested, then **Install / verify runtime** and **Start observer**. Linux runs the executable directly. Existing Windows Docker profiles show **Switch to Docker-free runtime**, which copies this plugin’s chain data and producer keys into Linux storage and preserves the originals. Docker is needed only if that optional runtime remains selected.
+1. **Overview** — Windows defaults to **Native through WSL2 (no Docker)**. Follow the guide at the top: **Set up WSL2**, finish Ubuntu's username/password setup and restart Windows if requested, then **Check setup → Install Teleno → Start observer**. Opening the Ubuntu installer alone does not complete setup. The guide is hidden only after successful runtime verification; failed or interrupted downloads leave the next step available to retry. Linux runs the executable directly. Existing Windows Docker profiles show **Switch to Docker-free runtime** in step 2, which copies this plugin’s chain data and producer keys into Linux storage and preserves the originals. Existing Docker controls remain in a collapsed section below the guide.
 2. **Wallet** — create a new wallet with a password, save its private-key backup offline, receive KOIN, view KOIN/VHP/Mana and activity, send tokens, or burn a chosen amount into VHP. Import is for deliberately restoring this wallet's backup; do not reuse Core, regular-node, or Master-node keys. No automatic wallet discovery or migration occurs.
 3. **Producer** — create a separate hot key while stopped, register that public key with the Teleno wallet, then start and validate an observer. Production needs an advancing recent head, a current peer reading, VHP, matching on-chain registration, and explicit native review. Each chain mutation requires the wallet password. A locked spending wallet does not stop an active producer.
 4. **Backups** — stop the node, create/list snapshots, check a restore, restore a local snapshot, or fetch the upstream network's public HTTPS bootstrap. Native restore preserves previous databases under `.pre-restore/`. It never imports a legacy snapshot or enables production. Start and validate an observer afterward. Chain snapshots exclude wallet and producer keys: back those up separately.
