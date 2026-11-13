@@ -21,8 +21,9 @@ Windows Server 2025 / Ubuntu 24.04 WSL2. Both networks passed installation,
 preserving data copy, JSON-RPC, HTTP/2 gRPC health checks, reopen, ownership,
 cancellation and backup checks. A Linux transport simulation additionally
 verifies launcher-crash recovery. [Windows evidence](https://github.com/therexdev/kai-plugin-koinos-node/actions/runs/43452980942/job/131979740683).
-Publisher signing and release/catalog publication are still pending; this
-source change is not an installed update.
+Update the independent Teleno Community plugin to 1.1.0, then use **Switch to
+Docker-free runtime** for an existing Windows Docker profile. A Core update is
+not required. Finish Ubuntu setup and any requested Windows restart first.
 No live wallet, burn, registration, transfer or funded production was tested.
 
 ## Previous release

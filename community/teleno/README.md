@@ -4,9 +4,9 @@ An independently installable KAI Core plugin for [Teleno](https://github.com/koi
 
 Install **Teleno Koinos Node** from KAI Core's Community catalog. Its signed package is independent from the regular node, even though both source trees live in this repository. Requires KAI Core 0.7.17 or later.
 
-The Docker-free Windows changes below are prepared for **1.1.0**. Publisher
-signing and catalog publication are still pending; this source branch does not
-update an already installed plugin.
+The Docker-free Windows runtime is included in **1.1.0**. Update this plugin from
+the Community catalog, then use **Switch to Docker-free runtime** for an existing
+Windows Docker profile. A Core application update is not required.
 
 ## Differences from the regular node
 
