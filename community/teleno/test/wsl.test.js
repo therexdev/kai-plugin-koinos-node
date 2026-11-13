@@ -52,6 +52,18 @@ test("saved WSL storage never marks a missing or failed executable installation 
   available=false;assert.equal((await r.setupStatus(s)).wslReady,false);
   const cancelled=new AbortController();cancelled.abort();await assert.rejects(r.setupStatus(s,cancelled.signal),/abort/i);
 });
+test("setup reopens an existing Ubuntu installation instead of installing it again",async t=>{
+  const calls=[],r=new Runtime(root(t),{platform:"win32",commandImpl:async(file,args)=>{calls.push({file,args});return file==="wsl.exe"?"Ubuntu-24.04 Stopped 2":"";}});
+  const result=await r.setupWsl(settings({},"win32"));assert.match(result.note,/existing Ubuntu/);
+  const launch=calls.find(c=>c.file==="powershell.exe").args.at(-1),encoded=launch.match(/'-EncodedCommand','([^']+)'/)[1],code=Buffer.from(encoded,"base64").toString("utf16le");
+  assert.equal(code,"& wsl.exe --distribution 'Ubuntu-24.04'");assert.doesNotMatch(launch,/-Verb RunAs/);assert.equal(calls.length,2);
+});
+test("new WSL setup installs Ubuntu and includes a preserving already-exists fallback",async t=>{
+  const calls=[],r=new Runtime(root(t),{platform:"win32",commandImpl:async(file,args)=>{calls.push({file,args});return file==="wsl.exe"?"Debian Stopped 2":"";}});
+  await r.setupWsl(settings({},"win32"));
+  const launch=calls.find(c=>c.file==="powershell.exe").args.at(-1),code=Buffer.from(launch.match(/'-EncodedCommand','([^']+)'/)[1],"base64").toString("utf16le");
+  assert.match(launch,/-Verb RunAs/);assert.match(code,/--install --distribution 'Ubuntu-24.04'/);assert.match(code,/if \(\$names -contains 'Ubuntu-24.04'\)/);assert.doesNotMatch(code,/unregister|terminate|shutdown|--name/);
+});
 test("upgrade recognizes old unsaved Windows chain data rather than hiding its key",async t=>{
   const dir=root(t);fs.mkdirSync(path.join(dir,"chains"));const controller=new AbortController();
   const service=create({version:1,plugin:{id:"community.teleno-node",dataDir:dir},signal:controller.signal,desktop:{confirm:async()=>true}},{platform:"win32",electron:{}});

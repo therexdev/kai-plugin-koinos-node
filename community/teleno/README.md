@@ -11,6 +11,11 @@ then **Start observer**. Later steps stay disabled until their prerequisites are
 ready. The guide disappears once Ubuntu and the runtime have been verified.
 A Core application update is not required.
 
+From **1.1.2**, **Set up WSL2** reopens Ubuntu when it is already installed,
+including after interrupted username/password setup. Complete any prompts, or
+return to **Check setup** if Ubuntu already opens at a command prompt. Existing
+Ubuntu files are preserved; restarting setup does not reinstall the distribution.
+
 ## Differences from the regular node
 
 | | Teleno Community | Regular KAI Koinos Node |

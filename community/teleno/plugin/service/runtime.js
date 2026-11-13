@@ -147,11 +147,17 @@ class Runtime {
   finishWslSwitch() {const file=path.join(this.root,"wsl-migration.json");safe(file,true);fs.rmSync(file,{force:true});}
   async setupWsl(options,signal) {
     if(this.platform!=="win32")throw Error("WSL2 setup is for Windows only.");
-    const {validDistro}=require("./wsl");if(!validDistro(options.wslDistro))throw Error("Invalid WSL distribution.");
-    const install=`& wsl.exe --install --distribution '${options.wslDistro}'`;
-    const encoded=Buffer.from(install,"utf16le").toString("base64");
-    await this.command("powershell.exe",["-NoProfile","-NonInteractive","-Command",`Start-Process powershell.exe -Verb RunAs -ArgumentList '-NoProfile','-NoExit','-EncodedCommand','${encoded}'`],{signal});
-    return {note:"Finish Ubuntu setup in the Windows terminal: create your Linux username and password, and restart Windows if prompted. Then return to the setup steps and choose Check setup. Launching this installer alone does not complete setup."};
+    const {validDistro,distributions}=require("./wsl");if(!validDistro(options.wslDistro))throw Error("Invalid WSL distribution.");
+    let exists=false;
+    try{exists=distributions(await this.command("wsl.exe",["--list","--verbose"],{signal,timeout:15000})).some(d=>d.name===options.wslDistro);}
+    catch{signal?.throwIfAborted();} // A missing WSL installation needs the installer.
+    const open=`& wsl.exe --distribution '${options.wslDistro}'`;
+    // Reopen registered Ubuntu even when first-launch user setup was interrupted.
+    // If another installer registered it after our probe, recover that race too.
+    const install=`& wsl.exe --install --distribution '${options.wslDistro}'\nif ($LASTEXITCODE -ne 0) {\n  $names = @(& wsl.exe --list --quiet 2>$null | ForEach-Object { ($_ -replace '[\\x00\\uFEFF]', '').Trim() })\n  if ($names -contains '${options.wslDistro}') { ${open} }\n}`;
+    const encoded=Buffer.from(exists?open:install,"utf16le").toString("base64");
+    await this.command("powershell.exe",["-NoProfile","-NonInteractive","-Command",`Start-Process powershell.exe ${exists?"":"-Verb RunAs "}-ArgumentList '-NoProfile','-NoExit','-EncodedCommand','${encoded}'`],{signal});
+    return {note:(exists?"Opened your existing Ubuntu installation. Its files are preserved. ":"")+"Complete any Linux username/password prompts and restart Windows if requested. If Ubuntu already shows a command prompt, return here and choose Check setup. Opening the terminal alone does not mark setup complete."};
   }
   prepare(options,producer=null) {
     const dir=this.basedir(options);fs.mkdirSync(path.join(dir,"chain"),{recursive:true,mode:0o700});

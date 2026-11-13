@@ -1,3 +1,22 @@
+# Teleno Koinos Node 1.1.2 — Resume Ubuntu setup
+
+Set up WSL2 now reopens an already installed Ubuntu distribution so interrupted
+first-launch setup can continue. It requests Windows elevation only when a new
+installation is needed. If a distribution appears during an installation
+attempt, the terminal reopens it instead of leaving an already-exists error.
+Existing Linux files, wallets and node data are preserved.
+
+Includes the ordered setup guide from 1.1.1. Complete any username/password
+prompts, then choose Check setup. If Ubuntu already opens at its command prompt,
+return to the plugin and check setup there. No distribution reset is needed.
+
+Validation: 35 plugin tests, signed-package verification, browser setup flows
+and real-executable Linux/WSL smoke tests. Windows qualification also checks the
+resume decision against the actually installed Ubuntu distribution; interactive
+terminal launch is captured so CI does not display user setup prompts.
+
+## Previous release
+
 # Teleno Koinos Node 1.1.1 — Guided Windows setup
 
 Overview now starts with three ordered setup steps: set up WSL2/Ubuntu, install

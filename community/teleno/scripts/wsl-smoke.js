@@ -42,6 +42,12 @@ async function main(){
     async function ready(){for(let i=0;i<100;i++){if(!r.child)throw Error(r.lastError);try{if(await rpc()===id&&/teleno_node ready/.test(r.logs(s)))return;}catch{}await pause(100);}throw Error("Observer did not become ready");}
     try{
       const before=await r.setupStatus(s);assert.equal(before.wslReady,true);assert.equal(before.runtimeReady,false);assert.equal(r.wsl.meta,null);
+      // Probe the real installed distro, but capture its interactive terminal
+      // launch instead of opening a user-facing PowerShell window in CI.
+      const originalCommand=r.command;let terminal;
+      try{r.command=async(file,args,options)=>{if(file==="powershell.exe"){terminal=args.at(-1);return "";}return originalCommand(file,args,options);};await r.setupWsl(s);}finally{r.command=originalCommand;}
+      const setupCode=Buffer.from(terminal.match(/'-EncodedCommand','([^']+)'/)[1],"base64").toString("utf16le");
+      assert.equal(setupCode,"& wsl.exe --distribution 'Ubuntu-24.04'");assert.doesNotMatch(terminal,/-Verb RunAs/);
       if(archive){
         const source=path.join(root,"chains",network,"migration-check.txt");fs.mkdirSync(path.dirname(source),{recursive:true});fs.writeFileSync(source,"native-data-copy-fixture");
         // Exercises the real Windows-to-Linux filesystem copy without needing

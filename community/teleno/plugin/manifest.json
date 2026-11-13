@@ -3,7 +3,7 @@
   "apiVersion": 3,
   "id": "community.teleno-node",
   "name": "Teleno Koinos Node",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Full upstream Teleno 1.3.0 node: native Linux x64 and Docker-free Windows through WSL2. Separate encrypted wallet, observer and block producer, local JSON-RPC and optional gRPC, native snapshots and public bootstrap. Existing Docker installations can copy their Teleno data into WSL2. No supported upstream ARM/Pi artifact.",
   "entry": "index.html",
   "runtime": "native",
