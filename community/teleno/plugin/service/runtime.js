@@ -63,6 +63,24 @@ class Runtime {
     const version=await this.command("docker",["run","--rm","--network","none","--pull","never",PIN.image,"--version"],{signal,timeout:60000});
     if(!version.startsWith("teleno_node 1.3.0+2c11229267cf"))throw Error("Unexpected Teleno container identity.");return version;
   }
+  async setupStatus(options,signal) {
+    if(this.platform!=="win32")return null;
+    const next={...options,runtime:"wsl"},support=this.support(next);
+    if(!support.supported)return {supported:false,wslReady:false,runtimeReady:false,message:support.reason};
+    const checked=AbortSignal.any([signal||new AbortController().signal,AbortSignal.timeout(15000)]);
+    let wslReady=false;
+    try {
+      await this.wsl.check(next,checked);wslReady=true;
+      // WSL being installed, or having a saved storage record, does not prove
+      // that the executable download and verification completed successfully.
+      if(!this.wsl.ready(next))return {supported:true,wslReady:true,runtimeReady:false,message:"Ubuntu is ready. Install the Teleno runtime next."};
+      await this.installed(next,checked);
+      return {supported:true,wslReady:true,runtimeReady:true,message:"WSL2 and the Teleno runtime are ready."};
+    } catch(error) {
+      signal?.throwIfAborted();
+      return {supported:true,wslReady,runtimeReady:false,message:checked.aborted?"The setup check timed out. Finish Ubuntu setup and any requested Windows restart, then check again.":redact(error.message)};
+    }
+  }
   async install(options,signal,{resumeMigration=false}={}) {
     this.idle({allowMigration:resumeMigration});const support=this.support(options);if(!support.supported)throw Error(support.reason);
     if(options.runtime === "docker") {await this.localDocker(signal);await this.command("docker",["pull",PIN.image],{signal,timeout:600000});return this.installed(options,signal);}
@@ -133,7 +151,7 @@ class Runtime {
     const install=`& wsl.exe --install --distribution '${options.wslDistro}'`;
     const encoded=Buffer.from(install,"utf16le").toString("base64");
     await this.command("powershell.exe",["-NoProfile","-NonInteractive","-Command",`Start-Process powershell.exe -Verb RunAs -ArgumentList '-NoProfile','-NoExit','-EncodedCommand','${encoded}'`],{signal});
-    return {note:"Complete WSL2 and Ubuntu setup in the Windows terminal, create the Linux user if requested, and restart Windows if prompted. Then return here and choose Install / verify runtime. Docker is not needed."};
+    return {note:"Finish Ubuntu setup in the Windows terminal: create your Linux username and password, and restart Windows if prompted. Then return to the setup steps and choose Check setup. Launching this installer alone does not complete setup."};
   }
   prepare(options,producer=null) {
     const dir=this.basedir(options);fs.mkdirSync(path.join(dir,"chain"),{recursive:true,mode:0o700});
@@ -229,6 +247,6 @@ class Runtime {
     return this.job;
   }
   logs(options) {const file=this.logFile(options);safe(file,true,4*1024*1024);return fs.existsSync(file)?redact(fs.readFileSync(file,"utf8").slice(-60000)):"No Teleno logs yet.";}
-  snapshot(options) {return {mode:this.mode,pid:this.child?.pid || null,peers:this.child&&Date.now()-this.peersAt<90000?this.peers:null,network:this.network,job:this.job,error:this.lastError,basedir:this.storageReady(options)?this.basedir(options):`${options.wslDistro} · Install runtime to prepare Linux storage`,support:this.support(options),version:PIN.version,platform:this.platform,storageReady:this.storageReady(options),migrationPending:fs.existsSync(path.join(this.root,"wsl-migration.json"))};}
+  snapshot(options) {return {mode:this.mode,pid:this.child?.pid || null,peers:this.child&&Date.now()-this.peersAt<90000?this.peers:null,network:this.network,job:this.job,error:this.lastError,basedir:this.storageReady(options)?this.basedir(options):`${options.wslDistro} · Install runtime to prepare Linux storage`,support:this.support(options),version:PIN.version,platform:this.platform,storageReady:this.storageReady(options),migrationPending:fs.existsSync(path.join(this.root,"wsl-migration.json")),recoveryPending:!this.child&&fs.existsSync(path.join(this.root,"process.json"))};}
 }
 module.exports={Runtime,command,decode,PIN};

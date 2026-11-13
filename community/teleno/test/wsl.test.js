@@ -35,6 +35,23 @@ test("fresh Windows status and shutdown do not need Docker or an initialized WSL
   const status=await service.call("status");assert.equal(status.settings.runtime,"wsl");assert.equal(status.producer.exists,false);assert.equal(status.runtime.storageReady,false);
   await service.dispose();
 });
+test("setup check reports missing Ubuntu without installing, approving or invoking Docker",async t=>{
+  const dir=root(t),calls=[],controller=new AbortController();
+  const runtime=new Runtime(dir,{platform:"win32",arch:"x64",commandImpl:async(file,args)=>{calls.push([file,args]);return "Debian Stopped 2";}});
+  const service=create({version:1,plugin:{id:"community.teleno-node",dataDir:dir},signal:controller.signal,desktop:{confirm:async()=>{throw Error("A readiness check must not request approval");}}},{platform:"win32",electron:{},runtime});
+  const result=await service.call("runtime.setupStatus");assert.equal(result.wslReady,false);assert.equal(result.runtimeReady,false);assert.match(result.message,/Ubuntu-24.04 is not installed/);
+  assert.deepEqual(calls,[["wsl.exe",["--list","--verbose"]]]);assert.equal(runtime.wsl.meta,null);assert.equal(fs.existsSync(path.join(dir,"runtime")),false);
+  await service.dispose();
+});
+test("saved WSL storage never marks a missing or failed executable installation as ready",async t=>{
+  const r=new Runtime(root(t),{platform:"win32",arch:"x64"}),s=settings({},"win32");let available=true,verified=false;
+  r.wsl.check=async()=>{if(!available)throw Error("Ubuntu is unavailable");};r.wsl.ready=()=>true;
+  r.installed=async()=>{if(!verified)throw Error("Executable verification failed");return "teleno_node 1.3.0";};
+  assert.deepEqual(await r.setupStatus(s),{supported:true,wslReady:true,runtimeReady:false,message:"Executable verification failed"});
+  verified=true;assert.equal((await r.setupStatus(s)).runtimeReady,true);
+  available=false;assert.equal((await r.setupStatus(s)).wslReady,false);
+  const cancelled=new AbortController();cancelled.abort();await assert.rejects(r.setupStatus(s,cancelled.signal),/abort/i);
+});
 test("upgrade recognizes old unsaved Windows chain data rather than hiding its key",async t=>{
   const dir=root(t);fs.mkdirSync(path.join(dir,"chains"));const controller=new AbortController();
   const service=create({version:1,plugin:{id:"community.teleno-node",dataDir:dir},signal:controller.signal,desktop:{confirm:async()=>true}},{platform:"win32",electron:{}});
