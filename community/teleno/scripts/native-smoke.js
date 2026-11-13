@@ -15,10 +15,10 @@ async function main(){
         for(let i=0;i<50;i++){await new Promise(resolve=>setTimeout(resolve,100));if(!r.child)throw Error(r.lastError);try{const response=await fetch(`http://127.0.0.1:${port}`,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({jsonrpc:"2.0",id:1,method:"chain.get_chain_id",params:{}})});answer=await response.json();if(answer.result && /teleno_node ready/.test(r.logs(s)))break;}catch{}}
         assert.equal(answer?.result?.chain_id,id);assert.match(r.logs(s),/teleno_node ready/);await r.stop(s);assert.equal(r.child,null);
       }
-      await r.backup(s,"list");await r.completion;assert.equal(r.job.state,"complete");
+      await r.backup(s,"list");await r.completion;assert.equal(r.job.state,"complete");assert.deepEqual(r.job.result.snapshots,[]);
       // Genesis-only chains cannot produce a meaningful native checkpoint.
       // Preserve the real upstream refusal rather than claiming a backup exists.
-      await r.backup(s,"create");await assert.rejects(r.completion,/exited/);assert.equal(r.job.state,"failed");assert.ok(fs.existsSync(path.join(r.basedir(s),"db")));assert.match(r.logs(s),/checkpoint identity/);
+      await r.backup(s,"create");await assert.rejects(r.completion,/exited/);assert.equal(r.job.state,"failed");assert.match(r.job.error,/checkpoint identity/);assert.ok(fs.existsSync(path.join(r.basedir(s),"db")));assert.match(r.logs(s),/checkpoint identity/);
       console.log(network+": exact runtime, offline RPC identity, clean stop/reopen, backup config/list and genesis-only backup refusal passed");
     }catch(e){console.error(r.logs(s).slice(-5000));throw e;}finally{await r.stop(s);fs.rmSync(root,{recursive:true,force:true});}
   }

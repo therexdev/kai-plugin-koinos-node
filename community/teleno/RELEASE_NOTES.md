@@ -1,3 +1,35 @@
+# Teleno Koinos Node 1.1.4 — Clear backup progress
+
+Backups now shows a live progress panel directly on the main screen: the
+current download or restore stage, measured bytes and percentage, elapsed
+time, transfer speed and an estimated remaining time when enough progress is
+available. Stages without a reported total remain indeterminate. Quiet stages
+explain that verification or disk work may still be running, and stale speed
+estimates are hidden.
+
+Snapshot lists are readable tables with a selection button. Completed downloads
+offer a reviewed restore of that exact snapshot; completed restores point back
+to Overview to start an observer. Download completion is distinct from restore
+completion. The snapshot field survives automatic refresh and navigation.
+Local snapshot actions and detailed logs remain available below the main flow.
+
+Cancellation, missing files, insufficient disk space and connection failures
+appear on the backup screen. Native diagnostics stay under Technical details.
+Progress parsing is bounded and scoped to the current process and network.
+Successful WSL maintenance drains its final output before reporting a result;
+missing or unreadable results never appear as a successful restore. Existing
+runtime checks, native review, recovery records and production-off behavior
+remain in place.
+
+Validation: 65 plugin tests, browser download/restore/cancellation/error flows
+and narrow-layout checks, and real-executable Linux/WSL backup-result smoke
+checks. A public metadata probe confirmed the native DNS error is surfaced;
+this workspace could not resolve the snapshot host, so it did not download or
+restore a full public chain snapshot. No live wallet or production actions
+were tested. Requires Core 0.7.17 or later; no new Core release is needed.
+
+## Previous release
+
 # Teleno Koinos Node 1.1.3 — Complete setup and transaction confirmation
 
 Overview now guides the full path from WSL2/runtime installation through a

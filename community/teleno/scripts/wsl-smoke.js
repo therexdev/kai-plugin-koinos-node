@@ -81,8 +81,8 @@ async function main(){
       }
       // Immediate Stop must cancel an in-flight launch, not leave an orphan.
       r.launch(s,["--disable","block_producer","p2p"],"observer");await r.stop(s);assert.equal(r.child,null);
-      for(const action of ["validate","list"]){await r.backup(s,action);await r.completion;assert.equal(r.job.state,"complete");}
-      await r.backup(s,"create");await assert.rejects(r.completion,/exited/);assert.equal(r.job.state,"failed");await r.stop(s);
+      for(const action of ["validate","list"]){await r.backup(s,action);await r.completion;assert.equal(r.job.state,"complete");assert.equal(r.job.result.ok,true);if(action==="list")assert.deepEqual(r.job.result.snapshots,[]);}
+      await r.backup(s,"create");await assert.rejects(r.completion,/exited/);assert.equal(r.job.state,"failed");assert.match(r.job.error,/checkpoint identity/);await r.stop(s);
       assert.ok(fs.existsSync(path.join(r.basedir(s),"db")));assert.equal(calls.includes("docker"),false);
       console.log(`${network}: ${local?"Linux transport simulation":"actual Windows WSL2"}; exact binary install, preserving data copy, RPC/gRPC, clean reopen, process ownership, cancellation, backup validation/list/refusal passed`);
     }catch(e){console.error(r.logs(s).slice(-6000));throw e;}
