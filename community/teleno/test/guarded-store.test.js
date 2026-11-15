@@ -2,7 +2,8 @@
 const test=require("node:test"),assert=require("node:assert/strict"),fs=require("node:fs"),os=require("node:os"),path=require("node:path");
 const {GuardedStore}=require("../plugin/service/guarded-store");
 function fixture(t){
-  const root=fs.mkdtempSync(path.join(os.tmpdir(),"teleno-store-"));t.after(()=>fs.rmSync(root,{recursive:true,force:true}));
+  // Match service initialization, which resolves macOS's /var temp alias.
+  const root=fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(),"teleno-store-")));t.after(()=>fs.rmSync(root,{recursive:true,force:true}));
   const file=path.join(root,"transactions.json");return {root,file,store:new GuardedStore(file)};
 }
 test("saved records stay independent of caller and reader mutations",t=>{
