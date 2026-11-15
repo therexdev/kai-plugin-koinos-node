@@ -1,3 +1,29 @@
+# Teleno Koinos Node 1.1.5 — Transaction confirmation recovery
+
+Fixes the “could not be cloned” error after a transfer, KOIN burn or signing-key
+registration. The transaction SDK attaches a wait function after submission;
+the saved journal now owns independent snapshots on both writes and reads,
+so later SDK or caller changes cannot corrupt its in-memory record. Inputs
+that cannot be cloned fail before any journal or backup file is changed.
+
+Previously saved pending transactions are checked again when the updated
+plugin opens. Confirmation still requires canonical block inclusion, an
+execution receipt and irreversible height. It never signs or resubmits a
+saved transaction. Wallets, keys, chain data and backup progress are preserved.
+
+If affected before updating, fully quit and reopen KAI, then choose Check
+pending transaction. This reloads the clean journal already on disk. Do not
+repeat the send, burn or key registration to clear a display error.
+
+Validation: all 70 tests pass, including the exact failure reproduced with
+the bundled SDK for all three transaction actions, independent journal
+snapshots, failed-write preservation, canonical/reverted receipt checks and
+no duplicate submissions. Package verification checks the exact signed
+contents. Live chain evidence was checked read-only; no live transaction was
+signed or submitted. Requires Core 0.7.17 or later; no Core update is needed.
+
+## Previous release
+
 # Teleno Koinos Node 1.1.4 — Clear backup progress
 
 Backups now shows a live progress panel directly on the main screen: the

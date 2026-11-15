@@ -25,8 +25,10 @@ class GuardedStore {
     if(!bytes && readFile(file+".last-good"))throw Error("Node settings primary is missing. Restore its backup deliberately before using Node");
   }
   assert() { if(hash(readFile(this.file))!==this.digest)throw Error("Node settings changed outside Core. Close and reopen this plugin before editing"); }
-  get(key,fallback) { const value=key.split(".").reduce((o,k)=>plain(o)&&Object.hasOwn(o,k)?o[k]:undefined,this.data);return value===undefined?fallback:value; }
-  set(key,value) { this.assert();const next=structuredClone(this.data),parts=key.split("."); if(parts.some(k=>["__proto__","constructor","prototype"].includes(k)))throw Error("Invalid node settings key");let row=next;for(const k of parts.slice(0,-1)){if(!plain(row[k]))row[k]={};row=row[k];}row[parts.at(-1)]=value;
+  // Own both sides of the persistence boundary. In particular, koilib adds
+  // transaction.wait after submission; it must not mutate the saved journal.
+  get(key,fallback) { const value=key.split(".").reduce((o,k)=>plain(o)&&Object.hasOwn(o,k)?o[k]:undefined,this.data);return value===undefined?fallback:structuredClone(value); }
+  set(key,value) { this.assert();const next=structuredClone(this.data),parts=key.split("."); if(parts.some(k=>["__proto__","constructor","prototype"].includes(k)))throw Error("Invalid node settings key");let row=next;for(const k of parts.slice(0,-1)){if(!plain(row[k]))row[k]={};row=row[k];}row[parts.at(-1)]=structuredClone(value);
     fs.mkdirSync(path.dirname(this.file),{recursive:true,mode:0o700});const previous=readFile(this.file); if(previous){ const backup=this.file+".core-backup-"+Date.now()+"-"+crypto.randomBytes(4).toString("hex");fs.writeFileSync(backup,previous,{flag:"wx",mode:0o600});if(!fs.readFileSync(backup).equals(previous))throw Error("Node configuration backup failed"); }
     const bytes=Buffer.from(JSON.stringify(next,null,2)),temp=this.file+"."+crypto.randomBytes(8).toString("hex")+".tmp";try{fs.writeFileSync(temp,bytes,{flag:"wx",mode:0o600});this.assert();fs.renameSync(temp,this.file);}finally{fs.rmSync(temp,{force:true});}this.data=next;this.digest=hash(bytes);
   }
