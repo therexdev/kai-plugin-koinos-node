@@ -2,22 +2,11 @@
 // Offline qualification of the actual upstream executable and WSL lifecycle.
 // Windows: uses real wsl.exe + Ubuntu-24.04. Linux --local-transport: executes
 // the same Linux commands/runner directly; does not claim Windows coverage.
-const fs=require("node:fs"),path=require("node:path"),os=require("node:os"),assert=require("node:assert/strict"),http2=require("node:http2");
+const fs=require("node:fs"),path=require("node:path"),os=require("node:os"),assert=require("node:assert/strict");
 const {spawn}=require("node:child_process");
 const {Runtime,command}=require("../plugin/service/runtime"),{settings}=require("../plugin/service/config");
 const pause=ms=>new Promise(resolve=>setTimeout(resolve,ms));
-function grpcHealth(port){
-  return new Promise((resolve,reject)=>{
-    const session=http2.connect(`http://127.0.0.1:${port}`),chunks=[];
-    let headers,trailers,done=false;
-    const finish=error=>{if(done)return;done=true;clearTimeout(timer);session.destroy();error?reject(error):resolve();};
-    const timer=setTimeout(()=>finish(Error("gRPC health check timed out")),2000);session.on("error",finish);
-    const request=session.request({":method":"POST",":path":"/grpc.health.v1.Health/Check","content-type":"application/grpc",te:"trailers"});
-    request.on("error",finish);request.on("response",value=>headers=value);request.on("trailers",value=>trailers=value);request.on("data",chunk=>chunks.push(chunk));
-    request.on("end",()=>{try{assert.equal(headers?.[":status"],200);assert.equal((trailers||headers)?.["grpc-status"],"0");assert.equal(Buffer.concat(chunks).toString("hex"),"00000000020801");finish();}catch(error){finish(error);}});
-    request.end(Buffer.alloc(5)); // Empty protobuf request, framed as gRPC.
-  });
-}
+const grpcHealth=require("./grpc-health");
 async function main(){
   const executable=process.argv[2],local=process.argv.includes("--local-transport");
   const archiveFlag=process.argv.indexOf("--archive"),archive=archiveFlag<0?null:process.argv[archiveFlag+1];

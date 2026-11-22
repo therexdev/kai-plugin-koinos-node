@@ -9,7 +9,7 @@ function settings(input, platform = process.platform) {
   if (![...ports,value.grpcPort].every(p => Number.isInteger(p) && p >= 1024 && p <= 65535) || new Set(ports).size!==ports.length) throw Error("Use different RPC, gRPC and P2P ports between 1024 and 65535.");
   if ([value.history,value.autoStart,value.grpc].some(v=>typeof v!=="boolean")) throw Error("Invalid Teleno option.");
   if (value.runtime === "wsl" && platform !== "win32") throw Error("WSL2 runtime is for Windows. Select native on Linux.");
-  if (value.runtime === "native" && platform !== "linux") throw Error("The native executable requires Linux x64. Select WSL2 on Windows; Intel macOS can use the optional Docker runtime.");
+  if (value.runtime === "native" && platform !== "linux") throw Error("The native executable requires 64-bit Linux (x64 or ARM64). Select WSL2 on Windows; Intel macOS can use the optional Docker runtime.");
   return value;
 }
 function generate(options, basedir, producer = null) {

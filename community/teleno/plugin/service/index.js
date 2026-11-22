@@ -30,7 +30,7 @@ function create(api,deps={}) {
   // that profile on its old runtime until the explicit preserving switch.
   if(hostPlatform==="win32"&&!savedOptions.runtime&&fs.existsSync(path.join(root,"chains")))savedOptions.runtime="docker";
   let options=validateSettings(savedOptions,hostPlatform),closed=false,tail=Promise.resolve(),pending=new Set(),observer=null,disposeTask=null;
-  const runtime=deps.runtime||new Runtime(root,{platform:deps.platform||process.platform}),chain=deps.chain||new ChainService({get:(key,fallback)=>key==="network"?options.network:fallback});
+  const runtime=deps.runtime||new Runtime(root,{platform:deps.platform||process.platform,arch:deps.arch||process.arch}),chain=deps.chain||new ChainService({get:(key,fallback)=>key==="network"?options.network:fallback});
   const local=()=>createProvider([`http://127.0.0.1:${options.rpcPort}`],{timeoutMs:6000});
   // Testnet wallet traffic must use this plugin's port, never the regular node.
   const baseUrls=chain.rpcUrls.bind(chain);chain.rpcUrls=()=>options.network==="harbinger"?[`http://127.0.0.1:${options.rpcPort}`]:baseUrls();
@@ -193,7 +193,7 @@ function create(api,deps={}) {
       await runtime.switchToWsl(options,next,signal);active(signal);store.set("options",next);options=next;runtime.finishWslSwitch();chain.clearCache();observer=null;
       return {note:"Native WSL2 runtime is ready. Original data was preserved. Choose Start observer to sync; production stays off."};
     }
-    if(method==="runtime.install"){runtime.idle();await confirm("Install Teleno 1.3.0",options.runtime==="docker"?"Download the checksum-pinned Teleno Docker image. Docker must already be running.":`Download and verify the full upstream Linux x64 executable.${options.runtime==="wsl"?` Run it in ${options.wslDistro} under WSL2, without Docker. Node data stays in the Linux filesystem.`:""} This starts no node and spends no funds.`,signal);return runtime.install(options,signal);}
+    if(method==="runtime.install"){runtime.idle();await confirm("Install Teleno 1.3.0",options.runtime==="docker"?"Download the checksum-pinned Teleno Docker image. Docker must already be running.":`Download and verify the Teleno Linux ${runtime.arch==="arm64"?"ARM64":"x64"} executable selected for this computer.${options.runtime==="wsl"?` Run it in ${options.wslDistro} under WSL2, without Docker. Node data stays in the Linux filesystem.`:""} This starts no node and spends no funds.`,signal);return runtime.install(options,signal);}
     if(method==="node.start"){await confirm("Start Teleno observer",`${options.network.toUpperCase()}\nStart an observer in ${runtime.basedir(options)}. JSON-RPC stays on localhost. P2P listens on port ${options.p2pPort}. Block production remains off.`,signal);observer=null;await runtime.start(options,{signal});return runtime.snapshot(options);}
     if(method==="node.stop"){await runtime.stop(options);observer=null;return runtime.snapshot(options);}
     if(method==="producer.start") {

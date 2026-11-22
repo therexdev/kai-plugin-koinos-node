@@ -1,0 +1,155 @@
+name: Teleno ARM64 plugin integration
+on:
+  push:
+    branches: [codex/teleno-pi-support]
+    paths: ['.github/workflows/teleno-arm64-integration.yml']
+  workflow_dispatch:
+    inputs:
+      build_run:
+        description: Successful native ARM64 qualification run ID
+        required: true
+        default: '44992430549'
+permissions:
+  actions: read
+  contents: write
+jobs:
+  integrate:
+    runs-on: ubuntu-24.04-arm
+    container: debian:bookworm
+    timeout-minutes: 200
+    env:
+      BUILD_RUN: ${{ inputs.build_run || '44992430549' }}
+    steps:
+      - name: Install runtime tools
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends binutils ca-certificates curl git libstdc++6 python3 tar
+          test "$(uname -m)" = aarch64
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Verify the native qualification run
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 - <<'PY'
+          import json, os, time, urllib.request
+          run = os.environ['BUILD_RUN']
+          assert run.isdigit()
+          repo = os.environ['GITHUB_REPOSITORY']
+          request = urllib.request.Request(f'https://api.github.com/repos/{repo}/actions/runs/{run}', headers={'Authorization': 'Bearer '+os.environ['GH_TOKEN']})
+          deadline = time.monotonic()+10800
+          while True:
+              with urllib.request.urlopen(request, timeout=30) as response:
+                  record = json.load(response)
+              if record['status'] == 'completed':
+                  break
+              assert time.monotonic() < deadline, 'Native qualification did not finish within its build deadline'
+              print('Native ARM64 qualification is still running; integration waits for its result.', flush=True)
+              time.sleep(45)
+          assert record['status'] == 'completed' and record['conclusion'] == 'success'
+          assert record['head_repository']['full_name'] == repo
+          assert record['head_branch'] == 'codex/teleno-linux-arm64'
+          assert record['path'] == '.github/workflows/teleno-arm64.yml'
+          assert record['event'] in ['push', 'workflow_dispatch']
+          PY
+      - uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          run-id: ${{ env.BUILD_RUN }}
+          name: teleno-linux-arm64-1.3.0-${{ env.BUILD_RUN }}
+          path: qualified
+      - name: Verify provenance and all upstream native test results
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 - <<'PY'
+          import hashlib, json, os, pathlib, re, urllib.error, urllib.parse, urllib.request, xml.etree.ElementTree as ET
+          root = pathlib.Path('qualified/teleno-source/build')
+          info = json.loads((root/'generated/teleno-node-build-info.json').read_text())
+          assert info['source_commit'] == '2c11229267cff2f9ee39ed8e56ab70af391d85ce'
+          assert info['source_clean'] is True
+          compatibility = json.loads((root/'arm64-compatibility.json').read_text())
+          assert compatibility['engineSource'] == info['source_commit']
+          assert compatibility['patchSha256'] == hashlib.sha256(pathlib.Path('community/teleno/scripts/patches/libp2p-gcc12-templates.patch').read_bytes()).hexdigest()
+          assert compatibility['testFixturePatchSha256'] == hashlib.sha256(pathlib.Path('community/teleno/scripts/patches/teleno-gcc12-test-fixture.patch').read_bytes()).hexdigest()
+          report = root/'native-tests.xml'
+          if report.exists():
+              cases = ET.parse(report).findall('.//testcase')
+              assert len(cases) == 107
+              assert all(c.find('failure') is None and c.find('error') is None and c.find('skipped') is None for c in cases)
+          # Early qualification runs wrote JUnit relative to CTest's build
+          # directory. Preserve their actual successful test output instead;
+          # require every unique test ID, the zero-failure summary and the
+          # successful test step from the authenticated native run.
+          repo, run = os.environ['GITHUB_REPOSITORY'], os.environ['BUILD_RUN']
+          headers = {'Authorization': 'Bearer '+os.environ['GH_TOKEN']}
+          with urllib.request.urlopen(urllib.request.Request(f'https://api.github.com/repos/{repo}/actions/runs/{run}/jobs', headers=headers), timeout=30) as response:
+              jobs = json.load(response)['jobs']
+          job = next(j for j in jobs if j['name'] == 'native')
+          assert job['conclusion'] == 'success'
+          assert any(s['name'] == 'Build and run upstream native tests' and s['conclusion'] == 'success' for s in job['steps'])
+          class NoRedirect(urllib.request.HTTPRedirectHandler):
+              def redirect_request(self, req, fp, code, msg, hdrs, newurl):
+                  return None
+          request = urllib.request.Request(f"https://api.github.com/repos/{repo}/actions/jobs/{job['id']}/logs", headers=headers)
+          try:
+              urllib.request.build_opener(NoRedirect).open(request, timeout=30)
+              raise AssertionError('Expected a signed log download redirect')
+          except urllib.error.HTTPError as response:
+              assert response.code == 302
+              url = response.headers['Location']
+          assert urllib.parse.urlsplit(url).scheme == 'https'
+          # The signed download request deliberately has no GitHub credential.
+          with urllib.request.urlopen(url, timeout=60) as response:
+              lines = response.read().decode().splitlines()
+          passed = [line for line in lines if re.search(r'\b(\d+)/107 Test\s+#(\d+):.*?\bPassed\s+[0-9.]+ sec', line)]
+          ids = [int(re.search(r'Test\s+#(\d+):', line).group(1)) for line in passed]
+          assert len(ids) == 107 and set(ids) == set(range(1,108))
+          summary = [line for line in lines if '100% tests passed, 0 tests failed out of 107' in line]
+          assert len(summary) == 1
+          (root/'native-tests.log').write_text('\n'.join(passed+summary)+'\n')
+          print('All 107 upstream native tests passed on ARM64; exact log retained')
+          PY
+      - name: Qualify the real ARM64 engine through the plugin
+        shell: bash
+        run: |
+          tar -xzf qualified/arm64-runtime/teleno-node-1.3.0-linux-arm64.tar.gz -C qualified
+          node community/teleno/scripts/record-arm64-runtime.js "$GITHUB_WORKSPACE/qualified/teleno-node-1.3.0/bin/teleno_node" qualified/arm64-runtime/teleno-node-1.3.0-linux-arm64.tar.gz qualified/candidate-pins.json
+          cd community/teleno
+          npm test
+          node scripts/verify-package.js --source
+          node scripts/native-smoke.js "$GITHUB_WORKSPACE/qualified/teleno-node-1.3.0/bin/teleno_node" --archive "$GITHUB_WORKSPACE/qualified/arm64-runtime/teleno-node-1.3.0-linux-arm64.tar.gz" --pins-file "$GITHUB_WORKSPACE/qualified/candidate-pins.json" | tee "$GITHUB_WORKSPACE/qualified/arm64-plugin-smoke.txt"
+      - name: Prepare an isolated branch for the tested engine
+        uses: actions/checkout@v4
+        with:
+          path: runtime-stage
+      - name: Save tested runtime and evidence for pin review (no release)
+        working-directory: runtime-stage
+        run: |
+          branch="codex/teleno-arm64-runtime-$BUILD_RUN"
+          test -z "$(git ls-remote --heads origin "refs/heads/$branch")"
+          git switch --orphan "$branch"
+          mkdir -p runtimes/linux-arm64-1.3.0
+          cp "$GITHUB_WORKSPACE/qualified/arm64-runtime/teleno-node-1.3.0-linux-arm64.tar.gz" runtimes/linux-arm64-1.3.0/
+          cp "$GITHUB_WORKSPACE/qualified/candidate-pins.json" "$GITHUB_WORKSPACE/qualified/arm64-plugin-smoke.txt" runtimes/linux-arm64-1.3.0/
+          cp "$GITHUB_WORKSPACE/qualified/teleno-source/build/generated/teleno-node-build-info.json" "$GITHUB_WORKSPACE/qualified/teleno-source/build/native-tests.log" runtimes/linux-arm64-1.3.0/
+          cp "$GITHUB_WORKSPACE/qualified/teleno-source/build/arm64-compatibility.json" runtimes/linux-arm64-1.3.0/
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add runtimes
+          git commit -m 'Preserve qualified Teleno 1.3.0 Linux ARM64 runtime and test evidence'
+          git push origin "HEAD:refs/heads/$branch"
+          git rev-parse HEAD | tee "$GITHUB_WORKSPACE/qualified/runtime-commit.txt"
+      - name: Retain integration evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: teleno-arm64-plugin-integration-${{ github.run_id }}
+          if-no-files-found: warn
+          retention-days: 30
+          path: |
+            qualified/candidate-pins.json
+            qualified/arm64-plugin-smoke.txt
+            qualified/runtime-commit.txt

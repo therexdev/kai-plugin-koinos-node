@@ -1,0 +1,138 @@
+diff --git a/include/libp2p/injector/host_injector.hpp b/include/libp2p/injector/host_injector.hpp
+index 8ba0ba8..4265b3d 100644
+--- a/include/libp2p/injector/host_injector.hpp
++++ b/include/libp2p/injector/host_injector.hpp
+@@ -29,13 +29,13 @@ namespace libp2p::injector {
+         makeNetworkInjector<InjectorConfig>(),
+ 
+         // repositories
+-        di::bind<peer::PeerRepository>.to<peer::PeerRepositoryImpl>(),
+-        di::bind<peer::KeyRepository>.to<peer::InmemKeyRepository>(),
+-        di::bind<peer::ProtocolRepository>.to<peer::InmemProtocolRepository>(),
++        di::bind<peer::PeerRepository>.template to<peer::PeerRepositoryImpl>(),
++        di::bind<peer::KeyRepository>.template to<peer::InmemKeyRepository>(),
++        di::bind<peer::ProtocolRepository>.template to<peer::InmemProtocolRepository>(),
+ 
+         di::bind<Libp2pClientVersion>.to(Libp2pClientVersion{"cpp-libp2p"}),
+ 
+-        di::bind<Host>.to<host::BasicHost>(),
++        di::bind<Host>.template to<host::BasicHost>(),
+ 
+         // user-defined overrides...
+         std::forward<decltype(args)>(args)...
+diff --git a/include/libp2p/injector/network_injector.hpp b/include/libp2p/injector/network_injector.hpp
+index 30d59b6..bbc8d01 100644
+--- a/include/libp2p/injector/network_injector.hpp
++++ b/include/libp2p/injector/network_injector.hpp
+@@ -222,7 +222,7 @@ namespace libp2p::injector {
+   template <typename... AdaptorImpl>
+   inline auto useLayerAdaptors() {
+     return boost::di::bind<layer::LayerAdaptor *[]>()  // NOLINT
+-        .to<AdaptorImpl...>()[boost::di::override];
++        .template to<AdaptorImpl...>()[boost::di::override];
+   }
+ 
+   /**
+@@ -243,7 +243,7 @@ namespace libp2p::injector {
+   template <typename... SecImpl>
+   inline auto useSecurityAdaptors() {
+     return boost::di::bind<security::SecurityAdaptor *[]>()  // NOLINT
+-        .to<SecImpl...>()[boost::di::override];
++        .template to<SecImpl...>()[boost::di::override];
+   }
+ 
+   /**
+@@ -256,7 +256,7 @@ namespace libp2p::injector {
+   template <typename... MuxerImpl>
+   inline auto useMuxerAdaptors() {
+     return boost::di::bind<muxer::MuxerAdaptor *[]>()  // NOLINT
+-        .to<MuxerImpl...>()[boost::di::override];
++        .template to<MuxerImpl...>()[boost::di::override];
+   }
+ 
+   /**
+@@ -269,7 +269,7 @@ namespace libp2p::injector {
+   template <typename... TransportImpl>
+   inline auto useTransportAdaptors() {
+     return boost::di::bind<transport::TransportAdaptor *[]>()  // NOLINT
+-        .to<TransportImpl...>()[boost::di::override];
++        .template to<TransportImpl...>()[boost::di::override];
+   }
+ 
+   /**
+@@ -306,7 +306,7 @@ namespace libp2p::injector {
+ 
+     // clang-format off
+     return di::make_injector<InjectorConfig>(
+-        di::bind<crypto::random::RandomGenerator>.to<crypto::random::BoostRandomGenerator>(),
++        di::bind<crypto::random::RandomGenerator>.template to<crypto::random::BoostRandomGenerator>(),
+ 
+         di::bind<crypto::KeyPair>().to(std::move(keypair)),
+         di::bind<crypto::random::CSPRNG>().to(std::move(csprng)),
+@@ -314,41 +314,41 @@ namespace libp2p::injector {
+         di::bind<crypto::rsa::RsaProvider>().to(std::move(rsa_provider)),
+         di::bind<crypto::ecdsa::EcdsaProvider>().to(std::move(ecdsa_provider)),
+         di::bind<crypto::secp256k1::Secp256k1Provider>().to(std::move(secp256k1_provider)),
+-        di::bind<crypto::aes::AesCtr>().to<crypto::aes::AesCtrImpl>(),
+-        di::bind<crypto::hmac::HmacProvider>().to<crypto::hmac::HmacProviderImpl>(),
+-        di::bind<crypto::CryptoProvider>().to<crypto::CryptoProviderImpl>(),
+-        di::bind<crypto::marshaller::KeyMarshaller>().to<crypto::marshaller::KeyMarshallerImpl>(),
+-        di::bind<peer::IdentityManager>().to<peer::IdentityManagerImpl>(),
+-        di::bind<crypto::validator::KeyValidator>().to<crypto::validator::KeyValidatorImpl>(),
+-        di::bind<security::plaintext::ExchangeMessageMarshaller>().to<security::plaintext::ExchangeMessageMarshallerImpl>(),
+-        di::bind<security::secio::ProposeMessageMarshaller>().to<security::secio::ProposeMessageMarshallerImpl>(),
+-        di::bind<security::secio::ExchangeMessageMarshaller>().to<security::secio::ExchangeMessageMarshallerImpl>(),
++        di::bind<crypto::aes::AesCtr>().template to<crypto::aes::AesCtrImpl>(),
++        di::bind<crypto::hmac::HmacProvider>().template to<crypto::hmac::HmacProviderImpl>(),
++        di::bind<crypto::CryptoProvider>().template to<crypto::CryptoProviderImpl>(),
++        di::bind<crypto::marshaller::KeyMarshaller>().template to<crypto::marshaller::KeyMarshallerImpl>(),
++        di::bind<peer::IdentityManager>().template to<peer::IdentityManagerImpl>(),
++        di::bind<crypto::validator::KeyValidator>().template to<crypto::validator::KeyValidatorImpl>(),
++        di::bind<security::plaintext::ExchangeMessageMarshaller>().template to<security::plaintext::ExchangeMessageMarshallerImpl>(),
++        di::bind<security::secio::ProposeMessageMarshaller>().template to<security::secio::ProposeMessageMarshallerImpl>(),
++        di::bind<security::secio::ExchangeMessageMarshaller>().template to<security::secio::ExchangeMessageMarshallerImpl>(),
+         di::bind<layer::WsConnectionConfig>.to(layer::WsConnectionConfig{}),
+         di::bind<layer::WssCertificate>.to(layer::WssCertificate{}),
+ 
+         di::bind<basic::Scheduler::Config>.to(basic::Scheduler::Config{}),
+-        di::bind<basic::SchedulerBackend>().to<basic::AsioSchedulerBackend>(),
+-        di::bind<basic::Scheduler>().to<basic::SchedulerImpl>(),
++        di::bind<basic::SchedulerBackend>().template to<basic::AsioSchedulerBackend>(),
++        di::bind<basic::Scheduler>().template to<basic::SchedulerImpl>(),
+ 
+         // internal
+-        di::bind<network::DnsaddrResolver>().to <network::DnsaddrResolverImpl>(),
+-        di::bind<network::Router>().to<network::RouterImpl>(),
+-        di::bind<network::ConnectionManager>().to<network::ConnectionManagerImpl>(),
+-        di::bind<network::ListenerManager>().to<network::ListenerManagerImpl>(),
+-        di::bind<network::Dialer>().to<network::DialerImpl>(),
+-        di::bind<network::Network>().to<network::NetworkImpl>(),
+-        di::bind<network::TransportManager>().to<network::TransportManagerImpl>(),
+-        di::bind<transport::Upgrader>().to<transport::UpgraderImpl>(),
+-        di::bind<protocol_muxer::ProtocolMuxer>().to<protocol_muxer::multiselect::Multiselect>(),
++        di::bind<network::DnsaddrResolver>().template to <network::DnsaddrResolverImpl>(),
++        di::bind<network::Router>().template to<network::RouterImpl>(),
++        di::bind<network::ConnectionManager>().template to<network::ConnectionManagerImpl>(),
++        di::bind<network::ListenerManager>().template to<network::ListenerManagerImpl>(),
++        di::bind<network::Dialer>().template to<network::DialerImpl>(),
++        di::bind<network::Network>().template to<network::NetworkImpl>(),
++        di::bind<network::TransportManager>().template to<network::TransportManagerImpl>(),
++        di::bind<transport::Upgrader>().template to<transport::UpgraderImpl>(),
++        di::bind<protocol_muxer::ProtocolMuxer>().template to<protocol_muxer::multiselect::Multiselect>(),
+ 
+         // default adaptors
+         di::bind<muxer::MuxedConnectionConfig>.to(muxer::MuxedConnectionConfig{}),
+-        di::bind<layer::LayerAdaptor *[]>().to<layer::WsAdaptor, layer::WssAdaptor>(),  // NOLINT
+-        di::bind<security::SecurityAdaptor *[]>().to<security::Plaintext, security::Secio, security::Noise, security::TlsAdaptor>(),  // NOLINT
+-        di::bind<muxer::MuxerAdaptor *[]>().to<muxer::Yamux, muxer::Mplex>(),  // NOLINT
+-        di::bind<transport::TransportAdaptor *[]>().to<transport::TcpTransport, transport::QuicTransport>(),  // NOLINT
++        di::bind<layer::LayerAdaptor *[]>().template to<layer::WsAdaptor, layer::WssAdaptor>(),  // NOLINT
++        di::bind<security::SecurityAdaptor *[]>().template to<security::Plaintext, security::Secio, security::Noise, security::TlsAdaptor>(),  // NOLINT
++        di::bind<muxer::MuxerAdaptor *[]>().template to<muxer::Yamux, muxer::Mplex>(),  // NOLINT
++        di::bind<transport::TransportAdaptor *[]>().template to<transport::TcpTransport, transport::QuicTransport>(),  // NOLINT
+ 
+-        di::bind<peer::AddressRepository>.to<peer::InmemAddressRepository>(),
++        di::bind<peer::AddressRepository>.template to<peer::InmemAddressRepository>(),
+ 
+         // user-defined overrides...
+         std::forward<decltype(args)>(args)...
