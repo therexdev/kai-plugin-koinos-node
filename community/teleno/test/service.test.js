@@ -66,6 +66,14 @@ test("production setup reports read failures as unavailable rather than empty ba
   const {service}=fixture(t,{chain:fake.chain});await service.call("wallet.create",{password:"test-password-123"});await service.call("producer.key");
   const checked=await service.call("setup.productionStatus");assert.equal(checked.balances,null);assert.match(checked.balancesError,/unavailable/);assert.equal(checked.registered,null);assert.equal(fake.sends(),0);
 });
+test("overview reads the locked wallet without reviews and isolates an unreadable mining index from node controls",async t=>{
+  const fake=fakeChain(),provider=fake.chain.provider();fake.chain.provider=()=>provider;fake.chain.balances=async()=>({koin:"100",vhp:"200",mana:"100"});
+  provider.invokeGetContractAddress=async token=>({value:{address:token==="koin"?"19GYjDBVXU7keLbYvMLazsGQn3GTWHjHkK":"1H7QvaYveeG4oBM7krKSpEMXwREv1RFjvK"}});provider.getHeadInfo=async()=>({last_irreversible_block:"10"});provider.call=async()=>({values:[]});
+  const {service,api,reviews}=fixture(t,{chain:fake.chain});await service.call("wallet.create",{password:"test-password-123"});await service.call("wallet.lock");const count=reviews.length;
+  const summary=await service.call("dashboard.summary");assert.equal(summary.address,(await service.call("status")).wallet.address);assert.equal(summary.mining.totals.blocks,"0");assert.equal(summary.balances.vhp,"200");assert.equal(reviews.length,count);assert.equal(fake.sends(),0);assert.equal((await service.call("status")).wallet.unlocked,false);
+  await service.dispose();fs.writeFileSync(path.join(api.plugin.dataDir,"mining-history.json"),"unreadable preserved history");const reopened=create(api,{platform:"linux",chain:fake.chain,electron:{}});
+  try{const failed=await reopened.call("dashboard.summary");assert.equal(failed.mining,null);assert.match(failed.miningError,/unreadable/);assert.equal((await reopened.call("status")).runtime.mode,"stopped");assert.equal(fs.readFileSync(path.join(api.plugin.dataDir,"mining-history.json"),"utf8"),"unreadable preserved history");}finally{await reopened.dispose();}
+});
 test("uncertain wallet submission is persisted before transport and blocks duplicates",async t=>{
   const fake=fakeChain({fail:true}),{service,api}=fixture(t,{chain:fake.chain});await service.call("wallet.create",{password:"test-password-123"});
   const input={password:"test-password-123",to:"test-address",amount:"1",token:"koin"};

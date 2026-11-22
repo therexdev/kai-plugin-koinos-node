@@ -25,3 +25,9 @@ test("non-cloneable input fails before changing the journal or its backups",t=>{
   assert.deepEqual(store.get("pending"),{txId:"preserved"});assert.equal(store.get("last",null),null);
   store.set("last",{txId:"safe"});assert.equal(store.get("last").txId,"safe");
 });
+test("a frequently refreshed derived index stays bounded and still preserves externally changed data",t=>{
+  const {root,file}=fixture(t),index=new GuardedStore(file,{backup:false});
+  index.set("mining.cursor","100");index.set("mining.cursor","200");
+  assert.deepEqual(fs.readdirSync(root),[path.basename(file)]);assert.equal(new GuardedStore(file).get("mining.cursor"),"200");
+  fs.writeFileSync(file,"unreadable external data");assert.throws(()=>index.set("mining.cursor","300"),/changed outside/);assert.equal(fs.readFileSync(file,"utf8"),"unreadable external data");
+});
