@@ -4,7 +4,7 @@ const {pipeline}=require("node:stream/promises"),{Transform}=require("node:strea
 const {GuardedStore}=require("./guarded-store"),{safe,write}=require("./storage"),{inventory,digest}=require("./wsl-migration");
 const MARKER=".kai-teleno-storage.json",networks=new Set(["mainnet","harbinger"]),hash=value=>crypto.createHash("sha256").update(value).digest("hex");
 const signature=st=>({dev:st.dev,ino:st.ino}),same=(a,b)=>a.dev===b.dev&&a.ino===b.ino;
-function syncFile(file){const fd=fs.openSync(file,"r");try{fs.fsyncSync(fd);}finally{fs.closeSync(fd);}}
+function syncFile(file,flags="r+"){const fd=fs.openSync(file,flags);try{fs.fsyncSync(fd);}finally{fs.closeSync(fd);}}
 function freeBytes(file){try{const s=fs.statfsSync(file,{bigint:true});return Number(s.bavail*s.bsize);}catch{return null;}}
 function existingParent(file){let at=file;while(!fs.existsSync(at)){const next=path.dirname(at);if(next===at)throw Error("Storage location is unavailable.");at=next;}return at;}
 class ChainStorage {
@@ -12,7 +12,7 @@ class ChainStorage {
     this.root=root;this.platform=platform;this.owner=hash(root).slice(0,20);this.store=new GuardedStore(path.join(root,"chain-storage.json"));
     this.journal=path.join(root,"chain-storage-transfer.json");this.job=null;this.task=null;this.controller=null;
   }
-  syncDirectory(file){if(this.platform==="linux")syncFile(file);}
+  syncDirectory(file){if(this.platform==="linux")syncFile(file,"r");}
   get busy(){return !!this.task;}
   get pending(){safe(this.journal,true,32768);return fs.existsSync(this.journal);}
   location(options){
