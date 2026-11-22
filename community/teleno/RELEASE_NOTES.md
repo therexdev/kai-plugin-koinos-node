@@ -1,3 +1,26 @@
+# Teleno Koinos Node 1.2.0 — Linux ARM64 / Raspberry Pi
+
+- The existing plugin now selects a checksum-pinned native engine for Linux
+  x64 or ARM64. Raspberry Pi requires 64-bit Raspberry Pi OS and ARM64 KAI Core.
+- Native ARM64 targets Debian 12 / Pi OS Bookworm (GLIBC 2.36+). This community
+  build uses the same Teleno 1.3.0 source as the existing x64 runtime.
+- 32-bit ARM, macOS ARM64, Windows ARM64 and ARM64 Docker remain unsupported
+  and receive explicit platform messages. There is no x64 fallback on ARM64.
+- Archive and executable verification are per architecture. Native installation
+  checks the actual engine before replacing an existing installation.
+- Windows x64 WSL2, Linux x64 and optional x64 Docker retain their pinned
+  engines. Wallets, producer approvals and chain directories keep their
+  existing behavior.
+
+Validation: 80 plugin tests and source-package verification; actual Linux x64
+archive installation, both offline network identities, restart, RPC/gRPC,
+process ownership, cancellation and backup validation/list/refusal pass.
+ARM64 native compilation/qualification is recorded separately by the ARM64
+workflow. A signed package/catalog release follows successful ARM64 validation
+and pin review. Physical Pi uptime and funded production are not claimed.
+
+---
+
 # Teleno Koinos Node 1.1.5 — Transaction confirmation recovery
 
 Fixes the “could not be cloned” error after a transfer, KOIN burn or signing-key

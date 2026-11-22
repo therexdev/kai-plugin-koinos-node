@@ -31,15 +31,38 @@ guide offers **Stop node** before that step. Wallet backup confirmation is tied
 to the wallet; balances and registration are checked separately for each network
 and key. Unavailable RPC results are shown as unverified, not zero balances.
 
+## Raspberry Pi / Linux ARM64 (1.2.0)
+
+Use the same **Teleno Koinos Node** Community plugin on a Raspberry Pi with
+64-bit Raspberry Pi OS Bookworm or newer and the ARM64 build of KAI Core.
+The plugin selects the ARM64 engine automatically. In Settings, use
+**Native Linux (x64 / ARM64)**, then follow **Install Teleno** and the existing
+observer or producer guide. Docker and an Android installation are unnecessary.
+A 32-bit OS is refused with instructions to install the 64-bit OS.
+
+The engine is a separate Linux GLIBC build of the same pinned Teleno 1.3.0
+source, not the Android executable. It is maintained by therexdev and is not
+an official upstream ARM64 release. Both the downloaded archive and extracted
+executable must match architecture-specific SHA-256 pins before execution.
+A failed download, checksum or native loader check preserves an existing engine.
+Windows and Linux x64 keep their existing upstream engine and image hashes.
+The optional Docker image remains x64 only; ARM64 uses the native runtime.
+
+Chain snapshots require space for the download, restored database and retained
+recovery data. Resource or disk-space refusals remain visible in Backups and
+Logs; the platform change does not bypass Teleno's readiness checks.
+Actual Pi hardware, sustained mainnet sync and funded block production still
+require operator testing. Native ARM64 runner tests are not a Pi uptime claim.
+
 ## Differences from the regular node
 
 | | Teleno Community | Regular KAI Koinos Node |
 | --- | --- | --- |
 | Runtime | Complete upstream Teleno executable; Docker optional | Docker microservice stack |
 | Wallet | Its own encrypted wallet and separate block-signing hot key | Its own Node wallet |
-| Native platform | Linux x64, GLIBC 2.38+; Windows x64 through WSL2 / Ubuntu 24.04 | Docker-based runtime |
+| Native platform | Linux x64 (GLIBC 2.38+), Linux ARM64 (GLIBC 2.36+); Windows x64 through WSL2 / Ubuntu 24.04 | Docker-based runtime |
 | Optional Docker platform | Existing x64 Windows profiles, Intel macOS, Linux | Multi-service Docker setup |
-| ARM / Raspberry Pi | Not supported by the pinned upstream artifacts | Separate regular-node support |
+| ARM / Raspberry Pi | Native Linux ARM64 community build; 64-bit OS and ARM64 KAI Core required | Separate regular-node support |
 | Chain data | Separate per-network Teleno databases | Legacy Koinos database layout |
 | Backups | Native snapshots, preflight, restore, public bootstrap | Regular-node quick sync / migration |
 | Funding | Receive, send KOIN/VHP, and explicit manual burn | Also bridge funding and external-signing flows |
@@ -70,7 +93,7 @@ The latest verified result remains visible after confirmation and after reopenin
 
 ## Runtime provenance and validation limits
 
-This package pins Teleno **1.3.0**, source `2c11229267cff2f9ee39ed8e56ab70af391d85ce`. Archive, native executable and Docker image hashes are in [`plugin/service/runtime.json`](plugin/service/runtime.json). Downloads are checked before execution; no rolling `latest` tag is used. New upstream binaries require a reviewed plugin release. Upstream artifacts are unsigned; checksum pins here are covered by the KAI publisher's package signature.
+This package pins Teleno **1.3.0**, source `2c11229267cff2f9ee39ed8e56ab70af391d85ce`. Architecture-specific archives, native executables and the Docker image hashes are in [`plugin/service/runtime.json`](plugin/service/runtime.json). Downloads are checked before execution; no rolling `latest` tag is used. New upstream binaries require a reviewed plugin release. The x64 upstream artifacts and community ARM64 artifact have separate provenance; checksum pins here are covered by the KAI publisher's package signature.
 
 Upstream has published observer qualification, not a guarantee of unlimited mainnet producer uptime. See [release evidence and remaining work](https://github.com/koinos/teleno/releases/tag/teleno-node-v1.3.0). Local checks cover the real Linux executable's offline startup, genesis identity, clean reopen, backup configuration/listing and refusal of an empty-chain backup, plus wallet/lifecycle tests.
 

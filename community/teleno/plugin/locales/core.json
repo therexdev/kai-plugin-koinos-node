@@ -107,7 +107,10 @@
     "Start observer": "Iniciar observador",
     "Stop production": "Detener producción",
     "Teleno wallet": "Billetera Teleno",
-    "Upstream project": "Proyecto original"
+    "Upstream project": "Proyecto original",
+    "Native Linux (x64 / ARM64)": "Linux nativo (x64 / ARM64)",
+    "Native Linux ARM64; requires 64-bit Raspberry Pi OS": "Linux ARM64 nativo; requiere Raspberry Pi OS de 64 bits",
+    "Linux x64 and ARM64 native; Windows x64 through WSL2 without Docker. Docker remains an optional x64 runtime.": "Linux x64 y ARM64 nativo; Windows x64 mediante WSL2 sin Docker. Docker sigue siendo una opción para x64."
   },
   "pt-BR": {
     "About & differences": "Sobre e diferenças",
@@ -217,7 +220,10 @@
     "Start observer": "Iniciar observador",
     "Stop production": "Parar produção",
     "Teleno wallet": "Carteira Teleno",
-    "Upstream project": "Projeto original"
+    "Upstream project": "Projeto original",
+    "Native Linux (x64 / ARM64)": "Linux nativo (x64 / ARM64)",
+    "Native Linux ARM64; requires 64-bit Raspberry Pi OS": "Linux ARM64 nativo; requer Raspberry Pi OS de 64 bits",
+    "Linux x64 and ARM64 native; Windows x64 through WSL2 without Docker. Docker remains an optional x64 runtime.": "Linux x64 e ARM64 nativo; Windows x64 via WSL2 sem Docker. Docker continua opcional para x64."
   },
   "fr": {
     "About & differences": "À propos et différences",
@@ -327,7 +333,10 @@
     "Start observer": "Démarrer l’observateur",
     "Stop production": "Arrêter la production",
     "Teleno wallet": "Portefeuille Teleno",
-    "Upstream project": "Projet d’origine"
+    "Upstream project": "Projet d’origine",
+    "Native Linux (x64 / ARM64)": "Linux natif (x64 / ARM64)",
+    "Native Linux ARM64; requires 64-bit Raspberry Pi OS": "Linux ARM64 natif ; nécessite Raspberry Pi OS 64 bits",
+    "Linux x64 and ARM64 native; Windows x64 through WSL2 without Docker. Docker remains an optional x64 runtime.": "Linux x64 et ARM64 natif ; Windows x64 via WSL2 sans Docker. Docker reste facultatif pour x64."
   },
   "de": {
     "About & differences": "Info und Unterschiede",
@@ -437,6 +446,9 @@
     "Start observer": "Beobachter starten",
     "Stop production": "Blockproduktion stoppen",
     "Teleno wallet": "Teleno-Wallet",
-    "Upstream project": "Ursprungsprojekt"
+    "Upstream project": "Ursprungsprojekt",
+    "Native Linux (x64 / ARM64)": "Natives Linux (x64 / ARM64)",
+    "Native Linux ARM64; requires 64-bit Raspberry Pi OS": "Natives Linux ARM64; erfordert Raspberry Pi OS mit 64 Bit",
+    "Linux x64 and ARM64 native; Windows x64 through WSL2 without Docker. Docker remains an optional x64 runtime.": "Linux x64 und ARM64 nativ; Windows x64 über WSL2 ohne Docker. Docker bleibt für x64 optional."
   }
 }

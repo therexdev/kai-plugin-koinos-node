@@ -16,7 +16,7 @@ test("configuration never overwrites mismatched genesis",t=>{
   const runtime=new Runtime(root(t)),s=settings({});const dir=runtime.prepare(s);fs.writeFileSync(path.join(dir,"chain/genesis_data.json"),"other-chain");assert.throws(()=>runtime.prepare(s),/differs/);assert.equal(fs.readFileSync(path.join(dir,"chain/genesis_data.json"),"utf8"),"other-chain");
 });
 test("unsupported architecture is explicit and install executes no process",async t=>{
-  let called=false;const runtime=new Runtime(root(t),{arch:"arm64",commandImpl:async()=>{called=true;}});await assert.rejects(runtime.install(settings({})),/x64/);assert.equal(called,false);
+  let called=false;const runtime=new Runtime(root(t),{arch:"arm",commandImpl:async()=>{called=true;}});await assert.rejects(runtime.install(settings({})),/64-bit/);assert.equal(called,false);
 });
 test("checksum mismatch prevents executable launch",async t=>{
   let called=false;const runtime=new Runtime(root(t),{commandImpl:async()=>{called=true;}});fs.mkdirSync(path.dirname(runtime.binary));fs.writeFileSync(runtime.binary,"altered");await assert.rejects(runtime.installed(settings({})),/checksum/);assert.equal(called,false);

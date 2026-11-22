@@ -41,8 +41,8 @@ jobs:
         if: runner.os == 'Linux'
         shell: bash
         run: |
-          curl --fail --location --max-time 120 "$(node -p 'require("./plugin/service/runtime.json").url')" -o "$RUNNER_TEMP/teleno.tar.gz"
-          node -e 'const fs=require("fs"),c=require("crypto"),p=require("./plugin/service/runtime.json");if(c.createHash("sha256").update(fs.readFileSync(process.argv[1])).digest("hex")!==p.archiveSha256)throw Error("Runtime checksum mismatch")' "$RUNNER_TEMP/teleno.tar.gz"
+          curl --fail --location --max-time 120 "$(node -p 'require("./plugin/service/runtime.json").native.x64.url')" -o "$RUNNER_TEMP/teleno.tar.gz"
+          node -e 'const fs=require("fs"),c=require("crypto"),p=require("./plugin/service/runtime.json");if(c.createHash("sha256").update(fs.readFileSync(process.argv[1])).digest("hex")!==p.native.x64.archiveSha256)throw Error("Runtime checksum mismatch")' "$RUNNER_TEMP/teleno.tar.gz"
           tar -xzf "$RUNNER_TEMP/teleno.tar.gz" -C "$RUNNER_TEMP" teleno-node-1.3.0/bin/teleno_node
           node scripts/native-smoke.js "$RUNNER_TEMP/teleno-node-1.3.0/bin/teleno_node"
           node scripts/wsl-smoke.js "$RUNNER_TEMP/teleno-node-1.3.0/bin/teleno_node" --local-transport --archive "$RUNNER_TEMP/teleno.tar.gz"
@@ -68,8 +68,8 @@ jobs:
         run: |
           $pin = Get-Content plugin/service/runtime.json | ConvertFrom-Json
           $archive = Join-Path $env:RUNNER_TEMP "teleno.tar.gz"
-          Invoke-WebRequest -Uri $pin.url -OutFile $archive
-          if ((Get-FileHash $archive -Algorithm SHA256).Hash.ToLower() -ne $pin.archiveSha256) { throw "Runtime checksum mismatch" }
+          Invoke-WebRequest -Uri $pin.native.x64.url -OutFile $archive
+          if ((Get-FileHash $archive -Algorithm SHA256).Hash.ToLower() -ne $pin.native.x64.archiveSha256) { throw "Runtime checksum mismatch" }
           tar -xzf $archive -C $env:RUNNER_TEMP teleno-node-1.3.0/bin/teleno_node
           if ($LASTEXITCODE -ne 0) { throw "Native archive extraction failed" }
           node scripts/wsl-smoke.js (Join-Path $env:RUNNER_TEMP "teleno-node-1.3.0/bin/teleno_node") --archive $archive

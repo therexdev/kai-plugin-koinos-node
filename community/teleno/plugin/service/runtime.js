@@ -18,9 +18,10 @@ async function freePort(port,host) {
   await new Promise((resolve,reject)=>{const server=net.createServer();server.once("error",()=>reject(Error(`Port ${port} is already in use. Stop the conflicting node or choose another port in Settings.`)));server.listen(port,host,()=>server.close(resolve));});
 }
 class Runtime {
-  constructor(root,{spawnImpl=spawn,commandImpl=command,fetchImpl=fetch,platform=process.platform,arch=process.arch,wslHostPathImpl}={}) {
+  constructor(root,{spawnImpl=spawn,commandImpl=command,fetchImpl=fetch,platform=process.platform,arch=process.arch,runtimePins=PIN,wslHostPathImpl}={}) {
     this.root=root;this.spawn=spawnImpl;this.command=commandImpl;this.fetch=fetchImpl;this.platform=platform;this.arch=arch;
     this.child=null;this.completion=null;this.mode="stopped";this.job=null;this.lastError=null;this.peers=null;this.peersAt=0;this.owner=hash(root).slice(0,20);
+    this.pins=runtimePins;
     this.binary=path.join(root,"runtime","teleno_node");this.activeOptions=null;this.network=null;
     this.wsl=new WslRuntime(root,{command:this.command,owner:this.owner,hostPathImpl:wslHostPathImpl});
   }
@@ -29,11 +30,26 @@ class Runtime {
   executionDir(options) {return options.runtime==="wsl"?this.wsl.paths(options).linux:this.basedir(options);}
   name(options) {return `kai-teleno-${this.owner}-${options.network}`;}
   logFile(options) {return path.join(this.root,"logs",options.network+".log");}
+  artifact(options) {
+    const support=this.support(options);if(!support.supported)throw Error(support.reason);
+    return this.pins.native[this.arch];
+  }
+  verifyVersion(version) {
+    if(version!==`teleno_node ${this.pins.version}+${this.pins.source.slice(0,12)}`)throw Error("Unexpected Teleno runtime identity.");
+    return version;
+  }
   support(options) {
-    if (this.arch !== "x64") return {supported:false,reason:"Teleno 1.3.0 publishes x64 artifacts only. Raspberry Pi/ARM and Apple Silicon are not supported by this package."};
-    if (options.runtime === "native" && this.platform !== "linux") return {supported:false,reason:"Select WSL2 on Windows. The pinned native executable requires Linux x64."};
-    if(options.runtime==="wsl")return {supported:this.platform==="win32",reason:"Full Teleno Linux x64 executable through WSL2. Docker is not required. Ubuntu 24.04 provides the required native libraries."};
-    return {supported:true,reason:options.runtime === "native"?"Linux x64; GLIBC 2.38+ and libstdc++ required. Install checks the actual executable.":"Docker must be installed, running, and using Linux containers."};
+    if(this.platform==="linux"&&this.arch==="arm")return {supported:false,reason:"Raspberry Pi requires a 64-bit operating system and the ARM64 KAI Core build. Install 64-bit Raspberry Pi OS; 32-bit ARM is not supported."};
+    if(options.runtime==="native") {
+      if(this.platform!=="linux")return {supported:false,reason:"The native runtime requires Linux. Windows x64 uses WSL2; Intel macOS can use Docker."};
+      if(!["x64","arm64"].includes(this.arch))return {supported:false,reason:"Native Teleno requires Linux x64 or ARM64."};
+      const pin=this.pins.native[this.arch];
+      if(!pin||![pin.archiveSha256,pin.binarySha256].every(h=>/^[a-f0-9]{64}$/.test(h)))return {supported:false,reason:`A verified Linux ${this.arch} engine is not included in this plugin release.`};
+      return {supported:true,reason:`Linux ${this.arch=== "arm64"?"ARM64 (64-bit Raspberry Pi OS)":"x64"}; GLIBC ${pin.glibc}+ and libstdc++ required. Install checks the actual executable.`};
+    }
+    if(options.runtime==="wsl"&&this.platform==="win32"&&this.arch==="x64")return {supported:true,reason:"Full Teleno Linux x64 executable through WSL2. Docker is not required. Ubuntu 24.04 provides the required native libraries."};
+    if(options.runtime==="docker"&&["linux","win32","darwin"].includes(this.platform)&&this.arch==="x64")return {supported:true,reason:"Docker must be installed, running, and using Linux x64 containers."};
+    return {supported:false,reason:this.platform==="linux"&&this.arch==="arm64"?"On Raspberry Pi / Linux ARM64, select Native Linux in Settings. The pinned Docker image is x64 only.":"This runtime is not supported on this system. Windows/WSL2 and macOS/Docker require x64; ARM64 is supported with native Linux only."};
   }
   async localDocker(signal) {
     if(process.env.DOCKER_HOST && !/^(unix:|npipe:)/.test(process.env.DOCKER_HOST))throw Error("Use a local Docker Desktop/Engine context; remote Docker hosts cannot manage this plugin's local data.");
@@ -45,24 +61,23 @@ class Runtime {
   }
   async installed(options,signal) {
     const support=this.support(options);if(!support.supported)throw Error(support.reason);
+    const pin=options.runtime==="docker"?null:this.artifact(options);
     if(options.runtime==="wsl") {
       await this.wsl.check(options,signal);
       const binary=this.wsl.binaryHost(options);safe(binary,true);
       if(!fs.existsSync(binary))throw Error("Install the Teleno runtime from Overview first.");
-      if(hash(fs.readFileSync(binary))!==PIN.binarySha256)throw Error("Teleno executable checksum changed. Runtime was not started.");
+      if(hash(fs.readFileSync(binary))!==pin.binarySha256)throw Error("Teleno executable checksum changed. Runtime was not started.");
       const version=await this.wsl.exec(options,[this.wsl.paths(options).binary,"--version"],{signal});
-      if(!version.startsWith("teleno_node 1.3.0+2c11229267cf"))throw Error("Unexpected Teleno runtime identity.");
-      return version;
+      return this.verifyVersion(version);
     }
     if(options.runtime === "native") {
       safe(this.binary,true);if(!fs.existsSync(this.binary))throw Error("Install the Teleno runtime from Overview first.");
-      if(hash(fs.readFileSync(this.binary)) !== PIN.binarySha256)throw Error("Teleno executable checksum changed. Runtime was not started.");
-      const version=await this.command(this.binary,["--version"],{signal});if(!version.startsWith("teleno_node 1.3.0+2c11229267cf"))throw Error("Unexpected Teleno runtime identity.");
-      return version;
+      if(hash(fs.readFileSync(this.binary)) !== pin.binarySha256)throw Error("Teleno executable checksum changed. Runtime was not started.");
+      return this.verifyVersion(await this.command(this.binary,["--version"],{signal}));
     }
     await this.localDocker(signal);
     const version=await this.command("docker",["run","--rm","--network","none","--pull","never",PIN.image,"--version"],{signal,timeout:60000});
-    if(!version.startsWith("teleno_node 1.3.0+2c11229267cf"))throw Error("Unexpected Teleno container identity.");return version;
+    return this.verifyVersion(version);
   }
   async setupStatus(options,signal) {
     const next=this.platform==="win32"?{...options,runtime:"wsl"}:{...options},support=this.support(next);
@@ -85,11 +100,12 @@ class Runtime {
   async install(options,signal,{resumeMigration=false}={}) {
     this.idle({allowMigration:resumeMigration});const support=this.support(options);if(!support.supported)throw Error(support.reason);
     if(options.runtime === "docker") {await this.localDocker(signal);await this.command("docker",["pull",PIN.image],{signal,timeout:600000});return this.installed(options,signal);}
+    const pin=this.artifact(options);
     if(options.runtime==="wsl") {await this.wsl.initialize(options,signal);await this.wsl.idle(options,signal);}
     const dir=safe(path.join(this.root,"runtime"));fs.mkdirSync(dir,{recursive:true,mode:0o700});
     const staging=fs.mkdtempSync(path.join(dir,"download-")),archive=path.join(staging,"runtime.tar.gz");
     try {
-      let url=PIN.url, response;
+      let url=pin.url, response;
       for(let n=0;n<5;n++) {
         const u=new URL(url);
         if(u.protocol!=="https:" || u.username || u.password || !["github.com","release-assets.githubusercontent.com","objects.githubusercontent.com"].includes(u.hostname))throw Error("Unexpected runtime download host.");
@@ -99,13 +115,16 @@ class Runtime {
       }
       if(!response?.ok || !response.body)throw Error("Teleno runtime download failed.");
       const chunks=[];let bytes=0;for await(const chunk of response.body){signal?.throwIfAborted();bytes+=chunk.length;if(bytes>32*1024*1024)throw Error("Teleno download exceeds the release size limit.");chunks.push(chunk);}
-      const data=Buffer.concat(chunks);if(hash(data)!==PIN.archiveSha256)throw Error("Teleno download checksum mismatch.");fs.writeFileSync(archive,data,{flag:"wx",mode:0o600});
+      const data=Buffer.concat(chunks);if(hash(data)!==pin.archiveSha256)throw Error("Teleno download checksum mismatch.");fs.writeFileSync(archive,data,{flag:"wx",mode:0o600});
       const entries=(await this.command("tar",["-tzf",archive],{signal})).split(/\r?\n/);
       if(entries.some(p=>p.startsWith("/")||p.includes("\\")||p.split("/").includes("..")))throw Error("Unsafe runtime archive.");
       const executable=entries.filter(p=>p.endsWith("/teleno_node"));if(executable.length!==1)throw Error("Unexpected runtime archive layout.");
       await this.command("tar",["-xzf",archive,"-C",staging,executable[0]],{signal});
       const source=safe(path.join(staging,executable[0]),true);
-      if(hash(fs.readFileSync(source))!==PIN.binarySha256)throw Error("Teleno executable checksum mismatch.");
+      if(hash(fs.readFileSync(source))!==pin.binarySha256)throw Error("Teleno executable checksum mismatch.");
+      // Check the selected engine's real loader/libraries before replacing an
+      // existing native installation. A failed ARM64 install preserves it.
+      if(options.runtime==="native") {fs.chmodSync(source,0o700);this.verifyVersion(await this.command(source,["--version"],{signal}));}
       signal?.throwIfAborted();const binary=options.runtime==="wsl"?this.wsl.binaryHost(options):this.binary;
       write(binary,fs.readFileSync(source));
       if(options.runtime==="wsl")await this.wsl.exec(options,["chmod","700",this.wsl.paths(options).binary],{signal});else fs.chmodSync(binary,0o700);
@@ -260,6 +279,6 @@ class Runtime {
     }catch(error){progress.finish(error);throw error;}
   }
   logs(options) {const file=this.logFile(options);safe(file,true,4*1024*1024);return fs.existsSync(file)?redact(fs.readFileSync(file,"utf8").slice(-60000)):"No Teleno logs yet.";}
-  snapshot(options) {return {mode:this.mode,pid:this.child?.pid || null,peers:this.child&&Date.now()-this.peersAt<90000?this.peers:null,network:this.network,job:this.job?.network&&this.job.network!==options.network?null:this.job,error:this.lastError,basedir:this.storageReady(options)?this.basedir(options):`${options.wslDistro} · Install runtime to prepare Linux storage`,support:this.support(options),version:PIN.version,platform:this.platform,storageReady:this.storageReady(options),migrationPending:fs.existsSync(path.join(this.root,"wsl-migration.json")),recoveryPending:!this.child&&fs.existsSync(path.join(this.root,"process.json"))};}
+  snapshot(options) {return {mode:this.mode,pid:this.child?.pid || null,peers:this.child&&Date.now()-this.peersAt<90000?this.peers:null,network:this.network,job:this.job?.network&&this.job.network!==options.network?null:this.job,error:this.lastError,basedir:this.storageReady(options)?this.basedir(options):`${options.wslDistro} · Install runtime to prepare Linux storage`,support:this.support(options),version:PIN.version,platform:this.platform,arch:this.arch,storageReady:this.storageReady(options),migrationPending:fs.existsSync(path.join(this.root,"wsl-migration.json")),recoveryPending:!this.child&&fs.existsSync(path.join(this.root,"process.json"))};}
 }
 module.exports={Runtime,command,decode,PIN};
