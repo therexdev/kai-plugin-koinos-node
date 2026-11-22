@@ -3,7 +3,7 @@
   "apiVersion": 3,
   "id": "community.teleno-node",
   "name": "Teleno Koinos Node",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "description": "Teleno node with a live mining overview: independent wallet, balances, sync health, confirmed blocks, KOIN rewards and dated history. Native Linux x64 / ARM64 (64-bit Raspberry Pi OS), Windows x64 through WSL2, and optional x64 Docker. Checksum-pinned Teleno 1.3.0 engine, local RPC, snapshots and public bootstrap.",
   "entry": "index.html",
   "runtime": "native",

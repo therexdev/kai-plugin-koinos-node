@@ -3,7 +3,7 @@ var KaiLocale = globalThis.KaiI18n || (typeof require === "function" ? require("
 const $=id=>document.getElementById(id),call=(method,input={})=>window.kai.call(method,input);
 const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const units=s=>{try{const n=BigInt(s),w=n/100000000n,f=(n%100000000n).toString().padStart(8,"0").replace(/0+$/,"");return w.toLocaleString()+ (f?"."+f:"");}catch{return "—";}};
-let page="overview",state=null,busy=false,polling=false,lastLogs="",backupSelection="latest";
+let page="overview",state=null,busy=false,polling=false,lastLogs="",backupSelection="latest",contentReady=false,statusFailed=false;
 let setup=null,setupPromise=null,setupChecking=false,setupCheckedAt=0,paintedOverviewKey="";
 let production=null,productionPromise=null,productionChecking=false,productionCheckedAt=0,pendingChecking=false,pendingCheckedAt=0;
 let mining=null,miningPromise=null,miningCheckedAt=0,miningExpanded=false;
@@ -27,7 +27,21 @@ async function checkProduction(force=false){
     finally{productionChecking=false;productionCheckedAt=Date.now();productionPromise=null;if(page==="overview"&&!busy)paint();else if(page==="producer")updateProducerControls();}
   })();return productionPromise;
 }
-function navigate(next,target){page=next;notice("");paint();if(target)$(target)?.scrollIntoView({block:"start"});else window.scrollTo(0,0);if(page==="overview"||page==="producer"){void checkSetup();void checkProduction();}}
+function navigate(next,target){page=next;notice("");paint();if(!contentReady)void refresh(true);if(target)$(target)?.scrollIntoView({block:"start"});else window.scrollTo(0,0);if(page==="overview"||page==="producer"){void checkSetup();void checkProduction();}}
+async function readStatus(){
+  let timer;
+  try{
+    // Bound this read only. Spending and node-control calls retain their
+    // existing confirmation journals and cancellation behavior.
+    const value=await Promise.race([call("status"),new Promise((_,reject)=>{timer=setTimeout(()=>reject(Error("Teleno did not return its node status within 20 seconds. Retry the connection.")),20000);})]);
+    if(!value||!value.settings||!value.wallet||!value.runtime||!value.producer)throw Error("Teleno returned an incomplete node status. Retry the connection.");
+    return value;
+  }finally{clearTimeout(timer);}
+}
+function showStartupFailure(error){
+  $("content").innerHTML=KaiLocale.html`<section class="card" id="startup-failure" role="status"><h2>Teleno could not load</h2><p>The node status is unavailable. You can retry the connection here.</p><p class="note">${esc(String(error?.message||error).slice(0,500))}</p><div class="actions">${button("retry-status","Retry connection","primary")}</div></section>`;
+  bind();syncControls();
+}
 function transactionStatus(){
   const pending=state.pending,last=state.lastTransaction,tx=pending||last;
   if(!tx)return KaiLocale.html`<p id="pending-tx">No pending transaction.</p>`;
@@ -123,12 +137,14 @@ function paint(){
   $("content").innerHTML=html;for(const id of openDetails){if($(id)?.tagName==="DETAILS")$(id).open=true;}
   if(page==="settings"){ $("setting-network").value=s.network;$("setting-runtime").value=s.runtime;$("setting-log").value=s.logLevel; }
   bind();syncControls();if(page==="overview")void loadMining();if(page==="wallet"&&w.exists)loadWallet();if(page==="logs")loadLogs();if(page==="producer"){updateProducerControls();void checkProduction();}
+  contentReady=true;
 }
 async function run(fn,checkAfter=false,productionAfter=false){if(busy)return;busy=true;notice("Working…");syncControls();try{const result=await fn();state=await call("status");if(checkAfter)await checkSetup(true);if(productionAfter)await checkProduction(true);if(page==="backups"&&(result?.category==="backup"||result?.job?.category==="backup"))notice("");else notice(typeof result==="string"?result:result?.note||result?.txId?`${result.note||(result.confirmed?(result.reverted?"Transaction reverted.":"Transaction confirmed."):"Transaction submitted.")}${result.txId?"\n"+result.txId:""}`:"Done.");paint();}catch(e){notice(e.message,true);if(page==="backups"){try{state=await call("status");updateBackups();}catch{}}if(checkAfter){try{state=await call("status");await checkSetup(true);paint();}catch{}}}finally{busy=false;syncControls();}}
 function bind(){
   if($("backup-id"))$("backup-id").oninput=()=>{backupSelection=$("backup-id").value;};
   document.querySelectorAll("[data-backup-select]").forEach(b=>b.onclick=()=>{backupSelection=b.dataset.backupSelect;if($("backup-id")){$("backup-id").value=backupSelection;$("backup-id").focus();}notice("Snapshot selected. Choose Download public snapshot, or Check restore for a local snapshot.");});
   document.querySelectorAll("[data-action]").forEach(b=>b.onclick=()=>{
+    if(b.dataset.action==="retry-status"){void refresh(true);return;}
     const destinations={"go-overview":["overview"],"go-wallet":["wallet"],"go-backup":["wallet","wallet-backup-panel"],"go-fund":["wallet","wallet-fund-panel"],"go-producer":["producer"],"go-logs":["logs"],"go-backups":["backups"],"go-settings":["settings"]};
     if(destinations[b.dataset.action]){navigate(...destinations[b.dataset.action]);return;}
     if(b.dataset.action==="mining-refresh"){void loadMining(true);return;}
@@ -157,6 +173,7 @@ function bind(){
 async function loadWallet(){const results=await Promise.allSettled([call("wallet.balances"),call("wallet.history")]);if(page!=="wallet")return;const [b,h]=results;if(b.status==="fulfilled"&&b.value)for(const token of ["koin","vhp","mana"]){if($("bal-"+token))$("bal-"+token).textContent=units(b.value[token]);}else if(b.status==="rejected")notice("Balances unavailable: "+b.reason.message,true);if(!$("history"))return;if(h.status==="rejected"){$("history").textContent="History unavailable: "+h.reason.message;return;}$("history").replaceChildren();for(const row of h.value.rows||[]){const item=document.createElement("div");item.className="history-item";KaiLocale.setText(item, ((_value) => _value ? KaiLocale.literal(_value) : KaiLocale.message(["Transaction"]))(row.label||row.type));const detail=document.createElement("small");detail.textContent=[row.id||row.txId,...(row.changes||[]).map(c=>(c.direction==="out"?"−":"+")+units(c.amount)+" "+c.asset)].filter(Boolean).join(" · ");item.append(detail);$("history").append(item);}if(!h.value.rows?.length)KaiLocale.setText($("history"), KaiLocale.message(["No activity is listed by the account-history service yet. The transaction status above is checked separately."]));}
 async function loadLogs(){try{lastLogs=await call("logs");if($("logs"))$("logs").textContent=lastLogs;}catch(e){notice(e.message,true);}}
 document.querySelectorAll("nav [data-page]").forEach(b=>b.onclick=()=>navigate(b.dataset.page));
-async function refresh(){if(polling||document.hidden)return;polling=true;try{state=await call("status");if(!$("content").children.length||(!busy&&page==="overview"&&paintedOverviewKey!==overviewKey()))paint();if($("live-mode"))$("live-mode").textContent=state.runtime.mode;if($("live-head"))$("live-head").textContent=state.head?.height?.toLocaleString()||"—";if($("live-peers"))$("live-peers").textContent=state.peers??"—";if($("live-rpc"))KaiLocale.setText($("live-rpc"), ((_value) => _value ? KaiLocale.literal(_value) : KaiLocale.message(["Observer mode does not spend funds or produce blocks."]))(state.rpcError||state.runtime.error));if(page==="overview"){drawMining();if(!busy)void loadMining();}if(page==="backups")updateBackups();if($("migration-status"))$("migration-status").textContent=state.runtime.job?.action==="switch-to-wsl"?jobStatus(state.runtime.job):"";if(page==="logs")await loadLogs();if(!busy&&(page==="overview"||page==="producer")){void checkSetup();void checkProduction();}if(!busy)void checkPending();if(page==="producer")updateProducerControls();}catch(e){notice(e.message,true);}finally{polling=false;}}
-window.addEventListener("focus",()=>{if(page==="backups")void refresh();if(!busy&&(page==="overview"||page==="producer")){void checkSetup();void checkProduction();}if(!busy)void checkPending();if(page==="producer")updateProducerControls();});
-refresh();setInterval(refresh,5000);
+async function refresh(force=false){if(polling||contentReady&&document.hidden&&!force)return;polling=true;try{state=await readStatus();if(statusFailed){notice("");statusFailed=false;}if(!contentReady||(!busy&&page==="overview"&&paintedOverviewKey!==overviewKey()))paint();if($("live-mode"))$("live-mode").textContent=state.runtime.mode;if($("live-head"))$("live-head").textContent=state.head?.height?.toLocaleString()||"—";if($("live-peers"))$("live-peers").textContent=state.peers??"—";if($("live-rpc"))KaiLocale.setText($("live-rpc"), ((_value) => _value ? KaiLocale.literal(_value) : KaiLocale.message(["Observer mode does not spend funds or produce blocks."]))(state.rpcError||state.runtime.error));if(page==="overview"){drawMining();if(!busy)void loadMining();}if(page==="backups")updateBackups();if($("migration-status"))$("migration-status").textContent=state.runtime.job?.action==="switch-to-wsl"?jobStatus(state.runtime.job):"";if(page==="logs")await loadLogs();if(!busy&&(page==="overview"||page==="producer")){void checkSetup();void checkProduction();}if(!busy)void checkPending();if(page==="producer")updateProducerControls();}catch(e){statusFailed=true;if(!contentReady)showStartupFailure(e);else{state={...state,rpcError:"Node status could not refresh: "+e.message};notice(state.rpcError,true);if(page==="overview")drawMining();}}finally{polling=false;}}
+window.addEventListener("focus",()=>{void refresh(true);if(!busy&&(page==="overview"||page==="producer")){void checkSetup();void checkProduction();}if(!busy)void checkPending();if(page==="producer")updateProducerControls();});
+document.addEventListener("visibilitychange",()=>{if(!document.hidden)void refresh(true);});
+paint();void refresh();setInterval(refresh,5000);

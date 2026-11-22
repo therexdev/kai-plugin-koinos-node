@@ -14,6 +14,14 @@ On Windows, **Set up WSL2** reopens an existing Ubuntu installation, including
 after interrupted username/password setup. Complete any prompts, or return to
 **Check setup** if Ubuntu opens at a command prompt. Ubuntu files are preserved.
 
+### Overview startup
+
+**1.3.1** loads the first node status even while Core is opening the embedded
+view. If status cannot be read, the page shows a reason and **Retry connection**
+after at most 20 seconds. Retry reads status again; it does not start production
+or repeat a wallet transaction. Update in place to retain your wallet and node
+data. Core **0.7.33** is sufficient for this plugin patch.
+
 ### Mining overview
 
 Version **1.3.0** brings the selected wallet and balances, node health, chain
