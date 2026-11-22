@@ -14,6 +14,27 @@ On Windows, **Set up WSL2** reopens an existing Ubuntu installation, including
 after interrupted username/password setup. Complete any prompts, or return to
 **Check setup** if Ubuntu opens at a command prompt. Ubuntu files are preserved.
 
+### Mining overview
+
+Version **1.3.0** brings the selected wallet and balances, node health, chain
+progress, confirmed produced blocks, KOIN rewards and VHP consumed to Overview.
+The recent reward feed includes block heights and local dates/times. Use
+**Show more blocks** for up to 40 recent indexed blocks. Deposits and transfers
+are excluded from mining rewards. Counts cover the wallet on the selected
+network, including production by another machine using the same wallet.
+
+Older history is indexed in bounded batches and resumes after restart. The
+newest confirmed rewards are fetched separately so they appear while totals
+are still marked partial. Network or history errors are displayed; previously
+loaded figures are clearly marked out of date. History requires an available
+account-history RPC service (local history on Harbinger). A recent head and
+peers show chain progress, not a guarantee that this machine will find a block.
+
+The overview refreshes node health every five seconds and wallet/mining details
+every 30 seconds while visible. It never unlocks a wallet or enables production.
+For the Pi AppImage extraction error, update **KAI Core to 0.7.33**; fully quit
+Core including its tray instance and reopen once if the old app already errored.
+
 ### Complete setup order
 
 1. **Set up WSL2 and Ubuntu** (Windows only), finish the Ubuntu prompts and any requested restart, then **Check setup**.

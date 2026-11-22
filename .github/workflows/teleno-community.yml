@@ -34,6 +34,18 @@ jobs:
       - run: npm test
       - run: node scripts/verify-package.js --source
       - run: node scripts/assemble-signed-package.js
+      - name: Install isolated desktop test tools
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          npm install --prefix "$RUNNER_TEMP/teleno-desktop-tools" --ignore-scripts --no-package-lock electron@43.8.3 playwright-core@1.62.1
+          node "$RUNNER_TEMP/teleno-desktop-tools/node_modules/electron/install.js"
+          sudo chown root:root "$RUNNER_TEMP/teleno-desktop-tools/node_modules/electron/dist/chrome-sandbox"
+          sudo chmod 4755 "$RUNNER_TEMP/teleno-desktop-tools/node_modules/electron/dist/chrome-sandbox"
+      - name: Verify mining overview in the sandboxed desktop renderer
+        if: runner.os == 'Linux'
+        shell: bash
+        run: KAI_DESKTOP_TEST_TOOLS="$RUNNER_TEMP/teleno-desktop-tools" node scripts/mining-smoke.cjs
       - name: Verify the exact signed release package
         if: github.event_name != 'pull_request'
         run: node scripts/verify-package.js

@@ -2,6 +2,7 @@
 const fs=require("node:fs"),path=require("node:path"),crypto=require("node:crypto");
 const {WalletService}=require("./core/lib/wallet"),{ChainService}=require("./core/lib/koinos/chain");
 const {WalletHistory}=require("./core/lib/koinos/wallet-history"),{GuardedStore}=require("./guarded-store");
+const {MiningStats}=require("./mining-stats");
 const {runOperation,guardKoinosProvider}=require("./core/lib/koinos/operation-lifetime");
 const {createProvider}=require("./core/lib/koinos-rpc"),{MAINNET_CHAIN}=require("./core/lib/koin-network/payment-network");
 const {Signer}=require("koilib"),{settings:validateSettings}=require("./config");
@@ -35,6 +36,8 @@ function create(api,deps={}) {
   // Testnet wallet traffic must use this plugin's port, never the regular node.
   const baseUrls=chain.rpcUrls.bind(chain);chain.rpcUrls=()=>options.network==="harbinger"?[`http://127.0.0.1:${options.rpcPort}`]:baseUrls();
   const history=new WalletHistory({chain,wallet});
+  let mining;
+  async function miningStatus(check){mining??=new MiningStats({chain,wallet,state:new GuardedStore(path.join(root,"mining-history.json")),checkNetwork});return mining.read(check);}
   const active=signal=>{api.signal.throwIfAborted();signal?.throwIfAborted();if(closed)throw Error("Teleno is closing.");store.assert();journal.assert();checkWallet();};
   const identity=()=>JSON.stringify({address:wallet.address,options});
   const context=(signal,id)=>()=>{active(signal);if(identity()!==id)throw Error("Teleno wallet or settings changed. Review the action again.");};
@@ -147,6 +150,14 @@ function create(api,deps={}) {
     if(method==="status")return status(signal);
     if(method==="runtime.setupStatus")return runtime.setupStatus({...options},signal);
     if(method==="setup.productionStatus")return productionSetup(signal);
+    if(method==="dashboard.summary") {
+      const address=wallet.address,network=options.network,check=context(signal,identity());
+      if(!address)return {address:null,network,balances:null,mining:null,observedAt:Date.now()};
+      await checkNetwork();check();
+      const [balances,stats]=await Promise.allSettled([chain.balances(address),miningStatus(check)]);check();
+      return {address,network,balances:balances.status==="fulfilled"?balances.value:null,balancesError:balances.status==="rejected"?redact(balances.reason.message):null,
+        mining:stats.status==="fulfilled"?stats.value:null,miningError:stats.status==="rejected"?redact(stats.reason.message):null,observedAt:Date.now()};
+    }
     if(method==="setup.goal") {
       if(!["observer","producer"].includes(input.goal))throw Error("Choose observer or block producer instructions.");
       if(store.get("setup.goal","producer")!==input.goal)store.set("setup.goal",input.goal);
@@ -228,7 +239,7 @@ function create(api,deps={}) {
     }
     throw Error("Unknown Teleno method.");
   }
-  const reads=new Set(["status","runtime.setupStatus","setup.productionStatus","logs","wallet.balances","wallet.history","wallet.pending","producer.status"]);
+  const reads=new Set(["status","runtime.setupStatus","setup.productionStatus","dashboard.summary","logs","wallet.balances","wallet.history","wallet.pending","producer.status"]);
   return {
     call(method,input={},signal) {
       const frozen=structuredClone(input),combined=AbortSignal.any([api.signal,lifetime.signal,...(signal?[signal]:[])]);

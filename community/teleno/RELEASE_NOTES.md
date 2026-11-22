@@ -1,3 +1,31 @@
+# Teleno Koinos Node 1.3.0 — Mining overview
+
+The Overview page now shows the current independent Teleno wallet, lock state,
+KOIN/tKOIN, VHP and mana balances, production/observer health, advancing chain
+head, irreversible height, peers, confirmed blocks produced, KOIN block rewards,
+and VHP consumed. A dated block/reward history shows the latest reward, with
+an expandable recent feed and a manual refresh button.
+
+Mining totals use irreversible block receipts signed by the selected wallet.
+Only native KOIN mint events and VHP burn events count as rewards and consumed
+VHP. Deposits, transfers, transaction mints and reversible blocks are excluded.
+Account totals may include another machine producing with the same wallet.
+Recent rewards load immediately while bounded older-history indexing resumes
+across restarts; totals stay labeled partial until indexing finishes. Failed
+refreshes retain previously loaded history with a visible stale-data warning.
+Wallet/network changes discard the previous identity's displayed figures.
+
+This is a read-only overview update. It does not unlock a wallet, enable
+production, burn, transfer or register a key. Existing wallets, signing keys,
+chain databases and the x64/ARM64 checksum-pinned engines are retained.
+The existing setup guide and reviewed producer controls remain available.
+
+Validation includes the plugin suite, exact signed-package verification and
+real sandboxed Electron renderer checks with synthetic chain replies on both
+Linux x64 and ARM64. No funded production or physical Pi uptime is claimed.
+
+---
+
 # Teleno Koinos Node 1.2.0 — Linux ARM64 / Raspberry Pi
 
 - The existing plugin now selects a checksum-pinned native engine for Linux
