@@ -3,13 +3,13 @@ const test=require("node:test"),assert=require("node:assert/strict"),{identity,p
 function state(){return {settings:{network:"mainnet",runtime:"wsl"},runtime:{platform:"win32",mode:"stopped"},wallet:{exists:false},producer:{exists:false},setup:{goal:"producer",walletBackupSaved:false}};}
 const runtime={wslReady:true,runtimeReady:true},current=g=>g.steps.find(s=>s.current)?.id;
 function funded(s){return {key:identity(s),checkedAt:Date.now(),balances:{koin:"200000000",vhp:"100000000",mana:"500000000"},registered:s.producer.publicKey};}
-test("producer guide orders wallet and backup and signing key before observer startup",()=>{
+test("producer setup starts the observer first and keeps production gated by live chain evidence",()=>{
   const s=state();assert.equal(current(progress(s,{wslReady:false,runtimeReady:false})),"wsl");
   assert.equal(current(progress(s,{wslReady:true,runtimeReady:false})),"runtime");
-  assert.equal(current(progress(s,runtime)),"wallet");s.wallet={exists:true,address:"wallet"};
+  assert.equal(current(progress(s,runtime)),"sync");s.runtime.mode="observer";assert.equal(current(progress(s,runtime)),"wallet");s.wallet={exists:true,address:"wallet"};
   assert.equal(current(progress(s,runtime)),"wallet-backup");s.setup.walletBackupSaved=true;
   assert.equal(current(progress(s,runtime)),"key");s.producer={exists:true,publicKey:"key"};
-  assert.equal(current(progress(s,runtime)),"sync");
+  assert.equal(current(progress(s,runtime)),"fund");
   s.runtime.mode="observer";s.head={recent:true,advancing:true};s.peers=2;
   assert.equal(current(progress(s,runtime)),"fund");
   const evidence=funded(s);evidence.registered=null;assert.equal(current(progress(s,runtime,evidence)),"register");

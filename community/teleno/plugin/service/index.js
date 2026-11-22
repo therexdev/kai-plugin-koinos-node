@@ -6,6 +6,7 @@ const {MiningStats}=require("./mining-stats");
 const {runOperation,guardKoinosProvider}=require("./core/lib/koinos/operation-lifetime");
 const {createProvider}=require("./core/lib/koinos-rpc"),{MAINNET_CHAIN}=require("./core/lib/koin-network/payment-network");
 const {Signer}=require("koilib"),{settings:validateSettings}=require("./config");
+const {formatAmount}=require("./core/lib/koinos/format"),os=require("node:os");
 const {Runtime}=require("./runtime"),{safe,write,redact}=require("./storage");
 // Verified from the pinned release with its bundled Harbinger genesis, offline.
 const HARBINGER_CHAIN="EiBncD4pKRIQWco_WRqo5Q-xnXR7JuO3PtZv983mKdKHSQ==";
@@ -36,6 +37,7 @@ function create(api,deps={}) {
   // Testnet wallet traffic must use this plugin's port, never the regular node.
   const baseUrls=chain.rpcUrls.bind(chain);chain.rpcUrls=()=>options.network==="harbinger"?[`http://127.0.0.1:${options.rpcPort}`]:baseUrls();
   const history=new WalletHistory({chain,wallet});
+  function idleForWalletSetup(){if(runtime.mode==="observer"&&runtime.child&&!runtime.chainStorage?.busy&&!runtime.chainStorage?.pending)return;runtime.idle();}
   let mining;
   // This derived index is rewritten frequently; settings and financial journals
   // keep their default versioned backups. All stores still reject unsafe or
@@ -82,7 +84,7 @@ function create(api,deps={}) {
   }
   function producerKey(createKey) {
     if(runtime.storageReady&&!runtime.storageReady(options)) {
-      if(createKey)throw Error("Install the native Teleno runtime from Overview before creating its block-signing key.");
+      if(createKey)throw Error(runtime.chainStorage?.info(options).error||"Prepare the Teleno runtime and chain storage in Setup before creating its block-signing key.");
       return {exists:false,publicKey:null};
     }
     const file=path.join(runtime.basedir(options),"block_producer/private.key");safe(file,true,1024);
@@ -107,7 +109,7 @@ function create(api,deps={}) {
   }
   async function status(signal) {
     active(signal);const saved=record(),last=journal.get("last",null);
-    const base={settings:{...options},wallet:wallet.status(),runtime:runtime.snapshot(options),producer:producerKey(false),setup:setupProgress(),
+    const base={settings:{...options},wallet:wallet.status(),runtime:runtime.snapshot(options),producer:producerKey(false),setup:setupProgress(),device:{freeMemory:os.freemem(),totalMemory:os.totalmem()},
       pending:saved?{txId:saved.txId,network:saved.network,kind:saved.kind,createdAt:saved.createdAt,...(pendingCheck?.txId===saved.txId?pendingCheck:{state:"submitted"})}:null,
       lastTransaction:last?.network===options.network&&last?.address===wallet.address?last:null};
     if(!runtime.child||runtime.mode==="maintenance")return base;
@@ -152,6 +154,19 @@ function create(api,deps={}) {
     active(signal);if(!input||typeof input!=="object"||Array.isArray(input))throw Error("Invalid Teleno input.");
     if(method==="status")return status(signal);
     if(method==="runtime.setupStatus")return runtime.setupStatus({...options},signal);
+    if(method==="storage.info")return runtime.chainStorage.info(options);
+    if(method==="storage.choose") {
+      runtime.idle();clearPending();const id=identity(),check=context(signal,id);
+      if(options.runtime==="wsl")throw Error("WSL2 uses its managed Linux storage inside Ubuntu.");
+      const picked=await electron.dialog.showOpenDialog(electron.BrowserWindow.fromId(api.desktop.hostWindowId()),{title:"Choose Teleno chain drive or folder",properties:["openDirectory","createDirectory"]});check();
+      if(picked.canceled||!picked.filePaths?.[0])return {cancelled:true,note:"Chain location was kept."};
+      const plan=runtime.chainStorage.plan(options,picked.filePaths[0]);if(plan.unchanged)return {note:"This chain location is already selected."};
+      await confirm(plan.reattach?"Reconnect Teleno chain location":"Use this Teleno chain location",`${options.network.toUpperCase()}\nFrom: ${plan.source}\nUse: ${plan.destination}\n${plan.reattach?"Reconnect the verified chain folder already belonging to this profile.":"Copy and checksum-verify this node's files, including its signing key and snapshots. Keep the original copy. Nothing at the destination is overwritten or merged."}\nYour encrypted spending wallet stays in this plugin's profile. The node stays stopped. Keep the drive connected whenever the node is running.`,signal,id);check();
+      return runtime.chainStorage.begin(plan,AbortSignal.any([api.signal,lifetime.signal]));
+    }
+    if(method==="storage.resume") {runtime.idle({allowStorage:true});clearPending();const p=runtime.chainStorage.readPlan();await confirm("Resume Teleno chain copy",`${p.network.toUpperCase()}\nFrom: ${p.source}\nTo: ${p.destination}\nVerify existing copied files and finish the copy. Original files stay in place; the node remains stopped.`,signal);return runtime.chainStorage.resume(options,AbortSignal.any([api.signal,lifetime.signal]));}
+    if(method==="storage.cancel")return runtime.chainStorage.cancel();
+    if(method==="storage.keepOriginal") {runtime.idle({allowStorage:true});const p=runtime.chainStorage.readPlan();await confirm("Keep the original chain location",`Use the original files at ${p.source}. Keep the partial copy at ${p.destination}. This removes only the saved copy task, not either data folder. The node stays stopped.`,signal);return runtime.chainStorage.keepOriginal(options);}
     if(method==="setup.productionStatus")return productionSetup(signal);
     if(method==="dashboard.summary") {
       const address=wallet.address,network=options.network,check=context(signal,identity());
@@ -167,8 +182,15 @@ function create(api,deps={}) {
       return {note:input.goal==="observer"?"Showing observer instructions. This does not stop an active producer.":"Showing the complete wallet and block production setup."};
     }
     if(method==="logs")return runtime.logs(options);
-    if(method==="wallet.balances"){if(!wallet.address)return null;await checkNetwork();const result=await chain.balances(wallet.address);active(signal);return result;}
+    if(method==="wallet.balances"){if(!wallet.address)return null;const address=wallet.address,network=options.network,check=context(signal,identity());await checkNetwork();check();const result=await chain.balances(address);check();return {...result,address,network,observedAt:Date.now()};}
     if(method==="wallet.history")return history.read(input);
+    if(method==="wallet.maxSend") {
+      const address=wallet.address,network=options.network,check=context(signal,identity()),valid=v=>typeof v==="string"&&/^(0|[1-9]\d{0,19})$/.test(v)&&BigInt(v)<(1n<<64n);
+      if(!address||input.expectedAddress!==address||input.expectedNetwork!==network||!["koin","vhp"].includes(input.token))throw Error("Check the selected wallet, network and asset before Send all.");
+      await checkNetwork();check();const b=await chain.balances(address);check();if(b?.stale||b?.error||!valid(b?.[input.token])||!valid(b?.mana))throw Error("Fresh token and mana balances are required for Send all.");
+      const balance=BigInt(b[input.token]),spendable=input.token==="koin"?BigInt(chain.burnableFromMana(b.mana)):BigInt(b.mana)>=5000000n?balance:0n,available=balance<spendable?balance:spendable;
+      return {address,network,token:input.token,amount:formatAmount(String(available),{grouping:false}),amountSat:String(available),manaLimited:available<balance,observedAt:Date.now()};
+    }
     if(method==="wallet.pending") {
       // Share confirmation reads without occupying the node-control queue.
       // Pending spends/settings remain blocked by the saved transaction, and
@@ -182,7 +204,7 @@ function create(api,deps={}) {
     if(method==="wallet.unlock")return wallet.unlock(input.password);
     if(method==="wallet.lock"){wallet.lock();return wallet.status();}
     if(method==="wallet.create"||method==="wallet.import") {
-      runtime.idle();clearPending();if(wallet.exists())throw Error("This plugin already has a wallet. Its funds and data were preserved.");
+      idleForWalletSetup();clearPending();if(wallet.exists())throw Error("This plugin already has a wallet. Its funds and data were preserved.");
       await confirm("Teleno wallet",`${method==="wallet.create"?"Create a new":"Import a backup for this"} separate Teleno wallet. Never reuse the KAI Core, regular node or Master node wallet.`,signal);
       if(method==="wallet.create")wallet.create({password:input.password});else wallet.importWif({password:input.password,wif:input.wif});
       return wallet.status();
@@ -196,10 +218,10 @@ function create(api,deps={}) {
         return {nativeShown:true};
       }
     }
-    if(method==="wallet.send") {if(!["koin","vhp"].includes(input.token)||!chain.isValidAddress(input.to))throw Error("Choose KOIN or VHP and a valid destination address.");amount(input.amount);return money(method,input,signal);}
-    if(method==="wallet.burn"){amount(input.amount);return money(method,input,signal);}
+    if(method==="wallet.send") {if(input.expectedAddress!==undefined&&input.expectedAddress!==wallet.address||input.expectedNetwork!==undefined&&input.expectedNetwork!==options.network)throw Error("Wallet or network changed. Review this transfer again.");if(!["koin","vhp"].includes(input.token)||!chain.isValidAddress(input.to))throw Error("Choose KOIN or VHP and a valid destination address.");amount(input.amount);return money(method,input,signal);}
+    if(method==="wallet.burn"){if(input.expectedAddress!==undefined&&input.expectedAddress!==wallet.address||input.expectedNetwork!==undefined&&input.expectedNetwork!==options.network)throw Error("Wallet or network changed. Review this burn again.");amount(input.amount);return money(method,input,signal);}
     if(method==="producer.register"){if(!producerKey(false).exists)throw Error("Create a block-signing key first.");return money(method,input,signal);}
-    if(method==="producer.key") {runtime.idle();await confirm("Create Teleno block-signing key","Create a separate hot key used only to sign blocks. It is stored in this plugin's node folder with restricted file permissions. Your spending wallet stays encrypted.",signal);return producerKey(true);}
+    if(method==="producer.key") {idleForWalletSetup();await confirm("Create Teleno block-signing key","Create a separate hot key used only to sign blocks. It is stored in this plugin's selected node folder with restricted file permissions. Your spending wallet stays encrypted. An observer may keep syncing; production remains off.",signal);return producerKey(true);}
     if(method==="runtime.setupWsl") {await confirm("Set up WSL2 for Teleno",`Install ${options.wslDistro} through Windows Subsystem for Linux, or reopen it if already installed. Existing Ubuntu files are preserved. A new installation may request administrator approval and a restart. Complete any Ubuntu user setup prompts in the terminal. This does not install Docker or start a node.`,signal);return runtime.setupWsl(options,signal);}
     if(method==="runtime.useWsl") {
       runtime.idle({allowMigration:true});clearPending();const next=validateSettings({...options,runtime:"wsl",autoStart:false},deps.platform||process.platform);
@@ -242,7 +264,7 @@ function create(api,deps={}) {
     }
     throw Error("Unknown Teleno method.");
   }
-  const reads=new Set(["status","runtime.setupStatus","setup.productionStatus","dashboard.summary","logs","wallet.balances","wallet.history","wallet.pending","producer.status"]);
+  const reads=new Set(["status","runtime.setupStatus","setup.productionStatus","dashboard.summary","storage.info","logs","wallet.balances","wallet.history","wallet.maxSend","wallet.pending","producer.status"]);
   return {
     call(method,input={},signal) {
       const frozen=structuredClone(input),combined=AbortSignal.any([api.signal,lifetime.signal,...(signal?[signal]:[])]);
