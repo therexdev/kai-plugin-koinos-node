@@ -21,6 +21,7 @@ jobs:
       KOINOS_BUILD_TESTS: 'ON'
       CFLAGS: '-march=armv8-a -mtune=generic'
       CXXFLAGS: '-march=armv8-a -mtune=generic'
+      CPP_LIBP2P_PATCH: ${{ runner.temp }}/teleno-libp2p-gcc12.patch
     steps:
       - name: Install Debian 12 build tools (Pi OS Bookworm compatibility)
         run: |
@@ -41,7 +42,11 @@ jobs:
         id: dependencies
         with:
           path: teleno-source/.deps
-          key: teleno-arm64-bookworm-v1-2c11229267cf
+          key: teleno-arm64-bookworm-v2-2c11229267cf
+      - name: Prepare the GCC 12 dependency compatibility patch
+        run: |
+          cat teleno-source/cmake/cpp-libp2p-koinos.patch community/teleno/scripts/patches/libp2p-gcc12-templates.patch > "$CPP_LIBP2P_PATCH"
+          sha256sum community/teleno/scripts/patches/libp2p-gcc12-templates.patch
       - name: Build the native ARM64 engine
         working-directory: teleno-source
         run: ./scripts/build-cpp-libp2p-koinos.sh
@@ -68,6 +73,14 @@ jobs:
           mkdir -p ../arm64-runtime/teleno-node-1.3.0/bin
           cp build/teleno_node ../arm64-runtime/teleno-node-1.3.0/bin/
           cp LICENSE ../arm64-runtime/teleno-node-1.3.0/
+          cp ../community/teleno/scripts/patches/libp2p-gcc12-templates.patch ../arm64-runtime/teleno-node-1.3.0/
+          python3 - <<'PY'
+          import hashlib, json, pathlib
+          patch = pathlib.Path('../community/teleno/scripts/patches/libp2p-gcc12-templates.patch')
+          result = {'engineSource': '2c11229267cff2f9ee39ed8e56ab70af391d85ce', 'cppLibp2pSource': 'c03bf7c44c4fd30a390f3ef93bd1eab482e686a6', 'patch': patch.name, 'patchSha256': hashlib.sha256(patch.read_bytes()).hexdigest(), 'purpose': 'C++ template disambiguation for GCC 12; dependency header syntax only'}
+          pathlib.Path('build/arm64-compatibility.json').write_text(json.dumps(result, indent=2)+'\n')
+          PY
+          cp build/arm64-compatibility.json ../arm64-runtime/teleno-node-1.3.0/
           tar --sort=name --mtime='UTC 2026-10-23' --owner=0 --group=0 --numeric-owner -czf ../arm64-runtime/teleno-node-1.3.0-linux-arm64.tar.gz -C ../arm64-runtime teleno-node-1.3.0
           sha256sum build/teleno_node ../arm64-runtime/*.tar.gz | tee build/arm64-checksums.txt
       - name: Preserve qualification evidence
@@ -84,9 +97,10 @@ jobs:
             teleno-source/build/native-tests.xml
             teleno-source/build/generated/teleno-node-build-info.json
             teleno-source/build/arm64-checksums.txt
+            teleno-source/build/arm64-compatibility.json
       - name: Preserve dependency builds after success or failure
         if: always() && steps.dependencies.outputs.cache-hit != 'true'
         uses: actions/cache/save@v4
         with:
           path: teleno-source/.deps
-          key: teleno-arm64-bookworm-v1-2c11229267cf
+          key: teleno-arm64-bookworm-v2-2c11229267cf

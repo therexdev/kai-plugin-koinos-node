@@ -18,8 +18,14 @@ for(const [name,max] of [["GLIBC","2.36"],["GLIBCXX","3.4.30"]]){
 }
 const version=execFileSync(binary,["--version"],{encoding:"utf8"}).trim();
 assert.equal(version,`teleno_node ${PIN.version}+${PIN.source.slice(0,12)}`,"Unexpected or dirty source identity");
+const patchName="libp2p-gcc12-templates.patch",expectedPatch=hash(fs.readFileSync(path.join(__dirname,"patches",patchName)));
+const bundle=path.resolve(path.dirname(binary),".."),compatibility=JSON.parse(fs.readFileSync(path.join(bundle,"arm64-compatibility.json"),"utf8"));
+assert.equal(compatibility.engineSource,PIN.source);
+assert.equal(compatibility.cppLibp2pSource,"c03bf7c44c4fd30a390f3ef93bd1eab482e686a6");
+assert.equal(compatibility.patchSha256,expectedPatch);
+assert.equal(hash(fs.readFileSync(path.join(bundle,patchName))),expectedPatch);
 // The later reviewed release URL must serve these identical archive bytes.
 const url=`https://github.com/therexdev/kai-plugin-koinos-node/releases/download/teleno-runtime-${PIN.version}-linux-arm64/${path.basename(archive)}`;
-const candidate={...PIN,native:{...PIN.native,arm64:{url,archiveSha256:hash(bytes),binarySha256:hash(elf),glibc:"2.36",publisher:"therexdev (community Linux build)",source:PIN.source}}};
+const candidate={...PIN,native:{...PIN.native,arm64:{url,archiveSha256:hash(bytes),binarySha256:hash(elf),glibc:"2.36",publisher:"therexdev (community Linux build)",source:PIN.source,buildPatchSha256:expectedPatch}}};
 fs.writeFileSync(output,JSON.stringify(candidate,null,2)+"\n",{flag:"wx"});
 console.log(`Recorded ARM64 Linux ${version}; archive ${hash(bytes)}; executable ${hash(elf)}. Not published or signed.`);

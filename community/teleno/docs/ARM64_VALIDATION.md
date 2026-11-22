@@ -15,6 +15,11 @@ x64. ARM64 must use a native, 64-bit Linux installation and ARM64 KAI Core.
   The Android engine and x64 engine are not substitutes.
 - The build must retain its source manifest, actual linked-library hashes,
   binary hash, archive hash and all upstream native test results.
+- Debian 12's GCC 12 requires explicit `template` disambiguators in the pinned
+  cpp-libp2p injector headers. The build combines the upstream dependency patch
+  with `scripts/patches/libp2p-gcc12-templates.patch`. That syntax-only patch
+  applies to cpp-libp2p, not Teleno's application/chain source. Its checksum and
+  source revision are retained in `arm64-compatibility.json` and the archive.
 - The publisher must review and include the tested archive and binary hashes
   in `plugin/service/runtime.json` before signing a release.
 
