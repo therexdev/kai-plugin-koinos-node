@@ -71,3 +71,10 @@ test("an altered or dirty version identity is refused even with a matching hash"
   fs.mkdirSync(path.dirname(r.binary));fs.writeFileSync(r.binary,runtimePins.native.arm64.bytes);
   await assert.rejects(r.installed(settings({},"linux")),/identity/);
 });
+test("runtime downloads reject HTTP, credentials and unapproved hosts before fetching",async t=>{
+  for(const url of ["http://github.com/example/runtime", "https://user:password@github.com/example/runtime", "https://github.com.untrusted.example/runtime"]){
+    const runtimePins=fixture(t);runtimePins.native.arm64.url=url;
+    const r=new Runtime(root(t),{platform:"linux",arch:"arm64",runtimePins,fetchImpl:async()=>assert.fail("unapproved download"),commandImpl:async()=>assert.fail("command")});
+    await assert.rejects(r.install(settings({},"linux")),/Unexpected runtime download host/);
+  }
+});

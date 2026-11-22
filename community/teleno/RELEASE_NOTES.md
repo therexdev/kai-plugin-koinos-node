@@ -12,7 +12,7 @@
   engines. Wallets, producer approvals and chain directories keep their
   existing behavior.
 
-Validation: 80 plugin tests and source-package verification; actual Linux x64
+Validation: 81 plugin tests and source-package verification; actual Linux x64
 archive installation, both offline network identities, restart, RPC/gRPC,
 process ownership, cancellation and backup validation/list/refusal pass.
 ARM64 native compilation/qualification is recorded separately by the ARM64

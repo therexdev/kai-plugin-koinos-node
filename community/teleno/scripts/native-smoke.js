@@ -29,7 +29,7 @@ async function main(){
       // Genesis-only chains cannot produce a meaningful native checkpoint.
       // Preserve the real upstream refusal rather than claiming a backup exists.
       await r.backup(s,"create");await assert.rejects(r.completion,/exited/);assert.equal(r.job.state,"failed");assert.match(r.job.error,/checkpoint identity/);assert.ok(fs.existsSync(path.join(r.basedir(s),"db")));assert.match(r.logs(s),/checkpoint identity/);
-      console.log(network+": "+process.arch+" engine, "+(archive?"verified archive install, ":"")+"offline RPC identity, gRPC health, clean stop/reopen, backup config/list and genesis-only backup refusal passed");
+      console.log(network+": "+process.arch+" engine, "+(archive?"verified archive install, ":process.argv.includes("--download")?"verified network download, ":"")+"offline RPC identity, gRPC health, clean stop/reopen, backup config/list and genesis-only backup refusal passed");
     }catch(e){console.error(r.logs(s).slice(-5000));throw e;}finally{await r.stop(s);fs.rmSync(root,{recursive:true,force:true});}
   }
 }

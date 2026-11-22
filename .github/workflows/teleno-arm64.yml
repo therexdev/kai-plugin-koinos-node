@@ -13,7 +13,7 @@ jobs:
   native:
     runs-on: ubuntu-24.04-arm
     container: debian:bookworm
-    timeout-minutes: 180
+    timeout-minutes: 360
     env:
       JOBS: '2'
       CMAKE_BUILD_PARALLEL_LEVEL: '2'
@@ -37,7 +37,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 24
-      - uses: actions/cache@v4
+      - uses: actions/cache/restore@v4
+        id: dependencies
         with:
           path: teleno-source/.deps
           key: teleno-arm64-bookworm-v1-2c11229267cf
@@ -83,3 +84,9 @@ jobs:
             teleno-source/build/native-tests.xml
             teleno-source/build/generated/teleno-node-build-info.json
             teleno-source/build/arm64-checksums.txt
+      - name: Preserve dependency builds after success or failure
+        if: always() && steps.dependencies.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: teleno-source/.deps
+          key: teleno-arm64-bookworm-v1-2c11229267cf
