@@ -148,7 +148,7 @@ function bind(){
     if(b.dataset.action==="mining-history"){miningExpanded=!miningExpanded;drawMining();return;}
     return run(async()=>{
     const action=b.dataset.action;
-    if(action==="storage-choose")return call("storage.choose");if(action==="storage-resume")return call("storage.resume");if(action==="storage-cancel")return call("storage.cancel");if(action==="storage-original")return call("storage.keepOriginal");if(action==="quick-bootstrap")return call("backup.run",{action:"bootstrap",id:"latest"});
+    if(action==="storage-choose")return call("chainStorage.choose");if(action==="storage-resume")return call("chainStorage.resume");if(action==="storage-cancel")return call("chainStorage.cancel");if(action==="storage-original")return call("chainStorage.keepOriginal");if(action==="quick-bootstrap")return call("backup.run",{action:"bootstrap",id:"latest"});
     if(action==="goal-producer"||action==="goal-observer")return call("setup.goal",{goal:action.slice(5)});
     if(action==="check-progress"||action==="producer-check")return {note:"Progress checked. Follow the next available setup step."};
     if(action==="check-setup")return {note:"Setup checked. Follow the next available step below."};

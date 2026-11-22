@@ -120,7 +120,7 @@ jobs:
           node "$GITHUB_WORKSPACE/.core-startup/node_modules/electron/install.js"
           sudo chown root:root "$GITHUB_WORKSPACE/.core-startup/node_modules/electron/dist/chrome-sandbox"
           sudo chmod 4755 "$GITHUB_WORKSPACE/.core-startup/node_modules/electron/dist/chrome-sandbox"
-      - name: Open the signed plugin in the actual Core host with a fresh profile
+      - name: Open the signed plugin and exercise folder choice through the actual Core host
         shell: bash
         run: KAI_CORE_SOURCE="$GITHUB_WORKSPACE/.core-startup" node scripts/core-startup-smoke.cjs
 

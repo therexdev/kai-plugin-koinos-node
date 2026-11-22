@@ -1,3 +1,21 @@
+# Teleno Koinos Node 1.4.1 — Folder picker routing fix
+
+Fixes “Invalid storage key” when choosing a chain drive or folder. The 1.4.0
+commands used Core's reserved `storage.*` namespace and were intercepted before
+the native Teleno service could open the picker. Chain-folder commands now use
+the plugin-owned `chainStorage.*` namespace, including copy progress controls.
+
+The fix requires only a plugin update. Wallets, signing keys, selected paths,
+copy journals and chain databases are retained. Storage selection still requires
+a stopped node, native review and verified copying with originals retained.
+
+Regression coverage clicks the actual signed plugin's folder button through
+Core's real preload/IPC/host dispatch, exercises picker cancellation, declines
+and accepts native review, checks the selected path after copy/reopen, and
+verifies no Core key/value-storage request or node start occurred.
+
+---
+
 # Teleno Koinos Node 1.4.0 — Dashboard, wallet and USB storage
 
 The Android-inspired Dashboard shows balances, mana, live node health, chain
