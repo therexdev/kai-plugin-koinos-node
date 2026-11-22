@@ -1,0 +1,2 @@
+mainnet: arm64 engine, verified archive install, offline RPC identity, gRPC health, clean stop/reopen, backup config/list and genesis-only backup refusal passed
+harbinger: arm64 engine, verified archive install, offline RPC identity, gRPC health, clean stop/reopen, backup config/list and genesis-only backup refusal passed

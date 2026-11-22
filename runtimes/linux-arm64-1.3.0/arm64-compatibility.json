@@ -1,0 +1,10 @@
+{
+  "engineSource": "2c11229267cff2f9ee39ed8e56ab70af391d85ce",
+  "cppLibp2pSource": "c03bf7c44c4fd30a390f3ef93bd1eab482e686a6",
+  "patch": "libp2p-gcc12-templates.patch",
+  "patchSha256": "6985eb6866ac310966fcd21aabf20a72d1a3941fbf2e0fb2149d53d0695668f2",
+  "purpose": "C++ template disambiguation for GCC 12; dependency header syntax only",
+  "testFixturePatch": "teleno-gcc12-test-fixture.patch",
+  "testFixturePatchSha256": "16b7d3533a409897fd56950ca1b60d88aa85d6242ea4d55bf34542a84abc0128",
+  "testFixturePurpose": "Explicit aggregate initialization in one upstream test; no assertion or runtime change; test source restored before final clean engine build"
+}

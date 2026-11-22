@@ -1,0 +1,2634 @@
+{
+  "format": "teleno-native-release-build",
+  "version": 1,
+  "native_version": "1.3.0",
+  "native_build_version": "teleno_node 1.3.0+2c11229267cf",
+  "release_tag": "teleno-node-v1.3.0",
+  "source_commit": "2c11229267cff2f9ee39ed8e56ab70af391d85ce",
+  "source_clean": true,
+  "binary": {
+    "bytes": 40377568,
+    "sha256": "b12859308a3bf6e588dee59fe121d5eb6e5994047417f3d5393d167081c0a5bf"
+  },
+  "compiler": "c++ (Debian 12.2.0-14+deb12u1) 12.2.0",
+  "actual_link_archives": {
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/build/src/libkoinos_node_core.a": {
+      "bytes": 963724,
+      "sha256": "178bb7128f62cf61bf3196d9911c451944953a26786872d73060f478bf178df9"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/build/src/libkoinos_backup_lib.a": {
+      "bytes": 120794,
+      "sha256": "92dcded8269d52f6b7bc701bc29643edc69b05be1ebb11063fe352c52f658536"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/build/src/libkoinos_backup_checkpoint_lib.a": {
+      "bytes": 51754,
+      "sha256": "c859261834ab432066c1f5b0bc6d938d06a8d708c6d9005fa5e1b71cb038a2c1"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/build/src/libkoinos_backup_snapshot_lib.a": {
+      "bytes": 1338240,
+      "sha256": "77fbd13694d7b06e3e7976e03d9861968575df7bdd3f12a4d53dc387f71f0f69"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/build/src/libkoinos_backup_sftp_lib.a": {
+      "bytes": 877390,
+      "sha256": "2990711aa322911bc9e34101bd63071aa3ecc4597558672cbe04fd900125d7c2"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/build/src/libkoinos_backup_public_restore_lib.a": {
+      "bytes": 5652542,
+      "sha256": "e1b420c4235e4396755375f6f58d914f0ec334cea9075ef778b36a9ead686c9d"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/build/src/libkoinos_backup_service_lib.a": {
+      "bytes": 448956,
+      "sha256": "0f64e9a549a2ca768b5e0db0820e05955877697804c590afcfe3f399ed262ff8"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/build/src/libkoinos_backup_admin_lib.a": {
+      "bytes": 1153818,
+      "sha256": "b7bab9d1ee807cdb89381d762f3ce8758a2be334f25aed45bc517008a0edc9c7"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/build/src/libkoinos_storage_lib.a": {
+      "bytes": 344330,
+      "sha256": "2904685d8a943d5e1b5491766947e779738c28039d235409a09b3316587a6d3c"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/build/src/libkoinos_block_store_lib.a": {
+      "bytes": 430336,
+      "sha256": "900e996f8bb448ff068eeb5e9df7564b0ba6f47a84bbdf6c324a02adfbd438df"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/build/src/libmempool_lib.a": {
+      "bytes": 973774,
+      "sha256": "2549b8213bb238815a0ecea7a0a41bc6ed6a517b006ec37e245d7061a20fe1a2"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/build/src/libkoinos_p2p_lib.a": {
+      "bytes": 3096000,
+      "sha256": "fb1a9845a14aa8be6ffe84b89f22a83ab63040578130bf4c42183f99866fb88e"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/build/src/libkoinos_block_producer_lib.a": {
+      "bytes": 446678,
+      "sha256": "9593ccee56dace26eea6cfc0a44977c16952427e2cf56a401d4eac5ae64005d7"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/build/src/libkoinos_account_history_lib.a": {
+      "bytes": 127128,
+      "sha256": "4340d666590efc1f7c00b15a96ea6d362f083f23ee0e6fa41d05732b0879501c"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/build/src/libkoinos_grpc_server_lib.a": {
+      "bytes": 293872,
+      "sha256": "5b98d4a1a40fb1570f2fce2d7b6fe355e5b0b73b0b10bd90ef7d7c796d8131fd"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/build/src/libkoinos_contract_meta_store_lib.a": {
+      "bytes": 107114,
+      "sha256": "e84e76b23f459add00a5ab84b441b8f7d94960142bcae8558ef68a74790402a9"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/build/src/libkoinos_transaction_store_lib.a": {
+      "bytes": 126256,
+      "sha256": "b2e33fc336585698465aeec28aa73184e94a1c5f4bd54e23235d013de25cb6cb"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/build/src/libkoinos_jsonrpc_lib.a": {
+      "bytes": 2390992,
+      "sha256": "aa0fb8a95070637f54a92b2c3361cadcf4645627205efe76b3ac35f1d4ab17fc"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/hunter/_Base/a20151e/7b0a4ab/04aefd4/Install/lib/libkoinos_log.a": {
+      "bytes": 524212,
+      "sha256": "a872c930b10ca4a5564a887645cec6244db53dbd0a2146be0755f9066183254f"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/build/teleno-proto/libteleno_koinos_proto.a": {
+      "bytes": 10754116,
+      "sha256": "27c9e902c94398a08b11e6060fc570487f542f096ff31300fb372a110d3bbc33"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/hunter/_Base/a20151e/7b0a4ab/04aefd4/Install/lib/libkoinos_util.a": {
+      "bytes": 115308,
+      "sha256": "04ab2668266a10f98c2d8c43c1e1dd6efdbcede7e311275103e1a5ded24dea2b"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/build/_deps/teleno_json_sdk_53eae7b73dbe/lib/libteleno_koinos_exception.a": {
+      "bytes": 455072,
+      "sha256": "caa4f595ffe7106ef8eccda7b60a67f3c91247b77d21cac82e43ee79fed1c211"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/build/_deps/teleno_json_sdk_53eae7b73dbe/lib/libteleno_koinos_crypto.a": {
+      "bytes": 880962,
+      "sha256": "84be3069f093c94c1c4aec62b64d598f01b39d8d0cf84d474692723d48b942c0"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/build/src/libkoinos_state_db_local.a": {
+      "bytes": 3591322,
+      "sha256": "0147974d305452390da886da09a2a6470cd207592a61d2c6fd41699665e1529e"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/rocksdb-zstd-8.8.1/lib/librocksdb.a": {
+      "bytes": 28997988,
+      "sha256": "efabf89e963cc7340789064e83f290a33daddbd9d82d667ff9b39503e22bce37"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/hunter/_Base/a20151e/7b0a4ab/04aefd4/Install/lib/libboost_program_options-mt-a64.a": {
+      "bytes": 1216726,
+      "sha256": "2996f0eff9b8e23d7b09bda641b4887af51b8869a5d34993fedd861166676dfe"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/hunter/_Base/a20151e/7b0a4ab/04aefd4/Install/lib/libboost_thread-mt-a64.a": {
+      "bytes": 373522,
+      "sha256": "882783d2c03c7eb49aa875d4b5d48f4e94e207a43080857b81c818392e454cda"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/hunter/_Base/a20151e/7b0a4ab/04aefd4/Install/lib/libboost_filesystem-mt-a64.a": {
+      "bytes": 407940,
+      "sha256": "fc19c1d71174770f4f1eb6a1118cc121ac44129440c2961e07b40bdf3433fa11"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/hunter/_Base/a20151e/7b0a4ab/04aefd4/Install/lib/libyaml-cpp.a": {
+      "bytes": 1080176,
+      "sha256": "991f01409a5b08ed75d7e6262eabd457f68d80277136ae5f5a2d5d8831d74e28"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/build/src/libchain.a": {
+      "bytes": 6800328,
+      "sha256": "86693373cc9bbdb5b385bed0a9d86cbea45b0926df2f43d0a83f93379f17842f"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/libssh-static-0.12.0/lib/libssh.a": {
+      "bytes": 1165264,
+      "sha256": "26c2023fbc7d62014c1250bd5e1b9bb5294230df85dc795f73a341b8a0e930d8"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p_gossip.a": {
+      "bytes": 3043406,
+      "sha256": "19e8c147fc5737082bd9b63fcc61734b2752c6233a726032fa5d33c53602ec5e"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libsubscription.a": {
+      "bytes": 8362,
+      "sha256": "e2400af4c5a9fb8f9a240618ea05b33c7066f46301f5ce14c517ce4da0321580"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p_gossip_proto.a": {
+      "bytes": 173764,
+      "sha256": "13b43cc55ef3120569888fd6eb7d92f8014c92a182e184216e1eb35b0c856c07"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p_kademlia.a": {
+      "bytes": 4235960,
+      "sha256": "afd97ec233b3e4c71d8d53ed7035a016ba83627ce27e4c28ddcddf2de9928395"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p_kademlia_message.a": {
+      "bytes": 468168,
+      "sha256": "af51e0550eaf96c1993d2da736882a41498ad1e0e3f9913f42048993822b4f32"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p_cid.a": {
+      "bytes": 384912,
+      "sha256": "151c6d45789993e822e94a4f1288f1da6dda1cd67cdaf08e8cd28b29f98660fa"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p_kademlia_proto.a": {
+      "bytes": 72860,
+      "sha256": "0c7ffb9300dc7a69193452fd8efef16b03deb633ae076248054f609a86de6ea9"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p_kademlia_error.a": {
+      "bytes": 145770,
+      "sha256": "4b47bb3e9be6f8c9e1704203f97738f4bd9e1ac6f504bd3f1057a56c17214ae7"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p_identify.a": {
+      "bytes": 2365350,
+      "sha256": "f5006dff6f43cb34f3ed286eee4f84658099b81fa4f4c7116c3825ff01507803"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p.a": {
+      "bytes": 1524,
+      "sha256": "2a5762f28678d963b70c9b001325bab80f24587a600efbf6ddf5d1d8794d37fc"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p_default_host.a": {
+      "bytes": 165052,
+      "sha256": "940f76f65b214c8d64b0f81bfa2868b5c0bea6c50d1461cb188b512d949759f9"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p_basic_host.a": {
+      "bytes": 377726,
+      "sha256": "977feaf74084dc69ec9a85aeaaeea5f5640414cd676259a74d4ffc90d55410e4"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p_inmem_key_repository.a": {
+      "bytes": 204494,
+      "sha256": "73d490790033c872297dd7e6d495b1e9fa3fd58a242b8dba2997b96b5a746cec"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p_peer_repository.a": {
+      "bytes": 199120,
+      "sha256": "ed751c8a138d0f4c4eeb0be3cb72d4dc93ed519d2bff7393f30734ca9f3c5dd1"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p_inmem_address_repository.a": {
+      "bytes": 366348,
+      "sha256": "f41a204f7281061794b82f1da0fa2a6ecac9110d64861d3cdb0cab83d7c580a4"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p_address_repository.a": {
+      "bytes": 272254,
+      "sha256": "4e0b8a6c8851efd953c1fc5e11565ada4c5f36478699a3f47ff52d233668fee7"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p_dnsaddr_resolver.a": {
+      "bytes": 239362,
+      "sha256": "99d79229364fcd437935843665703a8b4e4e012196db1cc9a7682fd4bcd12a54"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p_cares.a": {
+      "bytes": 301750,
+      "sha256": "7dfbf26fcb0613408aca6f8b7c3227cb0ba25cae20c39b444c41b0f0113b3609"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p_inmem_protocol_repository.a": {
+      "bytes": 229468,
+      "sha256": "f2f6b8b00a167a58522f16a1dc327ca4e847b8360d85fb8f052793f116bfa2f2"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p_peer_errors.a": {
+      "bytes": 143488,
+      "sha256": "d1d9355a58eafb4813709cc18596fc70513ad4d3efbc36884ac3a405b110cb2b"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p_default_network.a": {
+      "bytes": 165058,
+      "sha256": "9c044ed9d40066f46509d059d2cea1c828d9d086e6bcfb2127b28acc32256f34"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p_noise.a": {
+      "bytes": 2388792,
+      "sha256": "5eff3d807f007eaaf7914203c0b51b30197fff6fbd5fa915cb891466685e4f64"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p_noise_handshake_message_marshaller.a": {
+      "bytes": 206168,
+      "sha256": "9b532fbf0a7a518663565a019b4f8b5632d084e22774a01779e6789b3b8998ff"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p_noise_proto.a": {
+      "bytes": 30128,
+      "sha256": "e86a046b54349dc8af69baafd175489dd5136a35dd8fb450a9053154379369b1"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p_x25519_provider.a": {
+      "bytes": 202728,
+      "sha256": "3a3247cdafff3865360df27a0eb140e4e171b1c056d2e12815e5e9f6d4004dea"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p_chachapoly_provider.a": {
+      "bytes": 256436,
+      "sha256": "37d5e47d9940d49536b42cea30a9d9ef186d07eef4c8e327fb06f60f5b3d8ab4"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p_yamux.a": {
+      "bytes": 250846,
+      "sha256": "30760c0fb6aab791d2cfec8bbd039cbaddb4790c188142cdedb16e9dfcfcfe69"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p_yamuxed_connection.a": {
+      "bytes": 1240290,
+      "sha256": "1a9be206d9ad6ffc41f3e289a00692a36a0c28e309faf341d2aa24000619af9f"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p_network.a": {
+      "bytes": 172150,
+      "sha256": "d1bbc03ad9d067501f2bc860a05ad77234daa56a5b636e23c079ea294aede53f"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p_tcp.a": {
+      "bytes": 500294,
+      "sha256": "7d2683e2e3ff6af6396c099bf4d056c03b95059e68827b51097222749d5bf09d"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p_tcp_listener.a": {
+      "bytes": 498978,
+      "sha256": "d8da2e2085114b9a74e5c13fddcc27061a3ce00c59866b994e03ef51840928ee"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p_tcp_connection.a": {
+      "bytes": 644682,
+      "sha256": "01c840abe531f00a8face6adb84a83b742249277aedc192c50a6f6803a8ff33a"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p_upgrader_session.a": {
+      "bytes": 217446,
+      "sha256": "60bb278098fc658980c879ff2b62007f5bd595ee769789a2416d721e4068f52c"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p_upgrader.a": {
+      "bytes": 274032,
+      "sha256": "ca69ad53928be58e006865459e67ebdee9ee4c2a20aa1eafb81b106e9ed11d62"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p_mplex.a": {
+      "bytes": 162752,
+      "sha256": "4784cfe740f4a7f526df6c1472793578541e40287a2136c144559934ad214f79"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p_mplexed_connection.a": {
+      "bytes": 950510,
+      "sha256": "20b8fe63f108f3064ac47da5a3685438d081bc1d3edcab1879b7ad60fa913b5f"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p_plaintext.a": {
+      "bytes": 600232,
+      "sha256": "67da6e2c5c44379f8e11ce6543f37cec786a712736092714592c9092c92b4a18"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p_plaintext_exchange_message_marshaller.a": {
+      "bytes": 212156,
+      "sha256": "671ad970954445a8ac7435c2a184e96542a47fd1b22e63f4118332fd9cbfbdd6"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p_plaintext_proto.a": {
+      "bytes": 31932,
+      "sha256": "d4d91bc28974a1f9b70d9b602492b1d530d5e2525d65ed62d91f7211672c8902"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p_secio.a": {
+      "bytes": 1183880,
+      "sha256": "d2780c84466e4aeda6935ec79a0df17b9c60f664766f2c9cc9be5381b0565d56"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p_secio_propose_message_marshaller.a": {
+      "bytes": 164664,
+      "sha256": "a929d7ec652dc29d865a1e684409f2a568a764fcdf0f4aea5cbffab2faeefc3a"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p_secio_exchange_message_marshaller.a": {
+      "bytes": 162370,
+      "sha256": "47a0e1c14d3d42fee6a6db101d46b322f2f474d2a01dcbd9c678041b27342797"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p_secio_proto.a": {
+      "bytes": 47058,
+      "sha256": "9b634f9c91317cb00a689d8d28ff2ccf7482097a497b063ed18b1351e3a3f808"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p_tls.a": {
+      "bytes": 1647190,
+      "sha256": "a158feda3a345b4a6e169f1a6dba878b2ad61e1a078517937bfe3663ec7c1529"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p_security_error.a": {
+      "bytes": 143570,
+      "sha256": "3daaa198e91c2a3d2e8b568ec4ba186554c62a58a06567c095feb368924b4736"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p_websocket.a": {
+      "bytes": 1844728,
+      "sha256": "053d1865d08f2b60218b2d570768d67e973aaf869b9050eee21f1b21ba538597"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p_websocket_connection.a": {
+      "bytes": 1704426,
+      "sha256": "3cc910a465d90ff4931e88d3b5444b6c52f126e1160847c196481b3a10647421"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p_write_queue.a": {
+      "bytes": 149948,
+      "sha256": "b5fba404d75483458de7aa721b736ad98d142297523a74f788f99bcd51f4650c"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p_connection_error.a": {
+      "bytes": 147708,
+      "sha256": "ca9a87feb7144aacda3bae67159bd0e12d8778d03d8ef9a0bcd658d4df44a414"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p_connection_manager.a": {
+      "bytes": 492728,
+      "sha256": "4041de75fd619a460235488d72ddfca101d5e4e24a2333be3bbfaee50395a14c"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p_transport_manager.a": {
+      "bytes": 154676,
+      "sha256": "de729eea99a6dc323ee5abf9a7ff3badecfaf3338433e3e9fe9706fbb475eff8"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p_listener_manager.a": {
+      "bytes": 292234,
+      "sha256": "fbe4612421f7781a379cccc79e3d0ba2cb6f6db7c8a25801575a0bcd0e9c1b16"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p_identity_manager.a": {
+      "bytes": 209540,
+      "sha256": "074cda49c63eea11e2e2eea07238deb5be174dd004fd647c0d70a145847da9ef"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p_dialer.a": {
+      "bytes": 407536,
+      "sha256": "988ef990a88c745ec26e4ef1068f937473875e59181ec6bf69d855a2f0404ace"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p_multiaddress.a": {
+      "bytes": 262156,
+      "sha256": "07628d12f5cd44222a73976f71e5d6c3f7a2cd1fa0294c88937ebdc8ff634fe7"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p_converters.a": {
+      "bytes": 1421246,
+      "sha256": "d5d0cac2544cdec39754847f54838a2f3c0b934184ccb8d5a55063a14056af35"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p_byteutil.a": {
+      "bytes": 13908,
+      "sha256": "2f15f45a7cad431e6fd87a04a63a8cedad7bcfbefc0501fc0639a146fb6f42df"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p_router.a": {
+      "bytes": 255822,
+      "sha256": "649f0a4279df4c2fc0b606c14ecb51ee6b49cc8d4bce9177516101d4c11f27f0"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p_peer_id.a": {
+      "bytes": 199546,
+      "sha256": "65161e59dae815e37e0275b69065c46fc1fcbd6782b27963e59fccc4b282fc2c"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p_multihash.a": {
+      "bytes": 330844,
+      "sha256": "e67ca20ea581026d500ba8d64b5c2e657246476be4540f10af8c2a427c197855"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p_multibase_codec.a": {
+      "bytes": 1372914,
+      "sha256": "e0ccd1462057f25b3dd05028cac2bac02197727ccc8b2a52b04c4e4cee3fec41"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p_multiselect.a": {
+      "bytes": 1131510,
+      "sha256": "1920ecc03bc5a71ad2b1a02f39865c24ec2cb84eac8e5a47b9b30e194e0edb4b"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p_read_buffer.a": {
+      "bytes": 34714,
+      "sha256": "d022a4afae613b51789cc63376a72179bb15c159711dda4a1bf12ce79caa1e99"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p_varint_prefix_reader.a": {
+      "bytes": 2374,
+      "sha256": "a5d90070e7c8fbbcf5c24ae69b5df4c80c80e70842b92ef9794b83be38179527"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p_key_validator.a": {
+      "bytes": 203394,
+      "sha256": "ba5ab1621572328d69f78d331b2ed87bf270fe04e211c21babac69aad43a27dc"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p_crypto_provider.a": {
+      "bytes": 262108,
+      "sha256": "6b7147c3bd576ff4f97e14b8c5ba8dcefc3f97c02ef8d060899b6f9a52b91bca"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p_random_generator.a": {
+      "bytes": 9722,
+      "sha256": "db4d5563ac8f200ca57aee2c8988e2a4fbf5eab4c5542305da4ab40f1f870dce"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p_hmac_provider.a": {
+      "bytes": 345448,
+      "sha256": "22321e0717cb54a6425a1e5bb51211f502bda19614e000c3e70383838cd90d65"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p_aes_provider.a": {
+      "bytes": 178646,
+      "sha256": "366fb1991d176f8143d9ed94eb07a0de438009e465efd1b8937bd18133631ca0"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p_ecdsa_provider.a": {
+      "bytes": 225658,
+      "sha256": "e82ffd7d427b5f71ca50476924ce01ade2cf75c440334bc18ff85b71a65fc5ea"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p_ed25519_provider.a": {
+      "bytes": 215158,
+      "sha256": "72fc1271ca36d3aed7d03d0549e8cc597c4c99fb39ad023ce7f153b68b86fbc3"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p_rsa_provider.a": {
+      "bytes": 234560,
+      "sha256": "c1021abef17d43a3d1d2c55c70ab2879e561c52b932f99ba3bebddd436ea7577"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p_secp256k1_provider.a": {
+      "bytes": 207326,
+      "sha256": "26f8d077ad7b583057b7d0079b99d9a6864b0ebee51bae3a7eb451bf505d1f55"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p_sha.a": {
+      "bytes": 576124,
+      "sha256": "ce7e6d220065b93f2d8b709d6fa6c3b5a4b6c0fe7668e11edfac3ce084e7e4d7"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p_crypto_common.a": {
+      "bytes": 194986,
+      "sha256": "a50734d8e94da9523c9989a61396cb02dda86b26bb1623fc3d1309a9f49e7a9d"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/hunter/_Base/a20151e/7b0a4ab/04aefd4/Install/lib/libsecp256k1-vrf.a": {
+      "bytes": 151504,
+      "sha256": "4ce27cb92f6b2ba03fa0ee304a54e4a27484b72c2521f73e2036faa1dd5ae6bb"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p_key_marshaller.a": {
+      "bytes": 201912,
+      "sha256": "67d6154e4a15bdc6b1c50a3cf329702e24fdd7430315daddaabb12005f8a795d"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p_crypto_key.a": {
+      "bytes": 144270,
+      "sha256": "f1a14111dfba28d7f134864db16355434849df62f11cd168f91eb9b3fc626246"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p_crypto_error.a": {
+      "bytes": 153786,
+      "sha256": "0fec7d35bc506fe150bd0da2ea0e756949a6d1e6b2da2f7a7b49b48ca15ced01"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p_keys_proto.a": {
+      "bytes": 45154,
+      "sha256": "f3e1df49756a0fcb08047007f0053b6e58366491a82e16d400f13446d6dcd23f"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p_asio_scheduler_backend.a": {
+      "bytes": 354800,
+      "sha256": "0520543606eb58ad5f5dae20da6638914a74a904d9a540fc622f9d21552183ce"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p_basic_scheduler.a": {
+      "bytes": 59926,
+      "sha256": "cb87db01b21e55538aec1f47ec95e04291bde7b34282266de16c913f540cb2e1"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p_identify_proto.a": {
+      "bytes": 49876,
+      "sha256": "8ec94082dba33c33213f1df75d2f375c3c5fcf2f33813673e739da6252ed0298"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p_protobuf_message_read_writer.a": {
+      "bytes": 156048,
+      "sha256": "48efd4d8764924a03115eec79da8ce5d162668a8400f34c5ac98c9d3c86671ef"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p_message_read_writer.a": {
+      "bytes": 516872,
+      "sha256": "e99c0bfc327692f3a488bf182f6e14fd7be63ac9f478888766b9f5097d8fe7fb"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p_varint_reader.a": {
+      "bytes": 190632,
+      "sha256": "d7f1c4a04dfaa27f1347feed98f10ae2c4f6e989c7006a4f466f6409906dff79"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p_uvarint.a": {
+      "bytes": 12130,
+      "sha256": "deea779413f601216f06632a2161072bcaafa14e05b2c6c84f12666761c0c319"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p_message_read_writer_error.a": {
+      "bytes": 144206,
+      "sha256": "1e35acaa4e1fd0c7189879e0caa8bae19126b12e618078e0e03ec545cdb1a1e0"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/cpp-libp2p-koinos/lib/libp2p_logger.a": {
+      "bytes": 33492,
+      "sha256": "5240bd681ecf01e7faa7a61c9f5a93b146ad836b387e5a58ece81e4c09f2a8da"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/hunter/_Base/15ca502/ab3baa6/5e0acaf/Install/lib/soralog/libsoralog.a": {
+      "bytes": 1526,
+      "sha256": "08d59266040a0aaea9b0dde20ea7ee73b7d95005c613520709eb71863ce5ca63"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/hunter/_Base/15ca502/ab3baa6/5e0acaf/Install/lib/soralog/libfallback_configurator.a": {
+      "bytes": 30602,
+      "sha256": "3481afa4a126554ea91c340e22992742fe5a522acce3bbac53ba7c858506d9dc"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/hunter/_Base/15ca502/ab3baa6/5e0acaf/Install/lib/soralog/libconfigurator_yaml.a": {
+      "bytes": 230962,
+      "sha256": "04484c206fa65c6ba38750bf27ae4431c0de58a0f8224431a3f3347b4ec20617"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/hunter/_Base/15ca502/ab3baa6/5e0acaf/Install/lib/soralog/liblogging_system.a": {
+      "bytes": 186046,
+      "sha256": "49debdf289d135fa3c4ccac23d4d7475bfc91197a6f240d473a034188e37326a"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/hunter/_Base/15ca502/ab3baa6/5e0acaf/Install/lib/soralog/libgroup.a": {
+      "bytes": 25176,
+      "sha256": "49b62a61087e333fc7a06e268a00ced8818265c0a658690b1c77dee6047c46a3"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/hunter/_Base/15ca502/ab3baa6/5e0acaf/Install/lib/soralog/liblogger.a": {
+      "bytes": 16574,
+      "sha256": "046de4c5ca4840419c8b053f1c4859c2397b7b0706074d91c906997a6066057e"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/hunter/_Base/15ca502/ab3baa6/5e0acaf/Install/lib/soralog/libsink_to_nowhere.a": {
+      "bytes": 12058,
+      "sha256": "a42c4ca3138ff7441c7f40487bc32fea4f5082f46d91b79f563b1b771e5196b5"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/hunter/_Base/15ca502/ab3baa6/5e0acaf/Install/lib/soralog/libsink_to_console.a": {
+      "bytes": 35144,
+      "sha256": "8aad78cab1439f29d0fddd4d5562c18d3f2f62a63363e40610d8a8b3b9798aff"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/hunter/_Base/15ca502/ab3baa6/5e0acaf/Install/lib/soralog/libsink_to_file.a": {
+      "bytes": 48726,
+      "sha256": "a7ad698b93b01c88c864512018cf0f5a9238d4fc58b6a26e88fe03eb8c16b152"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/hunter/_Base/15ca502/ab3baa6/5e0acaf/Install/lib/soralog/libsink_to_syslog.a": {
+      "bytes": 34424,
+      "sha256": "7cf9922db70269d709d73a182260d773e2f565fa8f25e7e87886807b0139b6c2"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/hunter/_Base/15ca502/ab3baa6/5e0acaf/Install/lib/soralog/libmultisink.a": {
+      "bytes": 14072,
+      "sha256": "3278bbaa921a3455176d8e72af55503f0b9d21e39d3c828ef3400b50bcb9349c"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/hunter/_Base/15ca502/ab3baa6/5e0acaf/Install/lib/libfmt.a": {
+      "bytes": 248850,
+      "sha256": "7c8b2f789cca0a009008a422fa005c02228d05ca0a9e1f6a5a2d6c69597d77d3"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/hunter/_Base/a20151e/7b0a4ab/04aefd4/Install/lib/libboost_system-mt-a64.a": {
+      "bytes": 1484,
+      "sha256": "d8f0876c6a33e9242977a1b7536117cde996172a1daa198b2642e819c25dfd45"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/hunter/_Base/a20151e/7b0a4ab/04aefd4/Install/lib/libethash.a": {
+      "bytes": 15512,
+      "sha256": "598fdb28db43daf320568bf1597ee686e04380aedd69257234e32417d99d047a"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/hunter/_Base/a20151e/7b0a4ab/04aefd4/Install/lib/libkeccak.a": {
+      "bytes": 5598,
+      "sha256": "70a7b07190e3c39fb24a9041c5b443a1d782e6d270a13d0baaadeed5d44743b6"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/gmp-static-6.3.0/lib/libgmp.a": {
+      "bytes": 1349056,
+      "sha256": "baa0d9497ce5c385b4343f50192e2680ef67addd80f1157fef7f5d05e27c9f2e"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/zstd-static-1.5.7/lib/libzstd.a": {
+      "bytes": 1105392,
+      "sha256": "5f0d538ffe9e140999383961b1c70e33a596f1230843db019e3fd824a371fe03"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/build/src/libvm_manager.a": {
+      "bytes": 766334,
+      "sha256": "28ec3410a7c81594da4deb32fc9bb58eb937e87b9448fd872d8e767cf9d1a3aa"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/hunter/_Base/a20151e/7b0a4ab/04aefd4/Install/lib/libboost_log_setup-mt-a64.a": {
+      "bytes": 2884512,
+      "sha256": "3b13a81234aac3af2e5f187bbcf4a847830c1c78094df5a6b36fed08c4649525"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/hunter/_Base/a20151e/7b0a4ab/04aefd4/Install/lib/libboost_log-mt-a64.a": {
+      "bytes": 3345636,
+      "sha256": "b778ccf1384aad68c9770672951544faec7015624fd0969039001d3cb0f9919b"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/hunter/_Base/a20151e/7b0a4ab/04aefd4/Install/lib/libboost_atomic-mt-a64.a": {
+      "bytes": 9960,
+      "sha256": "73a08442e3666a97ee7ca3cd9df0e2160efd9274c44e6d87422a87d6b2ba5adf"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/hunter/_Base/a20151e/7b0a4ab/04aefd4/Install/lib/libboost_chrono-mt-a64.a": {
+      "bytes": 165670,
+      "sha256": "0d9e00dac9a14328bd57f6318238a2e01c2390fe6c3052dc544326912a819b20"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/hunter/_Base/a20151e/7b0a4ab/04aefd4/Install/lib/libboost_regex-mt-a64.a": {
+      "bytes": 697470,
+      "sha256": "6ff742f131a48884bed08d73f2a971aac6b17c8ab639ab1689169eac456f42fe"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/build/teleno-grpc/libgrpc++.a": {
+      "bytes": 1735050,
+      "sha256": "3e8a35d468fea643a048c983b5b4dfbfde5e903ecbdcfd34bae952ac71c781ab"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/hunter/_Base/a20151e/7b0a4ab/04aefd4/Install/lib/libgrpc.a": {
+      "bytes": 7263906,
+      "sha256": "4cc363efaf86bc59be65c3a0b95fcd8c27111a79633fe6623e64e9ab3fc33f45"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/hunter/_Base/a20151e/7b0a4ab/04aefd4/Install/lib/libssl.a": {
+      "bytes": 1261652,
+      "sha256": "df3b5b708e00819e6cf29caae29eddd42d28ef76c4817a705e3da87f1016884f"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/hunter/_Base/a20151e/7b0a4ab/04aefd4/Install/lib/libcrypto.a": {
+      "bytes": 9376786,
+      "sha256": "9c0da9c42a7449bacf569b5477d70b9118fbca87fa4dbe304d084135686614c3"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/hunter/_Base/a20151e/7b0a4ab/04aefd4/Install/lib/libgpr.a": {
+      "bytes": 135068,
+      "sha256": "495f73c34fdd30bfa315ddeb8aa619cf1c8d95c2c0dd7e5b8865a5e7ed9076e3"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/hunter/_Base/a20151e/7b0a4ab/04aefd4/Install/lib/libabsl_time.a": {
+      "bytes": 112942,
+      "sha256": "4032bcbe791d7bc2953c47565d6a4769f95d5a2f6228e4a7c9b532cf5344cd4a"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/hunter/_Base/a20151e/7b0a4ab/04aefd4/Install/lib/libabsl_civil_time.a": {
+      "bytes": 26452,
+      "sha256": "1ea32a653543a92034c1f40d7651f20e0453cb3c36aa3bed980b54cda6d66212"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/hunter/_Base/a20151e/7b0a4ab/04aefd4/Install/lib/libabsl_time_zone.a": {
+      "bytes": 206302,
+      "sha256": "3b742fc1b95142fba672cc2ab5281fb0ba47f9b0dad4243e2e705e2749682f25"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/hunter/_Base/a20151e/7b0a4ab/04aefd4/Install/lib/libabsl_str_format_internal.a": {
+      "bytes": 162360,
+      "sha256": "90d91c9547c8ba3171eae08550ddae2bdfd2601eeed82131d9eb6f4f69185033"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/hunter/_Base/a20151e/7b0a4ab/04aefd4/Install/lib/libaddress_sorting.a": {
+      "bytes": 11304,
+      "sha256": "bbdb1f9183e3a6a86516459788e02c255e98411a3ed0d5e48bff46214cc66dd4"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/hunter/_Base/a20151e/7b0a4ab/04aefd4/Install/lib/libupb.a": {
+      "bytes": 42952,
+      "sha256": "7869f014619749acc0739c70be4bbbaee0765be00713a69c20ab15b997616c53"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/hunter/_Base/a20151e/7b0a4ab/04aefd4/Install/lib/libcares.a": {
+      "bytes": 164764,
+      "sha256": "16e04cbc5b104e8f0eb389ba40addc10043f61ca6e7d348c7afabdaf99912eab"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/hunter/_Base/a20151e/7b0a4ab/04aefd4/Install/lib/libre2.a": {
+      "bytes": 970972,
+      "sha256": "4acc3c00e6db0f22f41e0456364e198881698775fcaca2748cfc11e614b2e0aa"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/hunter/_Base/a20151e/7b0a4ab/04aefd4/Install/lib/libabsl_bad_optional_access.a": {
+      "bytes": 1162,
+      "sha256": "8970e70c8ea11ed0c354614db973b82931e84e7f1c7328b01d27b32c001a2ff6"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/hunter/_Base/a20151e/7b0a4ab/04aefd4/Install/lib/libabsl_strings.a": {
+      "bytes": 226650,
+      "sha256": "abc0141be5cbc7ec7b8c340da81a350fe2482bb6fe07876ac03cc44940b9bcfd"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/hunter/_Base/a20151e/7b0a4ab/04aefd4/Install/lib/libabsl_string_view.a": {
+      "bytes": 1146,
+      "sha256": "aafaae2811d59beaebe6b3ab78e8549fe9d786bfe3756f5e3c33757cb5ee8326"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/hunter/_Base/a20151e/7b0a4ab/04aefd4/Install/lib/libabsl_strings_internal.a": {
+      "bytes": 13524,
+      "sha256": "ed5018f550e980c6e18ea9faf18fc18b6213c813424dfe26d28f2544a619dfdd"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/hunter/_Base/a20151e/7b0a4ab/04aefd4/Install/lib/libabsl_base.a": {
+      "bytes": 23690,
+      "sha256": "012d395feafa64085e9e96a8b911de050b5e94e691019d0403a2247930e831db"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/hunter/_Base/a20151e/7b0a4ab/04aefd4/Install/lib/libabsl_spinlock_wait.a": {
+      "bytes": 3154,
+      "sha256": "e92fe188b7e927210a2a414b747f9a1acb24c70f7c39efcaed0e258046c63a0c"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/hunter/_Base/a20151e/7b0a4ab/04aefd4/Install/lib/libabsl_int128.a": {
+      "bytes": 20588,
+      "sha256": "ca8f9030e7615de895233746510a1ded6f6fb1f597382f8c76fa0e5d0b91fa55"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/hunter/_Base/a20151e/7b0a4ab/04aefd4/Install/lib/libabsl_throw_delegate.a": {
+      "bytes": 16544,
+      "sha256": "c8618cc44bb47c0780059e9141a9ca4670a2a1c855fac3020f438f2226781c0c"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/hunter/_Base/a20151e/7b0a4ab/04aefd4/Install/lib/libabsl_raw_logging_internal.a": {
+      "bytes": 7828,
+      "sha256": "b12c228f68aa5220ad6ee14247fba795a988c6c0232b09484356a6d05c628306"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/hunter/_Base/a20151e/7b0a4ab/04aefd4/Install/lib/libabsl_log_severity.a": {
+      "bytes": 3602,
+      "sha256": "28bb6ea2bf1801365a33eb80f2d4954a6c2b20fee8ec6ed7462b3d880801312a"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/build/_deps/teleno_protobuf_eb6034f57fcb-build/libprotobuf.a": {
+      "bytes": 6162334,
+      "sha256": "7d28df68e26495567a5e643fe6973e7c326bc74d61ae69a9ce5fa8d1ac60541d"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/.deps/hunter/_Base/a20151e/7b0a4ab/04aefd4/Install/lib/libz.a": {
+      "bytes": 143158,
+      "sha256": "0d51a20a0f0cb5b139c9fcf4b92879458e25612fb2c1886cde93b057eb60d230"
+    },
+    "/__w/kai-plugin-koinos-node/kai-plugin-koinos-node/teleno-source/build/_deps/teleno_fizzy_dd4466f681bd-build/lib/libfizzy.a": {
+      "bytes": 366614,
+      "sha256": "94904097f50909e570278a7a686e4530578bc72d42296260fd1d712e4805dd35"
+    }
+  },
+  "committed_source_files": {
+    ".dockerignore": {
+      "bytes": 152,
+      "sha256": "1cf0014fe656d46a385e6f317d9ad59165b4487eefbfea9ab23f632ca664aea5"
+    },
+    ".gitattributes": {
+      "bytes": 191,
+      "sha256": "40e008f4710ff4f2c3c63b28832c304802cf2af4ef20290348400afd27c2917a"
+    },
+    ".github/dependabot.yml": {
+      "bytes": 196,
+      "sha256": "13bcb9beeb9e9b7c28efdb3c132a3978e158fa5b528c2a22f120e5da4380f19e"
+    },
+    ".github/workflows/build.yml": {
+      "bytes": 3254,
+      "sha256": "264326cd052b149308e8e8910e745000268b28f5e3c175d9a6433652c48f1493"
+    },
+    ".github/workflows/container.yml": {
+      "bytes": 13892,
+      "sha256": "816f373e2d40be089c307b4d2ae26c631186dedf5be2c8c74c8727b927cc765f"
+    },
+    ".gitignore": {
+      "bytes": 172,
+      "sha256": "8188adeb4c11423428627b8eb8da2b5854f4537bdcfafc36326908b1f2a50226"
+    },
+    "AGENTS.md": {
+      "bytes": 46822,
+      "sha256": "3f821de98cf55d3fa66c5444e1d49ff1e01cc45007f73a82ca4c20b81a258f73"
+    },
+    "CHANGELOG.md": {
+      "bytes": 35538,
+      "sha256": "e19afee6cfaccb43ce9c65a250b1f9b7dfd919eeb3fbeb9fb4128c4db751165d"
+    },
+    "CLAUDE.md": {
+      "bytes": 46822,
+      "sha256": "3f821de98cf55d3fa66c5444e1d49ff1e01cc45007f73a82ca4c20b81a258f73"
+    },
+    "CMakeLists.hunter.txt": {
+      "bytes": 4874,
+      "sha256": "fda17ea889fcada561f7ae06f0f13519354e6804638434a33156db0d4ef1951d"
+    },
+    "CMakeLists.standalone.txt": {
+      "bytes": 3714,
+      "sha256": "053e09cdc8f215c436d7f6be4eaa58f7c2ab2b5c556d16dad6f4ea26d13e07e9"
+    },
+    "CMakeLists.txt": {
+      "bytes": 5208,
+      "sha256": "5f3c388bed09a1a522fbc8dfb88a70ce33a48d30c58c922cfcbeb519dc26b6a4"
+    },
+    "Dockerfile": {
+      "bytes": 3532,
+      "sha256": "c0065275b2cb17db31293d180f3160b3dde51ed12e4ddfa3ea7024bbd32fe100"
+    },
+    "LICENSE": {
+      "bytes": 1063,
+      "sha256": "ef0a2d9a347cd91976a683089dad09541e24f5407b437e879b05548084233a7c"
+    },
+    "README.md": {
+      "bytes": 3612,
+      "sha256": "a1c08e00ba6c3dc906e89f2011ed8a17f31b882f16ceab8c39e1a956de6f6bd0"
+    },
+    "VERSION": {
+      "bytes": 6,
+      "sha256": "64d23f858ef51b0f996e4966d4e27c0371b437e2d2787890b1f7ad22d4ec5663"
+    },
+    "assets/branding/README.md": {
+      "bytes": 1446,
+      "sha256": "85ee9e82169c6e9fd65d8146ecca10662a44aa64736330a57287779bb60b100d"
+    },
+    "assets/branding/icon-dark.png": {
+      "bytes": 56497,
+      "sha256": "0474d5794ddf1fbc3d52ea69d62125cb0e3afe58417a1c02b9af5da821f8f1c1"
+    },
+    "assets/branding/icon-dark.svg": {
+      "bytes": 793,
+      "sha256": "a5644e14420a4bfdcd2b3edd060692ac2b072fec5e581bb73d31f453629b79cc"
+    },
+    "assets/branding/icon-light.png": {
+      "bytes": 29562,
+      "sha256": "59f81a1bf6387a5c199849a3b3a37c14e0225c34716425957b89c4d53fd80043"
+    },
+    "assets/branding/icon-light.svg": {
+      "bytes": 670,
+      "sha256": "a1cf5a5da6387abacf38580fff9dda9121abc996413d9792566c9938c8bf8836"
+    },
+    "assets/branding/icon-mark.png": {
+      "bytes": 21045,
+      "sha256": "e7e140f24f85b208b3173a727d54f94508db440f3295e0c41f8721356503a251"
+    },
+    "assets/branding/icon-mark.svg": {
+      "bytes": 527,
+      "sha256": "1fa20af27fc1596f4b50ca79b547bcbf7c666818d5b40434226d374cd1879d94"
+    },
+    "assets/branding/icon.png": {
+      "bytes": 56497,
+      "sha256": "0474d5794ddf1fbc3d52ea69d62125cb0e3afe58417a1c02b9af5da821f8f1c1"
+    },
+    "assets/branding/logo.png": {
+      "bytes": 20410,
+      "sha256": "23f5d81244116449fa327e36cc01b2814caea4f5d59d67a221dde81810651841"
+    },
+    "assets/branding/logo.svg": {
+      "bytes": 1122,
+      "sha256": "01f2eff4fb73838bfd3fcdac7094d74df2db9f8b2e152974137e2f6a031d2b44"
+    },
+    "cmake/ApplyFizzyContextPatch.cmake": {
+      "bytes": 1625,
+      "sha256": "f7822a9e70c0bf3b6f7f066e68c969c317add3db2b1448d7e9fd72909727bf84"
+    },
+    "cmake/ApplyGrpcCallBinding.py": {
+      "bytes": 1873,
+      "sha256": "cbb12636c315c96557a2118e0bc5e260ed19cbcc1b716fe1f9e4d75974801009"
+    },
+    "cmake/ApplyKoinosProtoOwnership.py": {
+      "bytes": 2118,
+      "sha256": "bfe90b3bc459518c77ddf89df2ffe361ade6758128239a59778bfc1c9357d5d5"
+    },
+    "cmake/ApplyNlohmannCleanup.py": {
+      "bytes": 3428,
+      "sha256": "4c586cbb7e6e14a535f87d84849c5b29175fd96b30cbb7f5ccb3ba5d8af0fa42"
+    },
+    "cmake/ApplyProtobufOwnershipPatch.cmake": {
+      "bytes": 2998,
+      "sha256": "11468ae1fd842c57d3bdd2b379ee86b223a9d1e173ff123a8697f289d6ceecc4"
+    },
+    "cmake/RepackGrpcCallBinding.py": {
+      "bytes": 4306,
+      "sha256": "550b85a76eb28d43f62b790d2eb5d2acefd29aa2f09d1a3a2d1369bec5f2dd75"
+    },
+    "cmake/TelenoFizzy.cmake": {
+      "bytes": 4617,
+      "sha256": "96bcef807ebf10145c4f42ab688e386ce4454a1ed5b51e3a24346f28b5fbc863"
+    },
+    "cmake/TelenoGrpcCallBinding.cmake": {
+      "bytes": 9084,
+      "sha256": "765f0148c3b338dd766bc5c66882a7827b5e64ecbb542d010f89c6d7aa5cc861"
+    },
+    "cmake/TelenoJson.cmake": {
+      "bytes": 1926,
+      "sha256": "6580ff1baf2184f9b3276f4968f7543bab7b5e130817db0403a693b67f4cf5d4"
+    },
+    "cmake/TelenoJsonSdk.cmake": {
+      "bytes": 6237,
+      "sha256": "9589ca1d1c40572b20f0f647fc8cede4c0ca6b0e71f0e033b07a46f951b32bbb"
+    },
+    "cmake/TelenoKoinosProto.cmake": {
+      "bytes": 4537,
+      "sha256": "64d61787eeb27a7cc2d83dfc8f2b8416316a94bec2ad64d3d6d642c671b14bcf"
+    },
+    "cmake/TelenoProtobuf.cmake": {
+      "bytes": 8127,
+      "sha256": "5225fc34c018c33f814fea05c5446f06d79f6d3e671564a300bf8fee591004d6"
+    },
+    "cmake/TelenoTsanScopes.cmake": {
+      "bytes": 1865,
+      "sha256": "840c0980e2bd11611531432879cd5bd920b03241966dffc262ace425b6809969"
+    },
+    "cmake/cpp-libp2p-koinos-prelude.cmake": {
+      "bytes": 495,
+      "sha256": "58742f03f2b61454ca94980c1f58bf321416674224ca5c91514b09e6abb5b421"
+    },
+    "cmake/cpp-libp2p-koinos.patch": {
+      "bytes": 18301,
+      "sha256": "163ce9d0122b3662764fc63429c620692d1c9041d5af10e4fb71738c9c68e2bb"
+    },
+    "cmake/cpp-libp2p-listener-lifetime.patch": {
+      "bytes": 1438,
+      "sha256": "44a8e8f4b06603f4463ac707c400b1cdb913f2fd4901675e27bd774fdc77d47d"
+    },
+    "cmake/patches/fizzy-context-allocation.patch": {
+      "bytes": 1395,
+      "sha256": "dd4466f681bd1c32807199056e0aefc43ffb42e42305281022475fb7f0a62bfc"
+    },
+    "cmake/patches/grpc-call-binding-manifest.json": {
+      "bytes": 205,
+      "sha256": "34b9c5ff766499dfb07a47b6dc1e815fb088cbfa70fbf9757cd9ab84e8e808f1"
+    },
+    "cmake/patches/koinos-proto-copy-ownership-manifest.json": {
+      "bytes": 14472,
+      "sha256": "651e7f7c59770abaadd15c6fef14327514bf73aefd7b62533f4443e1e800cb66"
+    },
+    "cmake/patches/nlohmann-json-allocation-free-destroy.patch": {
+      "bytes": 7906,
+      "sha256": "53eae7b73dbe6cdbed6f8d67e12bae38d897efe1d8f9be47dafc950003a19947"
+    },
+    "cmake/patches/nlohmann-json-cleanup-manifest.json": {
+      "bytes": 4745,
+      "sha256": "ffb9266644f5b8e09706c79a3ed3dfb4583120966cd3447bdca950aa9aecf53a"
+    },
+    "cmake/patches/nlohmann-sdk-source-manifest.json": {
+      "bytes": 5119,
+      "sha256": "04c9d8d94286f502d649c1ab9d52821f9084b59962675e4c77f277170ddcce0f"
+    },
+    "cmake/patches/protobuf-unknown-field-ownership.patch": {
+      "bytes": 9947,
+      "sha256": "eb6034f57fcbe59a347ef5444701d3fc198e8122786380b5877583ceb80b0382"
+    },
+    "cmake/shims/boost_beast-1.83.0/boost_beast-config-version.cmake": {
+      "bytes": 214,
+      "sha256": "e653248440bc49568ba3a349e5d0ca557ff8f15a77d75780f76fb55b15449f8c"
+    },
+    "cmake/shims/boost_beast-1.83.0/boost_beast-config.cmake": {
+      "bytes": 454,
+      "sha256": "e319ab7d22154ce3f6d617f5d6abc76b1777586c12a94449fe96e9fdc56efaef"
+    },
+    "cmake/teleno_tsan_scope_mutex.hpp": {
+      "bytes": 1215,
+      "sha256": "38019a2ac37e1c9c6f766c45f3508bf02bb8ce4ca1ff2b18ebab9b3ea184f8ad"
+    },
+    "config/example/harbinger/genesis_data.json": {
+      "bytes": 17789,
+      "sha256": "300f54e105dcdd1d9dfd7ac7349f56808276672c9e11e35a447325ab32111cfb"
+    },
+    "config/example/mainnet/genesis_data.json": {
+      "bytes": 582092,
+      "sha256": "ad3eadc626576f397d8ce4fc9cc43b96fc200e0489e4ed34bcaa3587415f9079"
+    },
+    "config/mainnet-observer.yml": {
+      "bytes": 1025,
+      "sha256": "c24a9fe290a7157c4fc14ea6e7c61b083ca0d70a0e3740cb0f691376350ec950"
+    },
+    "config/mainnet-public-backup-observer.yml": {
+      "bytes": 2851,
+      "sha256": "84b1192c5df795684edfa73fe5a05c0bdc50ee71f2719016e24c8f6888343223"
+    },
+    "config/mainnet-public-bootstrap-observer.yml": {
+      "bytes": 1310,
+      "sha256": "5ab6d85df9276acbc9b1e25df11522d1dcdd8b33135561d2b7959425f8b9ff97"
+    },
+    "config/prodnet-docker-producer.yml": {
+      "bytes": 1430,
+      "sha256": "535f9fce00e718fcdc5c9e06d76f6eb6e8ea7f2d3e386fbbc99cde6e5417f53b"
+    },
+    "config/public-bootstrap/testnet-ed25519.pub": {
+      "bytes": 113,
+      "sha256": "6993f483aecf040c776f8ddebe0d63eefe5971ec3e19f52e215bd3e3e952dd28"
+    },
+    "config/testnet-public-bootstrap-observer.container.yml": {
+      "bytes": 925,
+      "sha256": "27a5f5eb2df82ea8d18080324a2110c890b1f0e239e15d1d79b8508078e48b03"
+    },
+    "config/testnet-public-bootstrap-observer.yml": {
+      "bytes": 804,
+      "sha256": "73d299b79f0017807c6056ba44695d9982cd7fac9ceebd0c93885b595af37917"
+    },
+    "docker/teleno-prod-producer": {
+      "bytes": 3502,
+      "sha256": "bcc8c0d828eb87425ced4c18416ea6e86c1e0c3044ccfc0bedf9a789fc852b8f"
+    },
+    "docs/README.md": {
+      "bytes": 19194,
+      "sha256": "6782421bca12d58a34a38c92ec7c193b8bdfa52cfaae8956efffe2dd17535da2"
+    },
+    "docs/analysis/contract-abi-index-issue-11.md": {
+      "bytes": 17427,
+      "sha256": "e9b148e9e583b997cfe17eb4132518ca5ed563a4a7eedd008e308b9bf2ea18b1"
+    },
+    "docs/analysis/recovery-reserve-budget.md": {
+      "bytes": 11462,
+      "sha256": "883cd3b4611559ac7311af7d07d593762f09696901c5e38712b56e97cb49cedc"
+    },
+    "docs/backup-restore-cli.md": {
+      "bytes": 32268,
+      "sha256": "c8eadf1bcfde3d817ccd34dbe87acffd4a05a82b5b30304ce8bde0b363bd787f"
+    },
+    "docs/command-reference.md": {
+      "bytes": 10699,
+      "sha256": "da6d378b82f164ba8d991f18fb7545af9bb402a556675d2784012571867deeb0"
+    },
+    "docs/configuration.md": {
+      "bytes": 34613,
+      "sha256": "97345d8de91bfc143c6e5a7b8da71c62224e4b6c5aa9d39d1f80ffaa87959939"
+    },
+    "docs/implementation/backup-publisher-identity-update-plan.md": {
+      "bytes": 6648,
+      "sha256": "c9ebda56e67545b243b4b168dd533b34ac098dd6cc872aa47251dd2ee0ba11cf"
+    },
+    "docs/implementation/bounded-history-producer-design.md": {
+      "bytes": 25530,
+      "sha256": "bf07753a593363e2f0297f8e3438f8c2b8d4bbe648c67594b21d40c997e4479b"
+    },
+    "docs/implementation/chain-v1.5.2-fast-replay-plan.md": {
+      "bytes": 33536,
+      "sha256": "8d6eb2891cd4f5b88bd2f34ae29334d6798ce56a4947cec81077934d0a5129b0"
+    },
+    "docs/implementation/compaction-headroom-test-goal.md": {
+      "bytes": 6711,
+      "sha256": "2d646e37c28841f2501f65a2f7dc02b46ee7254313755532c46180a6c9a17abb"
+    },
+    "docs/implementation/contract-abi-index-recovery-plan.md": {
+      "bytes": 8872,
+      "sha256": "5b3f4a77566385d957dd72e9a6eb4bb0e13e688a5caf777a3c93b98cc4cc4d80"
+    },
+    "docs/implementation/issue-9-goal.md": {
+      "bytes": 54104,
+      "sha256": "09158de5d7fc48e29de5a7d3d13d89fe1cd75ef5f1f2bc4ca6298f07be37b138"
+    },
+    "docs/implementation/issue-9-m1-aggregate-goal.md": {
+      "bytes": 40968,
+      "sha256": "0d982a525e944412a6df8acc8d4317f5944e31bea76e36de30dbc5c973c047e6"
+    },
+    "docs/implementation/issue-9-m1-grpc-control-ownership.md": {
+      "bytes": 12699,
+      "sha256": "308f265ab48ed6cd445243098f3c3f5b76459251487f9bd7ce16cc9069fa562d"
+    },
+    "docs/implementation/issue-9-m1-isolated-vps-qualification.md": {
+      "bytes": 14048,
+      "sha256": "714452f57974a80c9ce5d195c447650a6c793d5b2084c45c003a6586937ee522"
+    },
+    "docs/implementation/issue-9-m1-mainnet-observer.md": {
+      "bytes": 15720,
+      "sha256": "0e4e86975ba67767fb7eab983289f0c70dab00c43f51e037e537447771d95453"
+    },
+    "docs/implementation/issue-9-m1-owned-memory-inventory.md": {
+      "bytes": 20326,
+      "sha256": "d63137a96258ea257a4ec3f4bba7f0256874db3aef939502b75710ee318a93e0"
+    },
+    "docs/implementation/issue-9-m1-receipt-output-repair.md": {
+      "bytes": 16558,
+      "sha256": "ae5b2be1ee2bd836af3407e2f0b20698897600e5cda1593b19538d06cbed7da3"
+    },
+    "docs/implementation/legacy-applicability-of-teleno-findings.md": {
+      "bytes": 31717,
+      "sha256": "2dd36edfc3ba25b373221667f34d367f643da6abb4ee94d3a7b970cbb1720677"
+    },
+    "docs/implementation/low-resource-mainnet-observer-plan.md": {
+      "bytes": 52483,
+      "sha256": "5a2ecca131569078508def2a68f5fd0aa10cd415a3726a97a284355415aacaa6"
+    },
+    "docs/implementation/mainnet-producer-commissioning-goal.md": {
+      "bytes": 12462,
+      "sha256": "5929c415d71c794c552de72481446bd2238a687e8b00289be7ed99b33eb8788f"
+    },
+    "docs/implementation/single-copy-backup-restore-plan.md": {
+      "bytes": 43776,
+      "sha256": "5dd63480041dea9be699890310cd361ab89ac18c7ccd11dec6ed68f8f76a458f"
+    },
+    "docs/implementation/teleno-audit-remediation-plan.md": {
+      "bytes": 34466,
+      "sha256": "4d7e941540ca85a47e6b66763fc01312a48cda33181d90e5cac532ac30267ced"
+    },
+    "docs/implementation/teleno-light-concept.md": {
+      "bytes": 3266,
+      "sha256": "a1fd23c353f5b8f166a89dbd4e044404098bae9a20bd1197683463eeaaedb4b2"
+    },
+    "docs/implementation/teleno-mobile-feasibility-and-implementation-plan.es.md": {
+      "bytes": 63254,
+      "sha256": "aa5fe7dd931aa1ad28072d34b82d75ed308acd64b1edf72c656f3fc0c999fead"
+    },
+    "docs/implementation/teleno-mobile-feasibility-and-implementation-plan.md": {
+      "bytes": 52841,
+      "sha256": "fcf595f8479766d25bf3b0fbec28ebabbfa59afc0086aec9826239f94cd8244f"
+    },
+    "docs/implementation/vps-8gib-reserve-test-goal.md": {
+      "bytes": 6365,
+      "sha256": "829831a15303e80db744c6cd8932ebebcef2bdc668dbe169ee93518ed425ca0d"
+    },
+    "docs/install-or-build.md": {
+      "bytes": 8389,
+      "sha256": "45350dfaf44092c4b03d2161edf90d26cb52a365245b229f791172fc4113697d"
+    },
+    "docs/logs-and-diagnostics.md": {
+      "bytes": 20360,
+      "sha256": "6af4d40054508ff9383cd4fb4094682f0fbbb89a2e6cf13fe3ebb4d751fd77d2"
+    },
+    "docs/memoria.md": {
+      "bytes": 292760,
+      "sha256": "d9955ebf2add74df2640e97cff430151dd6d444d5d28dec8484a97f8d2016716"
+    },
+    "docs/operations/container.md": {
+      "bytes": 7141,
+      "sha256": "ec4f72182fd0899122629fcdb8f6b4387469e364a9579213d65d1445fb3b859a"
+    },
+    "docs/operations/reward-reinvestment-macos.md": {
+      "bytes": 10820,
+      "sha256": "c547afa0d24917c04ea9f77a13fb4d4bff91d5719df477f0da1c307e0b654cf8"
+    },
+    "docs/operations/start-node.md": {
+      "bytes": 2988,
+      "sha256": "627c462349c773f0b42cfc24bb9df65f991698f0773591b1cd4d3aea77908f9b"
+    },
+    "docs/performance/KOINOS_HIGH_THROUGHPUT_IMPLEMENTATION_PLAN.md": {
+      "bytes": 107170,
+      "sha256": "2dee430127f9b0588c45c05fe6faedbf898196d20da0f520fdfb4dac40ea3fb3"
+    },
+    "docs/performance/database-size-reduction-assessment.md": {
+      "bytes": 19360,
+      "sha256": "d74c6b3cd8ff91941ef445dc3835496643d6a4eaa8bdffe89e9010f42d3f7131"
+    },
+    "docs/performance/mainnet-producer-commissioning-2026-10-18.md": {
+      "bytes": 9998,
+      "sha256": "a969afb960552a022172afd0ce83d810d070bf707bb55da8943827d91b2d6fa5"
+    },
+    "docs/performance/teleno-software-audit.md": {
+      "bytes": 54724,
+      "sha256": "72fee9856f9849c60d2343e90663166778b018f1adc3338bc44f777c5ee786ea"
+    },
+    "docs/performance/tps-optimization-assessment.md": {
+      "bytes": 10748,
+      "sha256": "4ccfb067d3181509c3e26631bed4b5eb9e887801e94acd499135438c4a3626b3"
+    },
+    "docs/performance/transaction-tps-benchmark.md": {
+      "bytes": 7895,
+      "sha256": "2953fe00dc76b3fc54462452441098175826efccefdb1dcaf6669f2788e52cb0"
+    },
+    "docs/preflight.md": {
+      "bytes": 5070,
+      "sha256": "55a310cb3d150c9ce64844f44b25a32eabe6b224fb339490f70cdb759a12dd5e"
+    },
+    "docs/quickstart.md": {
+      "bytes": 2792,
+      "sha256": "31e26b26f6a3999e395218677c271177c13e0ffda2728d31e0c1934ebe0c7b13"
+    },
+    "docs/release-builds.md": {
+      "bytes": 17097,
+      "sha256": "f32cc50e5c683d95fc7a4665e6dc35ee95f93bd0d7652317cad6d44d69f97617"
+    },
+    "docs/release-chain-v1.5.2-fast-replay-checklist.md": {
+      "bytes": 7402,
+      "sha256": "3d4f17acd899fa9af6961cbd11cc80c3b48836ee7a3ff2e317d9746a9f5273a9"
+    },
+    "docs/releases/1.3.0-alpha.1.md": {
+      "bytes": 14330,
+      "sha256": "0e2ebe53c2df3d3c79b73d58418b8e959c8be3ba791328ecdee173fe05633816"
+    },
+    "docs/releases/1.3.0-alpha.2.md": {
+      "bytes": 1701,
+      "sha256": "ed1a6368a3ca106823f3b82f084e8f46d594a4a1b0af6a7d6a0ff529cb5445f1"
+    },
+    "docs/releases/1.3.0.md": {
+      "bytes": 8485,
+      "sha256": "4f45843035bbc1bf9ab58106600f8a0256d9948fa8cab796dea638a138cbb481"
+    },
+    "docs/rpc-endpoints.md": {
+      "bytes": 11737,
+      "sha256": "ef750de5860d25958094d275d0d6d65773efd7b7e41d31b2591621c3acf6ffcd"
+    },
+    "docs/running-observer-node.md": {
+      "bytes": 10418,
+      "sha256": "9f63b25aeda716caa65bbe8aaf76c443d57a88b2c78688005b4093fc356a739a"
+    },
+    "docs/running-producer-node.md": {
+      "bytes": 6516,
+      "sha256": "6cca415943d0d37c13c3a196b6f6086ee3e94add462e39f06ec06c50b60b8417"
+    },
+    "docs/troubleshooting.md": {
+      "bytes": 8621,
+      "sha256": "3f31b36364181363786c456a6ecb0b55bf57b4480d59347b532880cf41bbac6c"
+    },
+    "docs/validation/alpha-1.3.0-alpha.2-publication.md": {
+      "bytes": 2834,
+      "sha256": "3906716405e81d60778a85b4e52bbe874648e327a5c065568ca7484044f42354"
+    },
+    "docs/validation/alpha-1.3.0-publication.md": {
+      "bytes": 6458,
+      "sha256": "3330a22739609b6ac6110f5ee722c8ae72dffafea1ba8e49e3c63830115d9d37"
+    },
+    "docs/validation/block-receipt-completion.md": {
+      "bytes": 3787,
+      "sha256": "2466274470c1d5e956f1a38a39a6b6f8fd465d3ab027adc95fa5420a88cd6785"
+    },
+    "docs/validation/chain-v1.5.2-fast-replay-validation.md": {
+      "bytes": 36686,
+      "sha256": "88d039c605d00da456bfdf96d014140262963777658da4a2f70a0b0fc4e5e8ac"
+    },
+    "docs/validation/compaction-headroom-experiment.md": {
+      "bytes": 18128,
+      "sha256": "4252954cb4bca801a6cff192d79e520890a5114082b764f70f8568ef13e8f9d6"
+    },
+    "docs/validation/compatibility-1.2.1-release-checkpoint.md": {
+      "bytes": 8110,
+      "sha256": "b17586f2affc2278b39a355cf4490a2ee4e95a7fa2bf6a2b63a56c810e8f21f4"
+    },
+    "docs/validation/compatibility-1.2.1.md": {
+      "bytes": 9254,
+      "sha256": "553a82becbeb74259265fc205f1a70d59d25f8e9d5904fcdd46d5202d2461c99"
+    },
+    "docs/validation/controlled-native-producer.md": {
+      "bytes": 8808,
+      "sha256": "5344218e5f31fe3533ff18ea94cabbdea511bc7cb5e5f607d0815c7ded91b320"
+    },
+    "docs/validation/current-container-runtime.md": {
+      "bytes": 3008,
+      "sha256": "69c68fb083d116ba3183ccd7a80e94b0a62d6a4a99192b8e7675ebb1e617d393"
+    },
+    "docs/validation/direct-restore-read-buffer.md": {
+      "bytes": 5494,
+      "sha256": "8e32c5e51500fa333d3d03f95d904db2d972115f8facf7afa25a71eb509c2951"
+    },
+    "docs/validation/direct-restore-scan-reuse.md": {
+      "bytes": 5894,
+      "sha256": "5226450dec0da1c3dc55af854d3917b5574d1d0a0620954cfb1d5db896c17226"
+    },
+    "docs/validation/fogata-gossip-publication.md": {
+      "bytes": 3250,
+      "sha256": "8d8f651849cb5343b8a10275d822a65e2e514310477c6739a21edb1da7f7bb62"
+    },
+    "docs/validation/historical-checkpoint-eligibility.md": {
+      "bytes": 14540,
+      "sha256": "d469a634532bb4f51d61094eb8dc8ed6713470040e80fd39ec7b053dd7fee132"
+    },
+    "docs/validation/historical-source-bridge.md": {
+      "bytes": 8199,
+      "sha256": "c5ff446120ba1819f5d385fb0204093e84bd8023b1aa0f9e8af4a6e952ff2ab9"
+    },
+    "docs/validation/larger-block-dictionary.md": {
+      "bytes": 13472,
+      "sha256": "cfe9435c27a69bd90c669842a0be70b1e3ecd37ca791a3427a65b20c336dc9e3"
+    },
+    "docs/validation/linux-rss-counter.md": {
+      "bytes": 4157,
+      "sha256": "ed5fcadc26f662e74c913fe5b7d1423efd18580c0b30cd555087f11ef9ce3e34"
+    },
+    "docs/validation/linux-vm-cache-policy.md": {
+      "bytes": 6296,
+      "sha256": "292318e4c08fb53372eb544c614b8c4d17b33072c23039a13de9983f3d166119"
+    },
+    "docs/validation/lossless-archive-storage-experiment.md": {
+      "bytes": 14997,
+      "sha256": "6ba0ac3c48b3ccc5c500d3bfff93b886752d0ecb810b3cf7748428107e8c6604"
+    },
+    "docs/validation/low-resource-lr0-baseline.md": {
+      "bytes": 15747,
+      "sha256": "4322af151928f7a014281c01024145e87e8ce48512993c75ce8173c68d316a0e"
+    },
+    "docs/validation/low-resource-lr1-prerequisites.md": {
+      "bytes": 14814,
+      "sha256": "f6969c0e9bd6126b8e39e02c3bf866f5b0f183dd9f91032cbdec47b39025cf67"
+    },
+    "docs/validation/low-resource-lr2-admission-atomicity.md": {
+      "bytes": 20065,
+      "sha256": "47d33a2d3db8f2ba893a9ef9d5ad2a9c4c34f193e21f969ede1473b94372f34d"
+    },
+    "docs/validation/low-resource-lr2-admission.md": {
+      "bytes": 14623,
+      "sha256": "7f31f999eb792192d4e6e0477344c74d21fb41975261263d4537dc1827edff59"
+    },
+    "docs/validation/low-resource-lr2-aggregate-memory.md": {
+      "bytes": 25363,
+      "sha256": "f3854cc621b071e9e5e5a5ea32ff83f96227c2b194490fe7e8f0d16fe7073801"
+    },
+    "docs/validation/low-resource-lr2-cleanup-atomicity.md": {
+      "bytes": 17728,
+      "sha256": "9017672a0f892b947eb1c7c7e31917d09efdbaffbb3fbf287abb083902677113"
+    },
+    "docs/validation/low-resource-lr2-completion-matrix.md": {
+      "bytes": 134749,
+      "sha256": "f787c67b8652417c8f3c457184966cd0ff1e7918a5e987d3a05ee1462eb7730a"
+    },
+    "docs/validation/low-resource-lr2-host-memory.md": {
+      "bytes": 11280,
+      "sha256": "4289946b1651f6213fcd63d174ef047bf6f30c17761e42a8f41af1c523428108"
+    },
+    "docs/validation/low-resource-lr2-m1-isolated-vps.md": {
+      "bytes": 16525,
+      "sha256": "4ff9da6ad1adca53b1b6cf13edb7f1805b718a58e89ee2144cafdde12c3a2232"
+    },
+    "docs/validation/low-resource-lr2-m1-json-cleanup.md": {
+      "bytes": 113842,
+      "sha256": "5393df99649786f69abf1be489681c63af5393eb0c5621751337479207965071"
+    },
+    "docs/validation/low-resource-lr2-m1-nonce-read.md": {
+      "bytes": 8183,
+      "sha256": "e468dcacec2474a596e791a0c897b0240a35e5568c5b86d507aa3b8d9e0a88bd"
+    },
+    "docs/validation/low-resource-lr2-m1-output-ownership.md": {
+      "bytes": 12874,
+      "sha256": "87256cf379edc1fe007a53e9062fdc7b2657f337a0800317acab8ab1dc31af6a"
+    },
+    "docs/validation/low-resource-lr2-m1-r15.md": {
+      "bytes": 24323,
+      "sha256": "08e0dd2084cfc1882684808fe55bdb3e90cc2c0597b9811cb4d3d1749af085b1"
+    },
+    "docs/validation/low-resource-lr2-m1-repair.md": {
+      "bytes": 36577,
+      "sha256": "3747a432fde2939e169ac37d8aff4d7ec287092299861d47efd82d780a6ceef7"
+    },
+    "docs/validation/low-resource-lr2-memory.md": {
+      "bytes": 25521,
+      "sha256": "5110ec095761f8312f906954da04d42163c722a9a9aed941f5be5da0870d3b3e"
+    },
+    "docs/validation/low-resource-lr2-p2p-client.md": {
+      "bytes": 15054,
+      "sha256": "e69061e887960a6ed6f14731089a86e9d04384e633425303200f6f6495a34bee"
+    },
+    "docs/validation/low-resource-lr2-p2p-dials.md": {
+      "bytes": 18932,
+      "sha256": "fb8cbcbc145a384662b9238411285cc68766f1f9cf7e9579d1d029051aff6293"
+    },
+    "docs/validation/low-resource-lr2-p2p-reads.md": {
+      "bytes": 9683,
+      "sha256": "53e968ffd2cb17a7ffa394247d06ad0810faa31d1678bff8681afa48d59e35f8"
+    },
+    "docs/validation/low-resource-lr2-p2p-retention.md": {
+      "bytes": 15030,
+      "sha256": "ad385aff8e23261b64d6f79adc3585c6bb161a1af574fb15c3bdcb589b969e2a"
+    },
+    "docs/validation/low-resource-lr2-p2p-writes.md": {
+      "bytes": 8285,
+      "sha256": "f0d73b0b1240c96786a6659217949d371e97484bec46483c398a55a26e07dd2b"
+    },
+    "docs/validation/low-resource-lr2-peer-bookkeeping.md": {
+      "bytes": 15756,
+      "sha256": "cb12a8618387e1f7ab1e8cfd178197ccd5ca5a4d4968c2b98c86d514d7bbeda1"
+    },
+    "docs/validation/low-resource-lr2-peer-snapshots.md": {
+      "bytes": 19001,
+      "sha256": "e4c0f0fde01df3daef32cd2ad873baeabe40123515cb574fc8601f2d9f67eb6f"
+    },
+    "docs/validation/low-resource-lr2-pending-records.md": {
+      "bytes": 19000,
+      "sha256": "3703d828c5d94b8d4050f199dc1ee4cda8fecd61f0f0091d39ec095d16cee051"
+    },
+    "docs/validation/low-resource-lr2-retained-memory.md": {
+      "bytes": 15728,
+      "sha256": "881eb352cb1ca6cfd5c1f2150e09e58dcd2e02b342c689c5023fe09d1ebd61f1"
+    },
+    "docs/validation/low-resource-lr2-rpc-batch.md": {
+      "bytes": 14493,
+      "sha256": "35e0af6db846c3ff30687ab36b793509c8d634893aea02056a9e3f09baeef21c"
+    },
+    "docs/validation/low-resource-lr2-rpc-bodies.md": {
+      "bytes": 14721,
+      "sha256": "eb68152f1bdea30f13a9323fc78347b7ab423d3ffdd8c8d198d7af69d06595af"
+    },
+    "docs/validation/low-resource-lr2-sdk-addresses.md": {
+      "bytes": 16567,
+      "sha256": "bdd3034cdfbabbfc910717eb748fd126f125418e671a296f0bc4b60e7588ecea"
+    },
+    "docs/validation/low-resource-lr2-state-ownership.md": {
+      "bytes": 18548,
+      "sha256": "34cadb191ffe0933ffa2b6ff9d5acf3386ac9eedde3c8cd55c34257192b724c3"
+    },
+    "docs/validation/low-resource-lr2-transaction-work.md": {
+      "bytes": 16624,
+      "sha256": "2277c1200235a48775edd5e45db3632ee101ad8625e4051591d09c053ce6ca6f"
+    },
+    "docs/validation/low-resource-lr2-vm-allocation.md": {
+      "bytes": 17255,
+      "sha256": "03415eeac88d7abc0f5a2d7718cc8eff7923b45a8b69a730eb055661b2a5ff93"
+    },
+    "docs/validation/low-resource-lr2-vm-capacity.md": {
+      "bytes": 16564,
+      "sha256": "c313c19b6bc6897f98d9e5d8ea34d170b794de2c4318df66272b971e2a03e9ba"
+    },
+    "docs/validation/low-resource-lr2-vm-lifetime.md": {
+      "bytes": 21814,
+      "sha256": "1a6f724b87fe92ff00a260ee6575f2fa0ea7970a5d00b6ea48203bc909a0e1a4"
+    },
+    "docs/validation/low-resource-lr2-workers.md": {
+      "bytes": 18736,
+      "sha256": "5bfd10f7ade52f019c6075e284b9b4b253cd99c6c268e6536bef3e1ed2215c61"
+    },
+    "docs/validation/mempool-admission-copy-ownership.md": {
+      "bytes": 12623,
+      "sha256": "571f8ca68b7f3ff1bb6c924325f10fc39048f51ae0e1fee3f01564c4200abc23"
+    },
+    "docs/validation/native-archive-rewrite.md": {
+      "bytes": 15972,
+      "sha256": "70bbf9bbc408de391f8d33bb867d8cc082e2073dcf46b2f639a80c7efce28f74"
+    },
+    "docs/validation/native-block-compression-policy.md": {
+      "bytes": 7403,
+      "sha256": "6c78d779c585e67b63c850af5fe93601239f2a1321ce0183d48b271d5cb370f7"
+    },
+    "docs/validation/native-producer-handoff.md": {
+      "bytes": 19645,
+      "sha256": "15a1822e64a18a3d38e5b9197a389e4d39da8aa49366d96f84cc64b8ea0f36c1"
+    },
+    "docs/validation/protobuf-unknown-field-ownership.md": {
+      "bytes": 17585,
+      "sha256": "8217fab58a27070574d6042b60ed93c8f6a923aec3ca033f0f2d286ad2ca0ade"
+    },
+    "docs/validation/reference-vps-observer.md": {
+      "bytes": 20508,
+      "sha256": "69fc3f6c127aa6957576e8f1da529a7e6220d48b338a996d5bf9b5118b5785e7"
+    },
+    "docs/validation/restore-40gb-current-baseline.md": {
+      "bytes": 8033,
+      "sha256": "b282cd809fb41d6da1015079e8e045c83d918001d982362c0d12177ee0004e0f"
+    },
+    "docs/validation/single-copy-restore-sc0-baseline.md": {
+      "bytes": 16110,
+      "sha256": "917db8e86ad6034d5dcaed15e13b4558182989d320b0458ba1dfefd83652511b"
+    },
+    "docs/validation/single-copy-restore-sc1-preflight.md": {
+      "bytes": 14797,
+      "sha256": "96afb8a4715e1eac444a7fe65a75f57f30424879912130d3a0bed36eca1e5e9a"
+    },
+    "docs/validation/single-copy-restore-sc2-staging.md": {
+      "bytes": 16817,
+      "sha256": "47ea26c26ef9e80f3753545370afe8cd66f2ddaeb6f9b23a9551f096f43973ba"
+    },
+    "docs/validation/single-copy-restore-sc3-activation.md": {
+      "bytes": 16331,
+      "sha256": "8d66db91c7519ae848e824ed192788f819565356a050abe7dd32f8620d460088"
+    },
+    "docs/validation/single-copy-restore-sc4-cli.md": {
+      "bytes": 16631,
+      "sha256": "1c680e317b772a03ffad1423616e2efff7b3fda64221fc5673c50cd8707c458c"
+    },
+    "docs/validation/single-copy-restore-sc5-capacity.md": {
+      "bytes": 16143,
+      "sha256": "593a45e099c09def8c74a28e2235c4b7c13ff244372f9ddca634d5d1905afed8"
+    },
+    "docs/validation/single-copy-restore-sc6-handoff.md": {
+      "bytes": 12457,
+      "sha256": "b4f1a25c2e23cbf2342691c25e94ce7d28524c6935b3f392b6f7bdd0612a75a9"
+    },
+    "docs/validation/source-export-provenance.md": {
+      "bytes": 7853,
+      "sha256": "9832c9d80e6e394e02b63910a73898f0b759bce51be163786990c0453c758ab1"
+    },
+    "docs/validation/state-cache-key-ownership-prototypes.md": {
+      "bytes": 7978,
+      "sha256": "032135f1a5f5ec165724f77b6f44ee4a85ffd80ca9e82a1abf01665edcd3e30d"
+    },
+    "docs/validation/vps-8gib-recovery-reserve.md": {
+      "bytes": 47105,
+      "sha256": "ad323e0949d10e798b621204107a9cdf66744a7b0e612fb75699f53d4796e2be"
+    },
+    "docs/validation/wal-retention-budget.md": {
+      "bytes": 8881,
+      "sha256": "022c5869a8f1cbbba51c9012984e956feb4c6ff1c5186871593da06eab6f6fea"
+    },
+    "scripts/benchmark-transaction-tps.py": {
+      "bytes": 26220,
+      "sha256": "c5fa727f4c1900060c11739620e8fc9e15fe276b8a7fca465aa39f56599d9303"
+    },
+    "scripts/build-chain-v1.5.2-reference-validator.sh": {
+      "bytes": 3670,
+      "sha256": "fd4ce55782ad4c0ab6b448d2f4e7f0acec66d158cc536bf2e759344467d55f9f"
+    },
+    "scripts/build-cpp-libp2p-koinos.sh": {
+      "bytes": 16074,
+      "sha256": "62565f050ab0cc590c1ad15c2b59b128b4ccb88d23b7e4bdeb65e581e97c489e"
+    },
+    "scripts/build-gmp-static.sh": {
+      "bytes": 4296,
+      "sha256": "ec2f64abcc998651f8338f7ca664e4b117fe34c613c278c5f74d70d18f9241a5"
+    },
+    "scripts/build-libssh-static.sh": {
+      "bytes": 7011,
+      "sha256": "3684e2e45317a4581b7ca07032e6565ad496eb5ab08054da0f181c88e2d5f888"
+    },
+    "scripts/build-rocksdb-zstd.sh": {
+      "bytes": 6181,
+      "sha256": "91d6510118948eefa81daa1fe68111341d995974818892d9258a62ae8523500d"
+    },
+    "scripts/build-zstd-static.sh": {
+      "bytes": 4424,
+      "sha256": "df6d1d08ebef39b7d34d63d3017f6fc8830c168f59b0f964e35ed940b73c8e5a"
+    },
+    "scripts/record-native-build.py": {
+      "bytes": 3107,
+      "sha256": "16d89bf662a167349be73df5d37b6427539cd594441455e820dd32b647286aa0"
+    },
+    "src/CMakeLists.txt": {
+      "bytes": 58205,
+      "sha256": "12e2b3f0e81f77d8df8de400ec8ba61b5a56318fe7cb2b433fa48c35d4ceb30e"
+    },
+    "src/account_history/account_history.cpp": {
+      "bytes": 6213,
+      "sha256": "e0007d6a3fefea7cc074814860ebe168959f1bc9c9b07e88db048c127ce56efa"
+    },
+    "src/account_history/account_history.hpp": {
+      "bytes": 2057,
+      "sha256": "68f61e729eaa3f1a47c5b2feff23696ccb5119e219b9a15533e49b05a86a74bb"
+    },
+    "src/backup/backup_admin_server.cpp": {
+      "bytes": 26316,
+      "sha256": "1b44b8451eafc222484a7007f14092e15fcb8315af7c7cb7469545f01678216d"
+    },
+    "src/backup/backup_admin_server.hpp": {
+      "bytes": 2999,
+      "sha256": "592ad919dd4aa536da45ff5cc05821bd02c34d9082fb9f260f30413c67812539"
+    },
+    "src/backup/backup_plan.cpp": {
+      "bytes": 19401,
+      "sha256": "af8d6d2ec934711e317db8bfee9ada240974d4f6280c321944d0ecfabf1e56d1"
+    },
+    "src/backup/backup_plan.hpp": {
+      "bytes": 2198,
+      "sha256": "2977a8f1189150bc8b459a8adae4b719213c983115a50c2d0f8e97e246cdd255"
+    },
+    "src/backup/backup_scheduler.cpp": {
+      "bytes": 10261,
+      "sha256": "1ba79f1e18d6b56d410e4d5a8fc3e3951f0f7fe6ffa247529f88a67761d5c2d4"
+    },
+    "src/backup/backup_scheduler.hpp": {
+      "bytes": 1338,
+      "sha256": "c68b8f8751dd14c3c8ba8b8427e4dfb1e8e0f17c9e723e87dac6d8f3db4ba250"
+    },
+    "src/backup/backup_service.cpp": {
+      "bytes": 45120,
+      "sha256": "c49fe1e5341d9958f69232347f381a66c37ddb7dd882e9c0d127ef4316c1e321"
+    },
+    "src/backup/backup_service.hpp": {
+      "bytes": 6709,
+      "sha256": "87dcc7c71c27ca2fda4f382ed82b1eaf4bee2c49dc9743619a44bd3052742f76"
+    },
+    "src/backup/checkpoint_identity.cpp": {
+      "bytes": 7026,
+      "sha256": "de228fd1c74e6b44219efe2b1685ea92ac67144eb6ae68119d357eab6d2fa3b0"
+    },
+    "src/backup/checkpoint_identity.hpp": {
+      "bytes": 510,
+      "sha256": "5d473d0765cbdb5d4da120defd359daed42e9b46e54a773578173eb1f640262e"
+    },
+    "src/backup/checkpoint_manager.cpp": {
+      "bytes": 3311,
+      "sha256": "15896bf9fa1935be66ca4d05222ce7b2b91c8db1fb9fe6197c033e0bed884499"
+    },
+    "src/backup/checkpoint_manager.hpp": {
+      "bytes": 649,
+      "sha256": "e356e8cc78851c15a5a4417b16e8156dd5077ef6880d18b17de8d9249220aa03"
+    },
+    "src/backup/direct_restore.cpp": {
+      "bytes": 44841,
+      "sha256": "ef888fbdd8e881fd45943c2893d384423cf74417cd50d0dadaff3ffb940e7ce7"
+    },
+    "src/backup/direct_restore.hpp": {
+      "bytes": 3456,
+      "sha256": "3717cfa8daee8d87fcbb7da9b5af17942192e79fa475be63e872c9725c4c6422"
+    },
+    "src/backup/direct_restore_cli.cpp": {
+      "bytes": 11514,
+      "sha256": "624240c8433dc4fff6623520d01cb606630882de49273a4058e2f88a927541fd"
+    },
+    "src/backup/direct_restore_cli.hpp": {
+      "bytes": 683,
+      "sha256": "42525971b4426eb03c1ea68d5ce9852e2f9239f391fa7c2b62ed5af87e7d404c"
+    },
+    "src/backup/durable_publication.cpp": {
+      "bytes": 2972,
+      "sha256": "cd0029e4df0c098e88b1ac924232db172929eaa4174863d84dba6fde2eaeea29"
+    },
+    "src/backup/durable_publication.hpp": {
+      "bytes": 506,
+      "sha256": "718e05952b8f6a3b9b2d0252d7b965c1f7489efb309dd9d46bb31a7f825f7e95"
+    },
+    "src/backup/offline_restore_validation.cpp": {
+      "bytes": 9841,
+      "sha256": "266f4ee09f25bfd8da36f656680a64db19bb0c8946704f4c5795ea9f0b7adfca"
+    },
+    "src/backup/offline_restore_validation.hpp": {
+      "bytes": 441,
+      "sha256": "d69a4ca48576be2bbb7505325110efcc9852ae6e3808c46c7e7d5ac4c8652d32"
+    },
+    "src/backup/public_restore.cpp": {
+      "bytes": 65875,
+      "sha256": "a2f4330fb77e3efb9df4f2a60453fd77fdb13433cc532d29965fc0a60dc4a4a1"
+    },
+    "src/backup/public_restore.hpp": {
+      "bytes": 3350,
+      "sha256": "eeeaf37a2b00a100d2d9aefe5699ee564a57e2cbef8426742b560789c708f3b3"
+    },
+    "src/backup/restore_activation_supervisor.cpp": {
+      "bytes": 4556,
+      "sha256": "a596ad0881a292af16ee4b76b931b881ee954783bff0530bcf9ee4c82a451934"
+    },
+    "src/backup/restore_activation_supervisor.hpp": {
+      "bytes": 876,
+      "sha256": "2cc2aee995de79d50c725aae798f77417fd24bce547c32ad5ec195008173b772"
+    },
+    "src/backup/restore_plan.cpp": {
+      "bytes": 23849,
+      "sha256": "f965a16f9f1e9493c353f1ec82686260c5193d19b1dfd947ea958937c2120588"
+    },
+    "src/backup/restore_plan.hpp": {
+      "bytes": 5517,
+      "sha256": "d9b1d91e7a66e3543dd5773a9aa40333de942f0e03d30b82d6b1d42bae1ced8f"
+    },
+    "src/backup/restore_recovery_reserve.hpp": {
+      "bytes": 1459,
+      "sha256": "6f812af4c585599a3469a77f5ea9866860f3c36d7d72dabf43cedcedf0c4e91a"
+    },
+    "src/backup/sftp_uploader.cpp": {
+      "bytes": 116657,
+      "sha256": "2a4ebe62bd3a5647c5769774078349cee3428bd92901e290c854cff72d337a25"
+    },
+    "src/backup/sftp_uploader.hpp": {
+      "bytes": 7892,
+      "sha256": "8b3d3e3de6d05eda6cd6cea8711f6c80ccd5eb242b17159e657ad72893784b90"
+    },
+    "src/backup/snapshot_repository.cpp": {
+      "bytes": 78141,
+      "sha256": "19d5824a66f4fc4e5ece8dbcf4b7c02c58dce191c41c717ce09ddc5a259496f7"
+    },
+    "src/backup/snapshot_repository.hpp": {
+      "bytes": 8966,
+      "sha256": "4e803de4d0874cfc03a8f409daf61834bcf0bef6c0add3d43c0f049601942b7c"
+    },
+    "src/block_production/block_producer.cpp": {
+      "bytes": 25087,
+      "sha256": "fb17f53723cbacefeeb9906656519e16305d2046cec145bd2af231db7f3ba7e5"
+    },
+    "src/block_production/block_producer.hpp": {
+      "bytes": 3499,
+      "sha256": "6d27b27c1d5a8d081fe1d28c2e45affe256a0cdb986d95114282a04b98ab004d"
+    },
+    "src/block_store/block_store.cpp": {
+      "bytes": 17603,
+      "sha256": "3cc499187f04217ae8d79c2dd1522c085905b0a89ca915b9ce420284431710a3"
+    },
+    "src/block_store/block_store.hpp": {
+      "bytes": 3449,
+      "sha256": "91a46c9019593948368c86d3088645a662df019d510ae38d4e0bd77e1ad6dda7"
+    },
+    "src/block_store/skip_list.hpp": {
+      "bytes": 1868,
+      "sha256": "a38f354dc45cf0cc979e94464bbee981af61b624ecf64d63eb71ab09a9093544"
+    },
+    "src/contract_meta_store/contract_meta_store.cpp": {
+      "bytes": 1890,
+      "sha256": "c8c0b36e58e7f94b9ab3bba2cd5a2de57cf86eb65d859fbe8e6cf376b6d6adbc"
+    },
+    "src/contract_meta_store/contract_meta_store.hpp": {
+      "bytes": 1048,
+      "sha256": "9759364524da0e66202bd83436c5a6a9bc998e5aa22e7ed36f07e7274dda9692"
+    },
+    "src/core/config.cpp": {
+      "bytes": 27361,
+      "sha256": "68c3a6b4860fbabb22f493db5c7f6b88d390ac04226cd90f12f02927cc1498d9"
+    },
+    "src/core/config.hpp": {
+      "bytes": 7652,
+      "sha256": "d6daf617e80cc37b433c0f01aa79ee4acdfa6659e1fb6ccca9f37790e00182e3"
+    },
+    "src/core/event_bus.hpp": {
+      "bytes": 1197,
+      "sha256": "76030087c4523e14a6ab98a15d049a5d3d2284d96bf4f2c7a04540a99573bf81"
+    },
+    "src/core/local_capacity.hpp": {
+      "bytes": 1208,
+      "sha256": "f8c91961191a67729eb8928ca206dc40042bb957928b9c8de78976e2d2196b02"
+    },
+    "src/core/monolith_client.hpp": {
+      "bytes": 1778,
+      "sha256": "94157e7ef1414aff3711ec59a018df946116b2c98cbe619ae2cc6f3761717a35"
+    },
+    "src/core/monolith_rpc_client.hpp": {
+      "bytes": 9774,
+      "sha256": "1d991d813f8aeffa13290f7b15cbeb19bb0fa75f292a6be37413db6af4f41e94"
+    },
+    "src/core/node_version.hpp": {
+      "bytes": 415,
+      "sha256": "5d43c62ff97c92708a1165f88913ad7fc8bbae651b5759c4a9076940cfcc3b04"
+    },
+    "src/core/owned_allocation.cpp": {
+      "bytes": 8615,
+      "sha256": "b51b43b9cff27aff78b3f1121047257132d09a946afda9479677a220ff6e0d87"
+    },
+    "src/core/owned_allocation.hpp": {
+      "bytes": 1087,
+      "sha256": "c047928725351493b39c62d81e0be0b0f6856e1d085bc1dc8fe01b5530c646c5"
+    },
+    "src/core/owned_memory_budget.hpp": {
+      "bytes": 19134,
+      "sha256": "ce93c787468187ae5de0b73cc66f353d13377399aa51af9e5b45a3737ccda8ce"
+    },
+    "src/core/preflight.cpp": {
+      "bytes": 13499,
+      "sha256": "6fc15a7b8644b3bef88037b4dd0adcb84cfb3dfc71ef4a9553296133189b8f6e"
+    },
+    "src/core/preflight.hpp": {
+      "bytes": 614,
+      "sha256": "a034e66a30919970977151d67094c6966bafb8c68a69be9512392de3a51406c3"
+    },
+    "src/core/process_memory.hpp": {
+      "bytes": 613,
+      "sha256": "29de960229f5cc3dfcb8ddf6846441010c88cbd0e658eb1acc057cbdadcfbe76"
+    },
+    "src/core/restore_startup.cpp": {
+      "bytes": 5916,
+      "sha256": "6862d7f588ba9989862eb21d804255c4cb03b48b4c484d9f0eebeacac6b28d86"
+    },
+    "src/core/restore_startup.hpp": {
+      "bytes": 965,
+      "sha256": "c560e912a1117553a67bf3597b433bfb161b5aa8c4d2e1e5c843c69af9fc8de7"
+    },
+    "src/core/rpc_access_policy.hpp": {
+      "bytes": 1629,
+      "sha256": "2297f7352efe8736d4e91c55d2ee0b2882abcba1e6365cb73b29200d409ce992"
+    },
+    "src/core/service_registry.hpp": {
+      "bytes": 2409,
+      "sha256": "0df24e992d526214d5e045a2ac889ee7d3d4e98c7de5ce79dc0a59626cf94a0d"
+    },
+    "src/core/storage_lease.cpp": {
+      "bytes": 1458,
+      "sha256": "11113aef45f331255a00035669e779d39c60a32b315359e4070836d5d4317694"
+    },
+    "src/core/storage_lease.hpp": {
+      "bytes": 587,
+      "sha256": "d6991d2de334843c86334cc9e8e6cf7729b6a78f245991abd702236c71c9634a"
+    },
+    "src/core/transaction_response_preparer.hpp": {
+      "bytes": 819,
+      "sha256": "5cb03300f3ab7f24d2f7d80fb1316d9eb09318c9176a0bf9410ceff9b88c8f04"
+    },
+    "src/core/transaction_work_budget.hpp": {
+      "bytes": 3265,
+      "sha256": "71b88806f76367db8535402bb84639d7a5bca1ee6760f416f40da7a8d658d99e"
+    },
+    "src/grpc_server/grpc_server.cpp": {
+      "bytes": 21742,
+      "sha256": "b5b0985df404fd3b51f7cd47544d3b90bfccf708c2390897b64614277f27e36d"
+    },
+    "src/grpc_server/grpc_server.hpp": {
+      "bytes": 2063,
+      "sha256": "7e4f3c598a218111260199c2f2dc6694481adec6945944a65103153c51a21b90"
+    },
+    "src/grpc_server/mempool_output_state.hpp": {
+      "bytes": 4840,
+      "sha256": "799e5e546086a008d641f54115c8c6e1e5ceb7b029c6751f070c7cea55d4dbab"
+    },
+    "src/interfaces/i_block_store.hpp": {
+      "bytes": 829,
+      "sha256": "6906d60d1b3e9facc74ce42636caaaa3da58819c9d2ecf7d531fd3c2492a171b"
+    },
+    "src/interfaces/i_chain.hpp": {
+      "bytes": 2268,
+      "sha256": "6d9ca342a72ec6d9f610313f68ca597c973fffb53ae7a57aef407d8376da8cad"
+    },
+    "src/interfaces/i_mempool.hpp": {
+      "bytes": 1434,
+      "sha256": "e1cec168560c7db201bf3622f34c68c7a411b2a79a11924ae496a65051e2b34d"
+    },
+    "src/jsonrpc/json_cleanup.hpp": {
+      "bytes": 4163,
+      "sha256": "91cd8731a06b5a358039e63358c8a8d8eef080f8e2fba02bbf975315daa28693"
+    },
+    "src/jsonrpc/jsonrpc_server.cpp": {
+      "bytes": 57056,
+      "sha256": "127fab3d825b6f1369b9ba058ef82ca227589061b4de46fe6861f9e30e299a8b"
+    },
+    "src/jsonrpc/jsonrpc_server.hpp": {
+      "bytes": 7126,
+      "sha256": "d282343eaaa3210b24ecd44c63cf1816972f37ce137b9b4bc3ef0ebea5d2995a"
+    },
+    "src/koinos/chain/chronicler.cpp": {
+      "bytes": 823,
+      "sha256": "99a0ed4123cdc1a13274e0e6f782feb36f4f74461c574e19d4c2bf74d9a85887"
+    },
+    "src/koinos/chain/chronicler.hpp": {
+      "bytes": 1120,
+      "sha256": "58873c5cb348c4db8631e32d53b915caefdaad8f9dfae1c45f641dd93af11ff8"
+    },
+    "src/koinos/chain/constants.hpp": {
+      "bytes": 242,
+      "sha256": "5a4b434c0e4887b20a1924489470212adb16107985d42901f6f1cc12a9c28327"
+    },
+    "src/koinos/chain/controller.cpp": {
+      "bytes": 57191,
+      "sha256": "dd9cb56dcb63069818cf8418dceeac1f1938b64dfd665493c92ed59656d47e79"
+    },
+    "src/koinos/chain/controller.hpp": {
+      "bytes": 3589,
+      "sha256": "cead2ab9aa446e52a9341043301aaf7818d2594d9e90f72848cf1bb4091104ae"
+    },
+    "src/koinos/chain/exceptions.hpp": {
+      "bytes": 5617,
+      "sha256": "347603ea5c054c1292f2c13ab7834af2fad377e48ac67ec8765a8a3d7dfb7837"
+    },
+    "src/koinos/chain/execution_context.cpp": {
+      "bytes": 13732,
+      "sha256": "b501defac3b5a3933ff460aedab2c8139b33520fb95eba1847ca3065b4c19503"
+    },
+    "src/koinos/chain/execution_context.hpp": {
+      "bytes": 6132,
+      "sha256": "b4a2d6b4bac46198a8f991ec9b3de0bb5fd3c8034a8f650219f19d2a3170cc56"
+    },
+    "src/koinos/chain/host_api.cpp": {
+      "bytes": 5993,
+      "sha256": "e9857309f971bef2de2698e28c16ab29b8d5c573f573acd75e8d78a881a992f3"
+    },
+    "src/koinos/chain/host_api.hpp": {
+      "bytes": 1256,
+      "sha256": "2dc88c77b0edabeb3fbafe67c0eb790bf1a24b616ccfa7d91db80891f958abd6"
+    },
+    "src/koinos/chain/indexer.cpp": {
+      "bytes": 12658,
+      "sha256": "97bc6857f9c640702bda48e7a26045716c932af110c6e49ddc409d4943edaec9"
+    },
+    "src/koinos/chain/indexer.hpp": {
+      "bytes": 2842,
+      "sha256": "dd6617bb422b83e8f42b8a5b9149fd62bba052baee32e49414e26dfdcd61125d"
+    },
+    "src/koinos/chain/proto_utils.cpp": {
+      "bytes": 10059,
+      "sha256": "e794f016e1229b31705723f038b216012938f3770a2a5cdc0d7d6e2bd6e128b4"
+    },
+    "src/koinos/chain/proto_utils.hpp": {
+      "bytes": 1131,
+      "sha256": "468099724fbd68ee8afe336fefcdd044ae54b88c9c5921153fdfd18193fc7e65"
+    },
+    "src/koinos/chain/rectify.cpp": {
+      "bytes": 226790,
+      "sha256": "ade6ee90a99bdba52f9989becbea94bbbe23d3754c18ad9e9f8e57bdfe8c3582"
+    },
+    "src/koinos/chain/rectify.hpp": {
+      "bytes": 667,
+      "sha256": "ac5131b2dff6d693f54452cdc4dbe5dba8b8fa13deae1e9e4a9a30cd84bf957a"
+    },
+    "src/koinos/chain/resource_meter.cpp": {
+      "bytes": 5524,
+      "sha256": "36bb8e0b7ca6d291322be513940d68bd8b7a27ec18c02e0bf849bedbc5ded39a"
+    },
+    "src/koinos/chain/resource_meter.hpp": {
+      "bytes": 1641,
+      "sha256": "db9f25373f48c59b5f5b878590d43c81ebee6708e4057ac8359ca6c06d544479"
+    },
+    "src/koinos/chain/session.cpp": {
+      "bytes": 929,
+      "sha256": "4b384e23e8eb56ee6be69ad7a7298cad756b0c05f224a0157a5d9fa6af2db50d"
+    },
+    "src/koinos/chain/session.hpp": {
+      "bytes": 882,
+      "sha256": "58c2e49a237a4b557da5df890a0dede762b7140d47f9ea599ad3d8ad88b49702"
+    },
+    "src/koinos/chain/state.cpp": {
+      "bytes": 2332,
+      "sha256": "21b7066d2b9001f27698b7fc30abbe199916fa6ceca86d9da2d382a54fbdb7e6"
+    },
+    "src/koinos/chain/state.hpp": {
+      "bytes": 2430,
+      "sha256": "f7a1465baea004172690b65bbd93d3de4f2eaa5a4fdacc99a01f4d839bdeb36e"
+    },
+    "src/koinos/chain/system_calls.cpp": {
+      "bytes": 59940,
+      "sha256": "20d9b5cf1b8f38ead8dc1f3401553fef8b2d4df963b14dbbd7b5d1d58b4d5acd"
+    },
+    "src/koinos/chain/system_calls.hpp": {
+      "bytes": 8382,
+      "sha256": "550d02d682e3bc3e01ac84b669b927475ed9cf06a0d2b10dd0526c5acfa78b2f"
+    },
+    "src/koinos/chain/thunk_dispatcher.cpp": {
+      "bytes": 1092,
+      "sha256": "5bfc79a1de8cd51dcd4d4dcf85d6197c161f3b7d05c7db62bf710e4c9afa9cfd"
+    },
+    "src/koinos/chain/thunk_dispatcher.hpp": {
+      "bytes": 16129,
+      "sha256": "1838e43b6826c30f3b88982ccab2ad816b8cd3c236343f26df5ff257cd5a8e7e"
+    },
+    "src/koinos/chain/thunk_utils.hpp": {
+      "bytes": 17871,
+      "sha256": "080ce8e3ec697735d713ff01411e25253511a83b02bc744f4e3d3a5139c7f183"
+    },
+    "src/koinos/chain/types.hpp": {
+      "bytes": 252,
+      "sha256": "05deee45d6a905ac644c212de76284d828b7b0c47b572ee85ae2f27483e71139"
+    },
+    "src/koinos/mempool/block_applicator.cpp": {
+      "bytes": 2421,
+      "sha256": "b3521a732cc2e4109b72a35ad36f3292c4172f0bdb9ecd1c63f79cc1f191cfee"
+    },
+    "src/koinos/mempool/block_applicator.hpp": {
+      "bytes": 530,
+      "sha256": "2040680d8007c9bbaba36c02f85bd7fbe5579d6e31cfca36e939debbc6710495"
+    },
+    "src/koinos/mempool/mempool.cpp": {
+      "bytes": 48439,
+      "sha256": "eb1f1b8d59eba2727928ecb8f0e6ba98791b1d4f9fedc87e0233b1daa177c19c"
+    },
+    "src/koinos/mempool/mempool.hpp": {
+      "bytes": 4926,
+      "sha256": "9f9badbffb72a892104d1a2b0d5ca453288d709dbf990c6e9f46311eb7a340fc"
+    },
+    "src/koinos/mempool/pending_record_budget.hpp": {
+      "bytes": 5736,
+      "sha256": "381a4f69991f4a69611b062d66e86d1ca8fbd7a397688988359238e13a5e0858"
+    },
+    "src/koinos/mempool/state.cpp": {
+      "bytes": 1603,
+      "sha256": "7b3e238961228375abb6e60ef5a9ee5e031b6cbc6b5be7c52b113a4d22afa7da"
+    },
+    "src/koinos/mempool/state.hpp": {
+      "bytes": 408,
+      "sha256": "9d5324ace6193460630d65cc0c5b3c9bacaf595afef1fc67206e6f9345d62f15"
+    },
+    "src/koinos/state_db/LICENSE.md": {
+      "bytes": 1062,
+      "sha256": "4704d16283ca50d02aa1f68dfb90b88f51ffc4623e51f464bfc6462940d55930"
+    },
+    "src/koinos/state_db/backends/backend.cpp": {
+      "bytes": 1230,
+      "sha256": "2ab83e74c45daa8c4bc4d6725b93b70acd7d9ded49459d19b19319e705d90fe8"
+    },
+    "src/koinos/state_db/backends/backend.hpp": {
+      "bytes": 2267,
+      "sha256": "5e156270b0799f62dda867aac25e24b2621b30feef94847dacffa947e9e17cac"
+    },
+    "src/koinos/state_db/backends/exceptions.hpp": {
+      "bytes": 370,
+      "sha256": "5c9bc4f0eb8d7f5f1d52be9f6f05ce0058bee79901a9cec21b89e5956e57411c"
+    },
+    "src/koinos/state_db/backends/iterator.cpp": {
+      "bytes": 1216,
+      "sha256": "aaa6dd41fcaed25cbec99c2880c8e146705e8f25faa97136a0cd2d748879d8c5"
+    },
+    "src/koinos/state_db/backends/iterator.hpp": {
+      "bytes": 1500,
+      "sha256": "dd5df41d1b25c52cb6f02126a41d3250c969c6b2250d4bf2c7fe05b6c752c807"
+    },
+    "src/koinos/state_db/backends/map/map_backend.cpp": {
+      "bytes": 3997,
+      "sha256": "f81ec52377940912a96a03bfee677de229def79ac86cc9cafa1a9e023a0f65a8"
+    },
+    "src/koinos/state_db/backends/map/map_backend.hpp": {
+      "bytes": 2446,
+      "sha256": "c2883bb351b3000dbb3d7825e65984ebf3d0ea99b6ae718c8cc96f7b751bf9bc"
+    },
+    "src/koinos/state_db/backends/map/map_iterator.cpp": {
+      "bytes": 1511,
+      "sha256": "0ee57a39f1dcff0bc3d48fa1715e22aaec36412e1fe1295d1554d7e6fdd617eb"
+    },
+    "src/koinos/state_db/backends/map/map_iterator.hpp": {
+      "bytes": 1359,
+      "sha256": "e47a77ab97b50e7b9c29b289e07309b9a012a47e0ec815a2e64d9d14fed2b728"
+    },
+    "src/koinos/state_db/backends/rocksdb/exceptions.hpp": {
+      "bytes": 882,
+      "sha256": "fcb84c196857cc46c621f10871106176e40d9c234e8ca818add578ead4ced57f"
+    },
+    "src/koinos/state_db/backends/rocksdb/object_cache.cpp": {
+      "bytes": 2525,
+      "sha256": "5f9cf220d0bf66a7476bf8b0ce49428efc902e199d62e60343b46bb6dc633860"
+    },
+    "src/koinos/state_db/backends/rocksdb/object_cache.hpp": {
+      "bytes": 1536,
+      "sha256": "412ef14d514a9f818e2a0fb21939f1d5e6bf88cb5a00148150d114981b70d6d7"
+    },
+    "src/koinos/state_db/backends/rocksdb/rocksdb_backend.cpp": {
+      "bytes": 18408,
+      "sha256": "180de83620ac3008dac977c86657ba55c54ecd767dfdf2e85fd075e3b75620eb"
+    },
+    "src/koinos/state_db/backends/rocksdb/rocksdb_backend.hpp": {
+      "bytes": 2502,
+      "sha256": "390c575e0b708125471966f283df90999152f93e01c9d5366eb9cf4654bc185e"
+    },
+    "src/koinos/state_db/backends/rocksdb/rocksdb_iterator.cpp": {
+      "bytes": 3419,
+      "sha256": "5064f6aa459315962b9d728b771474baebc1ca8649fdef6360460f3123c1f1a4"
+    },
+    "src/koinos/state_db/backends/rocksdb/rocksdb_iterator.hpp": {
+      "bytes": 1592,
+      "sha256": "50d7f37c47614a24bf28244b6dc522fcdaf60fc769cb18ff88faea7d8f56b433"
+    },
+    "src/koinos/state_db/backends/types.hpp": {
+      "bytes": 316,
+      "sha256": "b6a41dc2bca04151694a224803cdb5026b6898357784a84205cd70c2607eaf58"
+    },
+    "src/koinos/state_db/merge_iterator.cpp": {
+      "bytes": 9813,
+      "sha256": "b4c38c15d8be0fdf8712fb5b9a3830bd4924932384da19187a6c1c7dbc99648d"
+    },
+    "src/koinos/state_db/merge_iterator.hpp": {
+      "bytes": 4965,
+      "sha256": "6bda8283440ce5da67186a8e3b5bfd634c71b969973fa945f1d1699fd6f80775"
+    },
+    "src/koinos/state_db/retained_memory.hpp": {
+      "bytes": 2002,
+      "sha256": "1ac4ad71221661e5c9a84526eb2270bb6bbe211fa42bc51325b1677b34126c3b"
+    },
+    "src/koinos/state_db/state_db.cpp": {
+      "bytes": 60263,
+      "sha256": "243ca83ac673a8cb4860b3331eb5376cd99a25d804d8df05499d94d77065a879"
+    },
+    "src/koinos/state_db/state_db.hpp": {
+      "bytes": 20554,
+      "sha256": "80fd95e4d3b100910802182b8bc09d6be37060438f22ff1ee14a0c2f55390d32"
+    },
+    "src/koinos/state_db/state_db_types.hpp": {
+      "bytes": 2524,
+      "sha256": "1b532eb6fd1c4269b7c7b7b6f27309ed35fc9636ad9a33091e2606433def0af3"
+    },
+    "src/koinos/state_db/state_delta.cpp": {
+      "bytes": 20938,
+      "sha256": "3bb96089c95655bc5096a14c21dea70ab1be3803cd91ec48172fc19ba3ce42c5"
+    },
+    "src/koinos/state_db/state_delta.hpp": {
+      "bytes": 4825,
+      "sha256": "96461f55bb3edbc7f0908f9c2f5c83df11783c40bd6eab49fe94678f96c02dfe"
+    },
+    "src/koinos/vm_manager/exceptions.hpp": {
+      "bytes": 584,
+      "sha256": "417033dc0e4382d5340e2889f4d7988c3bb8a5ef5874049d741367001a964152"
+    },
+    "src/koinos/vm_manager/fizzy/exceptions.hpp": {
+      "bytes": 1191,
+      "sha256": "a64ae190f521e4a0aa2b4e3177b94d5446dcdafa538157e9fdf9b840e473776d"
+    },
+    "src/koinos/vm_manager/fizzy/fizzy_vm_backend.cpp": {
+      "bytes": 14061,
+      "sha256": "0a433dd3fb09f84732f6ca7ac042c0939561699370f17e287a9636580cd595a1"
+    },
+    "src/koinos/vm_manager/fizzy/fizzy_vm_backend.hpp": {
+      "bytes": 761,
+      "sha256": "2efed7214f64e85854aa71b2fde10f53ca1eb975bd6cd9ee297ad16a67a86015"
+    },
+    "src/koinos/vm_manager/fizzy/module_cache.cpp": {
+      "bytes": 4119,
+      "sha256": "75c9f344c5d7118daa729d17d72f6cf620601996dd97de9c27182d7bef05c9f2"
+    },
+    "src/koinos/vm_manager/fizzy/module_cache.hpp": {
+      "bytes": 3088,
+      "sha256": "21786258ae3f02f76e3239bb40183ee87d8b94e797758a6a7616ce5eb7b7e6ac"
+    },
+    "src/koinos/vm_manager/fizzy/module_memory.cpp": {
+      "bytes": 2471,
+      "sha256": "54175f749babbb1c3d31e1f14f02fbdaca65ff7eff543776208e122aad78c708"
+    },
+    "src/koinos/vm_manager/fizzy/module_memory.hpp": {
+      "bytes": 860,
+      "sha256": "6468c0a84acaf4b544023c1a0253bb3423f3e30567ba366ab2e8d4f29bd12273"
+    },
+    "src/koinos/vm_manager/host_api.cpp": {
+      "bytes": 196,
+      "sha256": "87482c77d259666724b789cd80481b6f702c6bb62208aefdcf7153abdc1efc14"
+    },
+    "src/koinos/vm_manager/host_api.hpp": {
+      "bytes": 1521,
+      "sha256": "0a054731e777ecf6e2b6defe5e37d7f559d51d25f6f62af942f610c5a87b49c5"
+    },
+    "src/koinos/vm_manager/vm_backend.cpp": {
+      "bytes": 1037,
+      "sha256": "cd7271a626f610621e31f70f0022040c5aa04898f169a42d509356216a10601d"
+    },
+    "src/koinos/vm_manager/vm_backend.hpp": {
+      "bytes": 1321,
+      "sha256": "6dce26c0a1659281da925345b4857c3e35039bd37e70dedf14c11cd657dd4304"
+    },
+    "src/koinos/vm_manager/vm_memory.hpp": {
+      "bytes": 536,
+      "sha256": "b0437e8e1266e4870d7324db20efbb1f9f418c1b64f036266430f336683c2faf"
+    },
+    "src/main.cpp": {
+      "bytes": 111494,
+      "sha256": "e76404acbb9d5fb52b6560072e8e3fa1a429c9b1e677353b10cac026d3d6b5d6"
+    },
+    "src/mempool/mempool_adapter.hpp": {
+      "bytes": 5668,
+      "sha256": "3c3352c0edb008a4983b4b9cdfb3bd28b0e8d6e04a392db620aad931f95adfaa"
+    },
+    "src/p2p/error_handler.hpp": {
+      "bytes": 10657,
+      "sha256": "ab8070ddb9d345482666511dd956c203e6d0f6b695cf17dcfc9394b3c2201c0f"
+    },
+    "src/p2p/fork_watchdog.hpp": {
+      "bytes": 1513,
+      "sha256": "efe09f4fe00a4388adbd408a5456c14ae7365f6956c6f56f5d9c68cb3b5417ad"
+    },
+    "src/p2p/go_bridge_transport.cpp": {
+      "bytes": 5594,
+      "sha256": "8d65b988479561a7d1b74f776e3e59d66492d5382472663eddd8e3ef0162dd1e"
+    },
+    "src/p2p/go_bridge_transport.hpp": {
+      "bytes": 3790,
+      "sha256": "56b5c9bd34e2ca9267b65891240864202712092596186e6326959d1752935114"
+    },
+    "src/p2p/go_math_rand_cooked.inc": {
+      "bytes": 13460,
+      "sha256": "b2a3e9338e67806a23293614278aa48266c1103db1a21e63f53359ff3a60ccfd"
+    },
+    "src/p2p/gorpc_codec.cpp": {
+      "bytes": 19978,
+      "sha256": "33224629912b141f5c62db28e68e5a1d9abc7d0cb3255cd599fdd145c96a0ea0"
+    },
+    "src/p2p/gorpc_codec.hpp": {
+      "bytes": 3783,
+      "sha256": "33c9728f737267bd00038de733f4f383e45ce2e2a3c014d3c2f05cb9aaa63f92"
+    },
+    "src/p2p/gossip_toggle.hpp": {
+      "bytes": 2830,
+      "sha256": "233b66a467302ef22263fd6caa8769226304808a545c00499df8983892873abb"
+    },
+    "src/p2p/identity.cpp": {
+      "bytes": 13047,
+      "sha256": "b1d30b873f8a377a7600a006a2ceedcfe5456574cb0e81f2c1385950b1f4e151"
+    },
+    "src/p2p/identity.hpp": {
+      "bytes": 506,
+      "sha256": "c54eb5c2a5b4a696c28009296eb6e0abb4bd22709b64e47fe9602142dfe32f2a"
+    },
+    "src/p2p/libp2p_transport.cpp": {
+      "bytes": 57330,
+      "sha256": "26a18a198785a828212ccb1a5366eb489c5575a1f69b8756c35786bb38965c80"
+    },
+    "src/p2p/libp2p_transport.hpp": {
+      "bytes": 7834,
+      "sha256": "296cbc5749745fc7fadab98f18936f1e8ba557191b96603cb6d4f901a975c303"
+    },
+    "src/p2p/local_transport_error.hpp": {
+      "bytes": 902,
+      "sha256": "7ebc4f18110efaf283dfd0f5c13c7074bd1f81e0ba6b12d06339c692ef4ac154"
+    },
+    "src/p2p/p2p_node.cpp": {
+      "bytes": 40529,
+      "sha256": "db0bfc55b778fd18cdced9178f8647a70f3108ef48d5a92d0ed2d267e3cdc094"
+    },
+    "src/p2p/p2p_node.hpp": {
+      "bytes": 5876,
+      "sha256": "13aa0a1f1eaec6d42b566bf868ab1017486e3c8528a3f2d0833c8184e91adf67"
+    },
+    "src/p2p/peer_advice_store.hpp": {
+      "bytes": 6097,
+      "sha256": "769d10b543ba237a4af9ac0757927fa16281cc2053f454bd41b9c6c0c2b3e09f"
+    },
+    "src/p2p/peer_dial_budget.hpp": {
+      "bytes": 8180,
+      "sha256": "794792e05c4fc9b5ca2ab6eae70568dda46e0f4c301a75950725d300fd098aac"
+    },
+    "src/p2p/peer_rpc_client.hpp": {
+      "bytes": 11143,
+      "sha256": "c6607b8ff7d5138a0df691671ca6da057ace01d051a0c5912cf3daea9588ae21"
+    },
+    "src/p2p/peer_rpc_read.hpp": {
+      "bytes": 6502,
+      "sha256": "5e637d2b8b2a79f5a69cfce0c5ba39c69f519427bd9c5f1627dd8f11d45f60cd"
+    },
+    "src/p2p/peer_rpc_write.hpp": {
+      "bytes": 4095,
+      "sha256": "0704120319bb570913cffadb9991d7c6f0afa00dde1d591d6b1744472f18d8f7"
+    },
+    "src/p2p/peer_snapshot.hpp": {
+      "bytes": 1542,
+      "sha256": "374415c296f23b63ba1046e0fdff62a828026794c773cf8b214657abfc8590a0"
+    },
+    "src/p2p/peer_snapshot_budget.hpp": {
+      "bytes": 4717,
+      "sha256": "5f828f5dc91256cbbf175beb7717f76e9743afb7b4af9786cfa566cdb3fe440b"
+    },
+    "src/p2p/sdk_address_repository.hpp": {
+      "bytes": 18169,
+      "sha256": "0d8195bd563cfbc7effcda504a6ce29c4f43f98b3ebe1b6d63c2d181eb611560"
+    },
+    "src/p2p/sdk_metadata_maintenance.hpp": {
+      "bytes": 1901,
+      "sha256": "0163cd500332a3971674c8b6bce5396ff8f59814996c4f0daee56ae68d67a89d"
+    },
+    "src/p2p/seen_cache.hpp": {
+      "bytes": 4832,
+      "sha256": "1ce430f9bf5107c5947f2b1604b3d7febe0a9646393df4063cbeabb64d74d4fd"
+    },
+    "src/p2p/transport.hpp": {
+      "bytes": 2898,
+      "sha256": "46c35e8a6c37142c18561f965d777d4da0f84b5339b18b9d2f56dbbbf4fdc627"
+    },
+    "src/p2p/types.hpp": {
+      "bytes": 3079,
+      "sha256": "6fd0be1ce409bf92c8f9e5ed134f3f96740851861ebaa66bc224c001bbb0b7e9"
+    },
+    "src/storage/chain_migration.cpp": {
+      "bytes": 13187,
+      "sha256": "a664859cf4da7f22b136ab399ccc9140de938138ce53c4baf93984caca12a69b"
+    },
+    "src/storage/chain_migration.hpp": {
+      "bytes": 1025,
+      "sha256": "83769faa7e8aff1b4fee4e4e2409005608ddb863350337b3cd7aabaf57919edc"
+    },
+    "src/storage/rocksdb_manager.cpp": {
+      "bytes": 28091,
+      "sha256": "ed125a9d7a77aea05fdcaaf43a65815cb761f8f99c3e5b74dda0ace21b584113"
+    },
+    "src/storage/rocksdb_manager.hpp": {
+      "bytes": 2668,
+      "sha256": "6560dca08ddd2b485498292dd8d48fa0785d5d8701a29bd011b749ffab21eb26"
+    },
+    "src/transaction_store/transaction_store.cpp": {
+      "bytes": 3092,
+      "sha256": "d49ca9b9e0143e2dcc64c0e4e283bb6e822d7637fb9b007861eb8b2f7541ab4f"
+    },
+    "src/transaction_store/transaction_store.hpp": {
+      "bytes": 1178,
+      "sha256": "327621e1dff4e1f5a3d0e6de909b92cb09597ee6061a47597b0f19273ca75feb"
+    },
+    "tests/artifact_root.hpp": {
+      "bytes": 1368,
+      "sha256": "2b43e3645e0d720848c45bf058d7a17593635ef9a4e3e1437b32ce4bdcf6a67e"
+    },
+    "tests/backup/backup_admin_server_test.cpp": {
+      "bytes": 21314,
+      "sha256": "ec26c373109e38fa133667b906a2b5bc3bae1e87845d0a08e9724b2e1ceb6fc9"
+    },
+    "tests/backup/backup_checkpoint_test.cpp": {
+      "bytes": 3649,
+      "sha256": "d00e3d6a1009f6d671d4518ba3c5d691c66feb159b89007d17caae0386df24b6"
+    },
+    "tests/backup/backup_plan_test.cpp": {
+      "bytes": 7855,
+      "sha256": "229371f02e57f7d193d4a10a5dc84e16b9cbb85aa2129add51384c6672497b95"
+    },
+    "tests/backup/backup_public_restore_test.cpp": {
+      "bytes": 18017,
+      "sha256": "fbf45cbeb5c17083a5c838bc76f8a8773e4ef108ffd1cf9cb22b32962ad190d1"
+    },
+    "tests/backup/backup_service_test.cpp": {
+      "bytes": 10090,
+      "sha256": "b43d4351c3275a3f8cae1e868cbd1f0a7b7139cc1a2745954047628df9e3f831"
+    },
+    "tests/backup/backup_sftp_test.cpp": {
+      "bytes": 13934,
+      "sha256": "716abe5dea00ab843953d36c18f8869304a4e9fb99e272540420737d760e6660"
+    },
+    "tests/backup/backup_snapshot_test.cpp": {
+      "bytes": 22253,
+      "sha256": "8deebf7842c36785eb88b81ebd0921acf74d241fd78b970bb9f6b1b6d92320cf"
+    },
+    "tests/backup/direct_activation_test.cpp": {
+      "bytes": 46058,
+      "sha256": "b650fc4fd981e0242343656f03ac6ebdc36bc49be28056a347fa3a3294bc4420"
+    },
+    "tests/backup/direct_restore_harness_test.py": {
+      "bytes": 10925,
+      "sha256": "dde136fa7e619cbc5de997deedeeb262a1cc1b6174af4db5edd22e623d8bdb0f"
+    },
+    "tests/backup/direct_restore_test.cpp": {
+      "bytes": 15023,
+      "sha256": "b069a7188b83ce830746030d0be1f76cfbee81e7f529c74759d4de550147ab17"
+    },
+    "tests/backup/durable_publication_test.cpp": {
+      "bytes": 2725,
+      "sha256": "136995d51eee016d2a35159bf4dbce55bbd63aceb9df978781a8d5e4fab99806"
+    },
+    "tests/backup/restore_plan_test.cpp": {
+      "bytes": 12960,
+      "sha256": "61cd44d1f5c491927fa2baeb2bd5311684db7dd6eb22b24f40c40f8f3492b79e"
+    },
+    "tests/block_production/block_producer_test.cpp": {
+      "bytes": 26505,
+      "sha256": "02df6fbef0deace8cb91cd0aa2eb7cbefdef98e8d67da9f8095278a197e6710a"
+    },
+    "tests/chain/controller_delta_test.cpp": {
+      "bytes": 40907,
+      "sha256": "6947addd8f70234ffa5a71b3f790597f74943dcd8d2f0852087a83b2ecf97ed4"
+    },
+    "tests/chain/historical_fast_replay_fixture_test.cpp": {
+      "bytes": 13419,
+      "sha256": "19c1f14b8e6346738f481f345ccb039bd3a04fc9a87c855cf3457ee4b3598451"
+    },
+    "tests/chain/indexer_lookahead_test.cpp": {
+      "bytes": 16347,
+      "sha256": "740e2dda9eb3fb322ba258cc9c6ff58fdf7ac361cf4f2564f96e86b1f9694b5e"
+    },
+    "tests/cli/direct_restore_preflight_test.py": {
+      "bytes": 11107,
+      "sha256": "801e52b9664ea705fa3ec4f7724349852c65253acb6d298b41b8add2b06d04a6"
+    },
+    "tests/cli/direct_restore_workflow_test.py": {
+      "bytes": 18940,
+      "sha256": "1baac1dc194031d3bab84fdfd86f31e5d04778b326ba637151093a4f9ac4ebdc"
+    },
+    "tests/cli/preflight_test.py": {
+      "bytes": 9513,
+      "sha256": "003ba53856647f5310a92bfa53f8f527ae47927876faa4fa1ab5ba6e20c33f67"
+    },
+    "tests/core/config_test.cpp": {
+      "bytes": 17572,
+      "sha256": "fd417607c7df3989a3f1c3eb656c72472bf50cbaf925f2d3bee02852697c596b"
+    },
+    "tests/core/owned_allocation_test.cpp": {
+      "bytes": 11326,
+      "sha256": "398e507f4983f0c1661f619ef028668cc814b2d5d264c2ce8b2aeef4ce59d2ae"
+    },
+    "tests/core/owned_memory_budget_test.cpp": {
+      "bytes": 14949,
+      "sha256": "12274e8ae55824838288691db0c9cec5c98933df79b287ccf2c192599b51dd6c"
+    },
+    "tests/core/process_memory_test.cpp": {
+      "bytes": 3412,
+      "sha256": "c15cb83b3c633c28615d121f94a5c22b8a28978fa63c232e16a1b54dddaacf1b"
+    },
+    "tests/core/protobuf_metadata_budget_test.cpp": {
+      "bytes": 3478,
+      "sha256": "412228c6599355f938974a0436988f7037a4088cb2654cdece8475fa74ef263c"
+    },
+    "tests/core/protobuf_unknown_field_ownership_test.cpp": {
+      "bytes": 7701,
+      "sha256": "ae7faa95661e00aa21792055ca8638eb3b8a95edad0e50964c14a5b31a6f5d98"
+    },
+    "tests/core/service_registry_test.cpp": {
+      "bytes": 5312,
+      "sha256": "09022a4b149b15c2b79e6ba5b5238558afeb4665f289ec66d0fa1a387a0b142d"
+    },
+    "tests/core/transaction_work_budget_test.cpp": {
+      "bytes": 10608,
+      "sha256": "bfbfd9ccf226b0e022562e400f9ccf5456ad426c3b529d3adab6cef66cc8e650"
+    },
+    "tests/fixtures/chain-v1.5.2-fast-replay/block-30504202-incomplete-receipt.pb.base64": {
+      "bytes": 1349,
+      "sha256": "3afb87eca0ad08de42e7d124c22dc73a6abb11610ee7151fc4abce4796d6cefe"
+    },
+    "tests/fixtures/chain-v1.5.2-fast-replay/block-30504202.json": {
+      "bytes": 768,
+      "sha256": "b8fa5b5fbb356d97cdce683e2908ef362565d673b4d4dc283ab02101d507468c"
+    },
+    "tests/fixtures/chain-v1.5.2-fast-replay/block-30504203.json": {
+      "bytes": 768,
+      "sha256": "8c4268893525e09ae0d39e3fa8e1b8522169f4eec7eae3612dac0456d8d727fe"
+    },
+    "tests/fixtures/chain-v1.5.2-fast-replay/block-32789377-honest-receipt.pb.base64": {
+      "bytes": 2993,
+      "sha256": "6ea36f2e1e355b66aaf9300f9b787c2392e33591b1a299d8d0ee27e2e9c1c9ae"
+    },
+    "tests/fixtures/chain-v1.5.2-fast-replay/block-32789377.json": {
+      "bytes": 683,
+      "sha256": "7ee7f986a89103fe9a753b9ae6fbe233b4d628883766b1e7e943b403c09999fb"
+    },
+    "tests/fixtures/chain-v1.5.2-fast-replay/block-32789378.json": {
+      "bytes": 683,
+      "sha256": "8e4086a9d37cadad6964a96d0c1653225d99de54b6d72e3b600c7807f5df189a"
+    },
+    "tests/fixtures/chain-v1.5.2-fast-replay/manifest.json": {
+      "bytes": 5421,
+      "sha256": "ade6486292e6999739e62859e3572ae70124c477d2b66fdfd3061ce32465349e"
+    },
+    "tests/grpc/grpc_server_test.cpp": {
+      "bytes": 31031,
+      "sha256": "b16dc5672fadcb092df9fb319b8ba3daf941994f88c1aa6d09a14057d2abcf37"
+    },
+    "tests/grpc/status_memory_test.cpp": {
+      "bytes": 10990,
+      "sha256": "04992b216514d0a24f4e9cd40c760147f33613bab8b5f5db27e90e970fc66532"
+    },
+    "tests/integration/compatibility_fixture.cpp": {
+      "bytes": 6225,
+      "sha256": "4ebaae5933c708f454721a1057115e1a0bf7ffbec0305695695fce9b7c8803b3"
+    },
+    "tests/integration/compatibility_node_test.py": {
+      "bytes": 8974,
+      "sha256": "de6aff193df5bd1703dbe82efba302a1c201451822ab83187a6e513cdeac43e0"
+    },
+    "tests/jsonrpc/batch_memory_test.cpp": {
+      "bytes": 10142,
+      "sha256": "71d1306dfb9b6b337eb8778943244cca5974b738233537d3cd73afd0b4be7781"
+    },
+    "tests/jsonrpc/json_cleanup_test.cpp": {
+      "bytes": 7615,
+      "sha256": "42803819776f09c1b6e71a014d4622d92970d2828f0e5318821f4b4f81770e60"
+    },
+    "tests/jsonrpc/json_default_cleanup_test.cpp": {
+      "bytes": 7125,
+      "sha256": "377d7e7f003f661406166722ea08b49922e071cc8699e8b47e00b8776127bc11"
+    },
+    "tests/jsonrpc/session_lifecycle_test.cpp": {
+      "bytes": 68359,
+      "sha256": "f0d3f3bae7d394150035f5ede0e84b738a6c6b819bf43ce5d0b9b9a31d629cec"
+    },
+    "tests/mempool/admission_atomicity_test.cpp": {
+      "bytes": 9414,
+      "sha256": "6b4f999258e68c4144949ab129a82fc3beedd0e4781817f87e2a04aa4b024ca3"
+    },
+    "tests/mempool/aggregate_memory_test.cpp": {
+      "bytes": 42806,
+      "sha256": "6f3e344000b6672f34f96dae5f6422c864cfde534285ada98888e85a3239d5c9"
+    },
+    "tests/mempool/cleanup_atomicity_test.cpp": {
+      "bytes": 11247,
+      "sha256": "72d61cefeef1dae45f9c4204df375e3e1defb253af5c99fce35a4eaf0cc709f5"
+    },
+    "tests/mempool/memory_fixture.hpp": {
+      "bytes": 3145,
+      "sha256": "38fa176da1ceb85603105451d171c4a15d0b9ff1350d641326be62458d755094"
+    },
+    "tests/mempool/mempool_adapter_test.cpp": {
+      "bytes": 20464,
+      "sha256": "6b1ecae084a4a398e2fd64037ed9c24a449b79b058e0c516e644c5618c81b490"
+    },
+    "tests/mempool/pending_record_budget_test.cpp": {
+      "bytes": 17659,
+      "sha256": "544d15a02b8d9f5837d34d9306875be13200eed195cc08a1f87dbed00e41c21e"
+    },
+    "tests/p2p/gorpc_codec_test.cpp": {
+      "bytes": 3222,
+      "sha256": "e848d46db84e275c4e48d80eebe33eba5a8acc0e2575c30af53cd0d19b3c5437"
+    },
+    "tests/p2p/identity_test.cpp": {
+      "bytes": 2722,
+      "sha256": "5728e0ae0c36a882cc8cf1d9b42b56f54648170fc525cdb2864a63194c226dd5"
+    },
+    "tests/p2p/libp2p_gossip_live_test.cpp": {
+      "bytes": 3291,
+      "sha256": "641364335ca0ee6fb63d41fd43d1b121261f74aaaa6005a4601cc117f7aca0b0"
+    },
+    "tests/p2p/libp2p_one_peer_sync_live_test.cpp": {
+      "bytes": 5350,
+      "sha256": "3be1131f16c165e8549b70918bafbdaf914c2cdc9495e1cf6484417face9364f"
+    },
+    "tests/p2p/libp2p_peer_rpc_live_test.cpp": {
+      "bytes": 2471,
+      "sha256": "22863334583d7ffcfcb7c3715fe87832f0c5711ea56dcd28563aabc96dcd897c"
+    },
+    "tests/p2p/native_gossip_regression.cpp": {
+      "bytes": 4450,
+      "sha256": "2f3e49095036b661f69d59a23d80fd76f6d2d6b106bb7c80a920ff5bc2e0e4a1"
+    },
+    "tests/p2p/p2p_one_peer_sync_test.cpp": {
+      "bytes": 56876,
+      "sha256": "064a4bff3907c861d8197ee20394cce41381dfac5a8626c6133347c530c1d052"
+    },
+    "tests/p2p/peer_advice_store_test.cpp": {
+      "bytes": 4516,
+      "sha256": "c84f653ceb60df1e043f58266b176bdda40a8ab92331b54da343730dd9209b93"
+    },
+    "tests/p2p/peer_dial_budget_test.cpp": {
+      "bytes": 8742,
+      "sha256": "220530ba4426fcd5352ba5c2e42b8339d9643ea22b182b8f05da917d40f136fb"
+    },
+    "tests/p2p/peer_error_handler_test.cpp": {
+      "bytes": 13002,
+      "sha256": "1e5689695eac88f586908589b5410a920c6fb029fe527626c381f895764c1938"
+    },
+    "tests/p2p/peer_rpc_client_test.cpp": {
+      "bytes": 18318,
+      "sha256": "5a77788ec8a2ec2d75a7a8e613d4c8a86f677e2a48627cbeca3ce110501206c0"
+    },
+    "tests/p2p/peer_rpc_read_test.cpp": {
+      "bytes": 14711,
+      "sha256": "86077759f42d3664a686b9b0aa0122bbbb23fe6cca65e9659ab392c85c89c8fe"
+    },
+    "tests/p2p/peer_rpc_transport_test.cpp": {
+      "bytes": 36643,
+      "sha256": "b925ad072c1289346e09f32f7f747fa414868deb71de0cd0d53e1c1e8c185163"
+    },
+    "tests/p2p/peer_rpc_write_test.cpp": {
+      "bytes": 8603,
+      "sha256": "039810f9bb569ed6d64710439d64824a9ff64e6a7596685ba199401c8cc10fa8"
+    },
+    "tests/p2p/peer_snapshot_budget_test.cpp": {
+      "bytes": 4620,
+      "sha256": "46982d91c852b01e8f9c321d35b925218571ca720fdd26f752af76978ac7da11"
+    },
+    "tests/p2p/sdk_address_repository_test.cpp": {
+      "bytes": 12006,
+      "sha256": "2373947f9442e368b8c512ac4deb481de10bc63e45b5b7e24baaea3574520f42"
+    },
+    "tests/p2p/seen_cache_test.cpp": {
+      "bytes": 5687,
+      "sha256": "903f2afb84aec9500a880b60f5eb3a8176b4c303301c87f23fd29cc763822874"
+    },
+    "tests/p2p/tsan_scope_lifetime_test.cpp": {
+      "bytes": 1169,
+      "sha256": "f3857c47f4050a5a4cd5fdcef9074422b40ae090d6283166b6a327208b0c6ff6"
+    },
+    "tests/scripts/benchmark_transaction_tps_test.py": {
+      "bytes": 8235,
+      "sha256": "deff6d3d5c6fd5b2d7c2f563199d5a6180c608305a77d2ba9f60d5c4ec91e613"
+    },
+    "tests/scripts/fixture_paths_test.py": {
+      "bytes": 7095,
+      "sha256": "b154c93196cc0203b27ce3d059c8f40710c4361fbbbfc5cbdcf0387879819367"
+    },
+    "tests/scripts/fizzy_dependency_recipe_test.py": {
+      "bytes": 4130,
+      "sha256": "d5711c4206e496c3f9d884db21d307c39d0a7ea189d0d8162fd601edafd0be18"
+    },
+    "tests/scripts/grpc_call_binding_recipe_test.py": {
+      "bytes": 9889,
+      "sha256": "874e5ec45e4bd1ada16340b45de19055d0f789d86a8a4ecd1a3d70cbeae88483"
+    },
+    "tests/scripts/koinos_proto_ownership_recipe_test.py": {
+      "bytes": 4091,
+      "sha256": "7e03867d9da74b586855f55c6dca88e72bd09317111f3db5f15746ffdf84b771"
+    },
+    "tests/scripts/low_resource_baseline_test.py": {
+      "bytes": 11444,
+      "sha256": "82a3b5292e5b6df748f9709a3f86508eafa42448209cad0a86e8254cb9034eea"
+    },
+    "tests/scripts/lr2_memory_test.py": {
+      "bytes": 1898,
+      "sha256": "ccf22a5e5ba3bcaa6e055892fd72996d0be84c8b866569b932fb5f87afb4643a"
+    },
+    "tests/scripts/nlohmann_cleanup_recipe_test.py": {
+      "bytes": 6550,
+      "sha256": "93009eb4f597313c24c5da05d25be3963a847d6ce20ef94bdb76c7718718cc60"
+    },
+    "tests/scripts/protobuf_dependency_recipe_test.py": {
+      "bytes": 6457,
+      "sha256": "d07e99663b4a6731256aefea5c475f6c724606ca10438318d288f400e16cc7cd"
+    },
+    "tests/scripts/validate_single_copy_restore_test.py": {
+      "bytes": 7525,
+      "sha256": "cc0ba29b6081b713db3b904e104db59edd30ba7285f15c27b459b4e19b3b63e5"
+    },
+    "tests/storage/atomic_write_batch_test.cpp": {
+      "bytes": 14714,
+      "sha256": "5cbae4a3fae10376a116d8be668ba9e5d6a7d1d9b1f98ce1d10428412d03fc12"
+    },
+    "tests/storage/block_receipt_completion_test.cpp": {
+      "bytes": 8071,
+      "sha256": "5c819266d7c3e0472a014c57ccb4680a60ea12f487d17adfe80d8a0c8100d703"
+    },
+    "tests/storage/cache_invariants_test.cpp": {
+      "bytes": 5320,
+      "sha256": "6b7dab3121e1577a122ee81536aaac3e4598108d4f49c253abcb79c6bf298d2c"
+    },
+    "tests/storage/fault_db.cpp": {
+      "bytes": 1495,
+      "sha256": "a40323d5177d113e42e3f5f1f2b2fdcaa4ff95bef83bf067375539024512d1a3"
+    },
+    "tests/storage/fault_db.hpp": {
+      "bytes": 272,
+      "sha256": "62109ab26ee0e47dfe0b40bbb708a9d73db9a04294fa705b6610a9d00d02c631"
+    },
+    "tests/storage/persistence_failure_test.cpp": {
+      "bytes": 10436,
+      "sha256": "e2c9c75fc9d7bff151ef4d58f90e3cdce1a5f520a7318ecd16a7224d56dd1365"
+    },
+    "tests/storage/retained_memory_test.cpp": {
+      "bytes": 17456,
+      "sha256": "e43c5759979f4b2382a712c3f938599d7b0238eda5affba76655a96ad79bf4bd"
+    },
+    "tests/storage/rocksdb_manager_test.cpp": {
+      "bytes": 22714,
+      "sha256": "0324a38d033a5cb6145fa3136480819bbf3b1d4ace42a2cdb51dab09f3d9e173"
+    },
+    "tests/storage/state_db_durability_test.cpp": {
+      "bytes": 8933,
+      "sha256": "4e993bc98b1fea4cf77aaa097a80ee2f5d21b2da8616fc5927a97a0c769c3643"
+    },
+    "tests/storage/state_db_pending_root_test.cpp": {
+      "bytes": 6759,
+      "sha256": "542a82d47087e612a9f32ac41b71a5090bf9c4272ac87526f8d9cd85846d66d0"
+    },
+    "tests/storage/state_value_lifetime_test.cpp": {
+      "bytes": 10503,
+      "sha256": "f8509723288acead76e58c1bb40fbc4ef5c70f8d9a847c83e4b0edb91ba1b17a"
+    },
+    "tests/vm/fizzy_lifetime_test.cpp": {
+      "bytes": 21515,
+      "sha256": "6e80db80519001d037cdedbc5ae943cde5d030e8a6d47f07ba8db8510036750e"
+    },
+    "tests/vm/host_memory_test.cpp": {
+      "bytes": 16390,
+      "sha256": "df8cd794eb45f34b49bd5a1c6112286150fa1f5d2750669060fc675300981745"
+    },
+    "tests/vm/module_capacity_test.cpp": {
+      "bytes": 9466,
+      "sha256": "7f3349c7884e301b0472d4afd681b26f2b71cc51844ca13ed97b4fcf16e97cdf"
+    },
+    "tools/backup/README.md": {
+      "bytes": 16637,
+      "sha256": "4c70ca2b208ef1a3e5999756e19fe5ad7c3842c4f167fc5dbf0ef516f6888a38"
+    },
+    "tools/backup/direct_restore_fixture.cpp": {
+      "bytes": 4734,
+      "sha256": "e38f0cc70a0f15aa62c8f56d683ea2237878e494e918857bdb5cc678b913d83b"
+    },
+    "tools/backup/measure_low_resource_baseline.py": {
+      "bytes": 21959,
+      "sha256": "1f46fd10da887b712b8855af4f149b4011cb6017ab83f22de90dfc6507004bba"
+    },
+    "tools/backup/record_sc0_baseline.py": {
+      "bytes": 20081,
+      "sha256": "9f5ad9168c5b825619c7ac389c006ca50d1205a85d39fbe9fd53fc433c06dfe8"
+    },
+    "tools/backup/restore_baseline_fixture.cpp": {
+      "bytes": 18507,
+      "sha256": "01d9e6ae117b1d9b4a2110b562b19654ac8721304fc037fe86f52c50268c9e5a"
+    },
+    "tools/backup/validate_single_copy_restore.py": {
+      "bytes": 25973,
+      "sha256": "14a1ba5b8daba25eddcd743c402a301cd2c356b2fe642bd9e1e09145f570489b"
+    },
+    "tools/diagnostics/fixture_paths.py": {
+      "bytes": 1316,
+      "sha256": "127edaf3fd27504d8f087c6d290523442a86b6905462e8e95fcbd036233cedc9"
+    },
+    "tools/diagnostics/json_cleanup_memory_profile.cpp": {
+      "bytes": 5365,
+      "sha256": "b249623d8297be8249d79e1de4322244c332cc85f9ac954fecf45344ebc53d5a"
+    },
+    "tools/diagnostics/measure_lr2_memory.py": {
+      "bytes": 6512,
+      "sha256": "74caa3f42540169e2cbe9e24d1eae74c60b688e251237860f66be69c545131d2"
+    },
+    "tools/grpc_parity_probe.cpp": {
+      "bytes": 13949,
+      "sha256": "486e7f296d1238b5389b12a00e95d666c5c973f0e6cd1d80f7acfcec43069c60"
+    },
+    "tools/historical_indexing_validator.cpp": {
+      "bytes": 18864,
+      "sha256": "bfcc5c9d4e8f0aa9a53dd1f37ef86c62a3d02daa2a5c02fc417b625b8c8981a2"
+    },
+    "tools/import_block_store_stream.cpp": {
+      "bytes": 8734,
+      "sha256": "f6acc349bcb8c3344e0e69720c3696dded36011b4247802479df6c005ec14567"
+    },
+    "tools/migrate_block_store.sh": {
+      "bytes": 18655,
+      "sha256": "3efa8ac58bffe99fae063ba34e2538d3470900d060b1a3f3dc62027e55b0c664"
+    },
+    "tools/private_testnet_keygen.cpp": {
+      "bytes": 1202,
+      "sha256": "dbf9ee0955391d1bc2abe74f1f2d7853e3870cce7be8f9953251925c772c7398"
+    },
+    "tools/reference/chain-v1.5.2/CMakeLists.txt": {
+      "bytes": 4827,
+      "sha256": "2c17071b333255712056212a2e30ca4fe49ace2fc5111856dec4cb7e8558c3e7"
+    },
+    "tools/reference/chain-v1.5.2/include/koinos/mq/client.hpp": {
+      "bytes": 722,
+      "sha256": "f1bcf156a996182fea85c3a7b6d30dc77b2d463ef228f1420288a82afe4d7309"
+    },
+    "tools/reference/chain-v1.5.2/reference_validator.cpp": {
+      "bytes": 12585,
+      "sha256": "f8feffcfa622c4771c0532cbaf18fe431d3d2079a7219d05ce942a86fcff89ac"
+    },
+    "tools/reinvestment/install-reinvest-macos.py": {
+      "bytes": 4463,
+      "sha256": "9f60fbee9714cf1edeaf1c5212b953a6b579d89b8bda181dfd446824a319d4fa"
+    },
+    "tools/reinvestment/reinvest-keychain.swift": {
+      "bytes": 2871,
+      "sha256": "1e1a3a38b7bf256c034e7b629b20041f886beaa688f84a364afdb08e8534a81c"
+    },
+    "tools/reinvestment/reinvest-macos-runner.cjs": {
+      "bytes": 1552,
+      "sha256": "0206814e3787493d61ecc0d084b8493118224f2394eea39081937570dc9f093d"
+    },
+    "tools/reinvestment/reinvest-rpc.cjs": {
+      "bytes": 4247,
+      "sha256": "63808fb6a04343501f3fd1de1e832f0ed4697ab9bbf61affc246c8688efc1cbf"
+    },
+    "tools/reinvestment/reinvest-rpc.test.cjs": {
+      "bytes": 6129,
+      "sha256": "a9a950161a2f83f62da7a4e38d4efd56842933074028c1bbf4241f46189ad961"
+    },
+    "tools/reinvestment/reinvest-teleno-rewards.cjs": {
+      "bytes": 14367,
+      "sha256": "1bafc311217500179633242e95f3931518a062b8684aa5c4b85f87f7915f6945"
+    },
+    "tools/reinvestment/reinvest-teleno-rewards.test.cjs": {
+      "bytes": 2792,
+      "sha256": "87ebb6c0ab6fb8e2cbc585ab2c96b812c0d2259a8e3ddfa0346ba40562545112"
+    },
+    "tools/state_delta_replay_audit.cpp": {
+      "bytes": 123260,
+      "sha256": "109833439f51952f528db31f825681e7c3cff466b4c617401bae152618dea82a"
+    }
+  }
+}
