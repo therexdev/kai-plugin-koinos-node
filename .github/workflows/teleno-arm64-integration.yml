@@ -8,7 +8,7 @@ on:
       build_run:
         description: Successful native ARM64 qualification run ID
         required: true
-        default: '44983795737'
+        default: '44992430549'
 permissions:
   actions: read
   contents: write
@@ -18,7 +18,7 @@ jobs:
     container: debian:bookworm
     timeout-minutes: 200
     env:
-      BUILD_RUN: ${{ inputs.build_run || '44983795737' }}
+      BUILD_RUN: ${{ inputs.build_run || '44992430549' }}
     steps:
       - name: Install runtime tools
         run: |
@@ -71,12 +71,14 @@ jobs:
           compatibility = json.loads((root/'arm64-compatibility.json').read_text())
           assert compatibility['engineSource'] == info['source_commit']
           assert compatibility['patchSha256'] == hashlib.sha256(pathlib.Path('community/teleno/scripts/patches/libp2p-gcc12-templates.patch').read_bytes()).hexdigest()
+          assert compatibility['testFixturePatchSha256'] == hashlib.sha256(pathlib.Path('community/teleno/scripts/patches/teleno-gcc12-test-fixture.patch').read_bytes()).hexdigest()
           cases = ET.parse(root/'native-tests.xml').findall('.//testcase')
           assert len(cases) >= 107
           assert all(c.find('failure') is None and c.find('error') is None and c.find('skipped') is None for c in cases)
           print(f'{len(cases)} upstream native tests passed on ARM64')
           PY
       - name: Qualify the real ARM64 engine through the plugin
+        shell: bash
         run: |
           tar -xzf qualified/arm64-runtime/teleno-node-1.3.0-linux-arm64.tar.gz -C qualified
           node community/teleno/scripts/record-arm64-runtime.js "$GITHUB_WORKSPACE/qualified/teleno-node-1.3.0/bin/teleno_node" qualified/arm64-runtime/teleno-node-1.3.0-linux-arm64.tar.gz qualified/candidate-pins.json
