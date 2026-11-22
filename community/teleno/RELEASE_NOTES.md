@@ -18,8 +18,8 @@ process ownership, cancellation and backup validation/list/refusal pass.
 Native Debian 12 ARM64 qualification passed all 107 upstream CTest tests,
 4 Python script tests, all 81 plugin tests and the actual ARM64 archive,
 both-network RPC/gRPC, restart and backup checks. Its immutable archive URL
-and hashes are pinned in this source update. A signed package/catalog release
-remains a separate publisher step. Physical Pi uptime and funded production are not claimed.
+and hashes are pinned in this update. The signed package retains the established
+publisher identity. Physical Pi uptime and funded production are not claimed.
 
 ---
 

@@ -27,7 +27,8 @@ x64. ARM64 must use a native, 64-bit Linux installation and ARM64 KAI Core.
   patches and their checksums. This test-only fix changes no runtime code.
 - The tested archive and binary hashes are included in
   `plugin/service/runtime.json`, together with an immutable download URL.
-  Publisher signing and a catalog release remain separate from this source PR.
+  Release packaging retains the established publisher key; the catalog entry
+  points to the independently signed 1.2.0 package.
 
 ## Checks
 
@@ -63,7 +64,7 @@ summary and a successful native test step.
 - [Native ARM64 build and upstream tests](https://github.com/therexdev/kai-plugin-koinos-node/actions/runs/44992430549)
 - [ARM64 plugin integration](https://github.com/therexdev/kai-plugin-koinos-node/actions/runs/44994808735)
 - [Immutable runtime and test evidence](https://github.com/therexdev/kai-plugin-koinos-node/tree/b97cecf9417a64dbe8808905f1c4ab59d0b5ac07/runtimes/linux-arm64-1.3.0)
-- [Plugin update under review](https://github.com/therexdev/kai-plugin-koinos-node/pull/6)
+- [Plugin implementation and review](https://github.com/therexdev/kai-plugin-koinos-node/pull/6)
 
 Continuous integration includes Linux x64, Linux ARM64, Windows and Intel
 macOS. Both Linux runners download the exact pinned archive and run the actual
