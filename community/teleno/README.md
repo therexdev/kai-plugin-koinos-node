@@ -42,7 +42,10 @@ A 32-bit OS is refused with instructions to install the 64-bit OS.
 
 The engine is a separate Linux GLIBC build of the same pinned Teleno 1.3.0
 source, not the Android executable. It is maintained by therexdev and is not
-an official upstream ARM64 release. Both the downloaded archive and extracted
+an official upstream ARM64 release. The Debian 12 build includes a syntax-only
+cpp-libp2p compatibility patch for GCC 12; its checksum and test evidence are
+recorded in the [ARM64 validation notes](docs/ARM64_VALIDATION.md). Both the
+downloaded archive and extracted
 executable must match architecture-specific SHA-256 pins before execution.
 A failed download, checksum or native loader check preserves an existing engine.
 Windows and Linux x64 keep their existing upstream engine and image hashes.
@@ -97,7 +100,7 @@ This package pins Teleno **1.3.0**, source `2c11229267cff2f9ee39ed8e56ab70af391d
 
 Upstream has published observer qualification, not a guarantee of unlimited mainnet producer uptime. See [release evidence and remaining work](https://github.com/koinos/teleno/releases/tag/teleno-node-v1.3.0). Local checks cover the real Linux executable's offline startup, genesis identity, clean reopen, backup configuration/listing and refusal of an empty-chain backup, plus wallet/lifecycle tests.
 
-The [actual Windows Server 2025 / Ubuntu 24.04 WSL2 test](https://github.com/therexdev/kai-plugin-koinos-node/actions/runs/43452980942/job/131979740683) passed for both Mainnet and Harbinger offline databases: exact binary installation, preserving Windows-to-Linux data copy, JSON-RPC, a complete HTTP/2 gRPC health request, clean reopen, process-identity checks, immediate cancellation and backup validation/list/refusal. The Linux transport simulation additionally verifies launcher crashes and orphan recovery. All 70 plugin tests and package-source verification pass on Windows, Linux and macOS. This does not qualify every Windows desktop configuration. Windows/macOS Docker operation and live funded mainnet production still need hardware/operator testing. No live wallet, burn, registration or production is exercised by the test suite.
+The [actual Windows Server 2025 / Ubuntu 24.04 WSL2 test](https://github.com/therexdev/kai-plugin-koinos-node/actions/runs/43452980942/job/131979740683) passed for both Mainnet and Harbinger offline databases: exact binary installation, preserving Windows-to-Linux data copy, JSON-RPC, a complete HTTP/2 gRPC health request, clean reopen, process-identity checks, immediate cancellation and backup validation/list/refusal. The Linux transport simulation additionally verifies launcher crashes and orphan recovery. The plugin test suite and package-source verification pass on Windows, Linux and Intel macOS. Current ARM64 results are recorded in the [ARM64 validation notes](docs/ARM64_VALIDATION.md). This does not qualify every Windows desktop configuration. Windows/macOS Docker operation and live funded mainnet production still need hardware/operator testing. No live wallet, burn, registration or production is exercised by the test suite.
 
 This is a full-trust native plugin. A separate data directory is not an operating-system security sandbox. It uses the public Foundation SDK and bundles its own dependencies. It does not read Core internals, another installed plugin, legacy wallets, or OS account secrets.
 
@@ -155,8 +158,10 @@ missing WSL installations return setup instructions instead of a Docker error.
 
 ## Upstream functionality
 
-This integration runs the complete, unmodified Teleno 1.3.0 executable, pinned
-to the release above. It does not substitute the legacy Koinos service stack.
+This integration runs the complete Teleno 1.3.0 engine from the pinned source
+above. The x64 executable is the unchanged upstream release; the ARM64 build
+records its dependency compatibility patch in the validation notes. It does
+not substitute the legacy Koinos service stack.
 The desktop controls cover observer syncing, explicitly enabled block production,
 JSON-RPC, optional gRPC, supported history indexing, logs, local snapshots,
 backup validation, public snapshot listing/download, restore and observer-first

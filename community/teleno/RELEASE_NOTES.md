@@ -15,9 +15,11 @@
 Validation: 81 plugin tests and source-package verification; actual Linux x64
 archive installation, both offline network identities, restart, RPC/gRPC,
 process ownership, cancellation and backup validation/list/refusal pass.
-ARM64 native compilation/qualification is recorded separately by the ARM64
-workflow. A signed package/catalog release follows successful ARM64 validation
-and pin review. Physical Pi uptime and funded production are not claimed.
+Native Debian 12 ARM64 qualification passed all 107 upstream CTest tests,
+4 Python script tests, all 81 plugin tests and the actual ARM64 archive,
+both-network RPC/gRPC, restart and backup checks. Its immutable archive URL
+and hashes are pinned in this source update. A signed package/catalog release
+remains a separate publisher step. Physical Pi uptime and funded production are not claimed.
 
 ---
 
