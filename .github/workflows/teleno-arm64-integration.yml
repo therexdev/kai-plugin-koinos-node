@@ -1,0 +1,114 @@
+name: Teleno ARM64 plugin integration
+on:
+  push:
+    branches: [codex/teleno-pi-support]
+    paths: ['.github/workflows/teleno-arm64-integration.yml']
+  workflow_dispatch:
+    inputs:
+      build_run:
+        description: Successful native ARM64 qualification run ID
+        required: true
+        default: '44975427828'
+permissions:
+  actions: read
+  contents: write
+jobs:
+  integrate:
+    runs-on: ubuntu-24.04-arm
+    container: debian:bookworm
+    timeout-minutes: 200
+    env:
+      BUILD_RUN: ${{ inputs.build_run || '44975427828' }}
+    steps:
+      - name: Install runtime tools
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends binutils ca-certificates curl git libstdc++6 python3 tar
+          test "$(uname -m)" = aarch64
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Verify the native qualification run
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 - <<'PY'
+          import json, os, time, urllib.request
+          run = os.environ['BUILD_RUN']
+          assert run.isdigit()
+          repo = os.environ['GITHUB_REPOSITORY']
+          request = urllib.request.Request(f'https://api.github.com/repos/{repo}/actions/runs/{run}', headers={'Authorization': 'Bearer '+os.environ['GH_TOKEN']})
+          deadline = time.monotonic()+10800
+          while True:
+              with urllib.request.urlopen(request, timeout=30) as response:
+                  record = json.load(response)
+              if record['status'] == 'completed':
+                  break
+              assert time.monotonic() < deadline, 'Native qualification did not finish within its build deadline'
+              print('Native ARM64 qualification is still running; integration waits for its result.', flush=True)
+              time.sleep(45)
+          assert record['status'] == 'completed' and record['conclusion'] == 'success'
+          assert record['head_repository']['full_name'] == repo
+          assert record['head_branch'] == 'codex/teleno-linux-arm64'
+          assert record['path'] == '.github/workflows/teleno-arm64.yml'
+          assert record['event'] in ['push', 'workflow_dispatch']
+          PY
+      - uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          run-id: ${{ env.BUILD_RUN }}
+          name: teleno-linux-arm64-1.3.0-${{ env.BUILD_RUN }}
+          path: qualified
+      - name: Verify provenance and all upstream native test results
+        run: |
+          python3 - <<'PY'
+          import json, pathlib, xml.etree.ElementTree as ET
+          root = pathlib.Path('qualified/teleno-source/build')
+          info = json.loads((root/'generated/teleno-node-build-info.json').read_text())
+          assert info['source_commit'] == '2c11229267cff2f9ee39ed8e56ab70af391d85ce'
+          assert info['source_clean'] is True
+          cases = ET.parse(root/'native-tests.xml').findall('.//testcase')
+          assert len(cases) >= 107
+          assert all(c.find('failure') is None and c.find('error') is None and c.find('skipped') is None for c in cases)
+          print(f'{len(cases)} upstream native tests passed on ARM64')
+          PY
+      - name: Qualify the real ARM64 engine through the plugin
+        run: |
+          tar -xzf qualified/arm64-runtime/teleno-node-1.3.0-linux-arm64.tar.gz -C qualified
+          node community/teleno/scripts/record-arm64-runtime.js "$GITHUB_WORKSPACE/qualified/teleno-node-1.3.0/bin/teleno_node" qualified/arm64-runtime/teleno-node-1.3.0-linux-arm64.tar.gz qualified/candidate-pins.json
+          cd community/teleno
+          npm test
+          node scripts/verify-package.js --source
+          node scripts/native-smoke.js "$GITHUB_WORKSPACE/qualified/teleno-node-1.3.0/bin/teleno_node" --archive "$GITHUB_WORKSPACE/qualified/arm64-runtime/teleno-node-1.3.0-linux-arm64.tar.gz" --pins-file "$GITHUB_WORKSPACE/qualified/candidate-pins.json" | tee "$GITHUB_WORKSPACE/qualified/arm64-plugin-smoke.txt"
+      - name: Prepare an isolated branch for the tested engine
+        uses: actions/checkout@v4
+        with:
+          path: runtime-stage
+      - name: Save tested runtime and evidence for pin review (no release)
+        working-directory: runtime-stage
+        run: |
+          branch="codex/teleno-arm64-runtime-$BUILD_RUN"
+          test -z "$(git ls-remote --heads origin "refs/heads/$branch")"
+          git switch --orphan "$branch"
+          mkdir -p runtimes/linux-arm64-1.3.0
+          cp "$GITHUB_WORKSPACE/qualified/arm64-runtime/teleno-node-1.3.0-linux-arm64.tar.gz" runtimes/linux-arm64-1.3.0/
+          cp "$GITHUB_WORKSPACE/qualified/candidate-pins.json" "$GITHUB_WORKSPACE/qualified/arm64-plugin-smoke.txt" runtimes/linux-arm64-1.3.0/
+          cp "$GITHUB_WORKSPACE/qualified/teleno-source/build/generated/teleno-node-build-info.json" "$GITHUB_WORKSPACE/qualified/teleno-source/build/native-tests.xml" runtimes/linux-arm64-1.3.0/
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add runtimes
+          git commit -m 'Preserve qualified Teleno 1.3.0 Linux ARM64 runtime and test evidence'
+          git push origin "HEAD:refs/heads/$branch"
+          git rev-parse HEAD | tee "$GITHUB_WORKSPACE/qualified/runtime-commit.txt"
+      - name: Retain integration evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: teleno-arm64-plugin-integration-${{ github.run_id }}
+          if-no-files-found: warn
+          retention-days: 30
+          path: |
+            qualified/candidate-pins.json
+            qualified/arm64-plugin-smoke.txt
+            qualified/runtime-commit.txt

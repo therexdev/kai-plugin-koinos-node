@@ -108,7 +108,7 @@ class Runtime {
       let url=pin.url, response;
       for(let n=0;n<5;n++) {
         const u=new URL(url);
-        if(u.protocol!=="https:" || u.username || u.password || !["github.com","release-assets.githubusercontent.com","objects.githubusercontent.com"].includes(u.hostname))throw Error("Unexpected runtime download host.");
+        if(u.protocol!=="https:" || u.username || u.password || !["github.com","raw.githubusercontent.com","release-assets.githubusercontent.com","objects.githubusercontent.com"].includes(u.hostname))throw Error("Unexpected runtime download host.");
         response=await this.fetch(u,{redirect:"manual",signal:AbortSignal.any([signal || new AbortController().signal,AbortSignal.timeout(120000)])});
         if([301,302,303,307,308].includes(response.status)) {url=new URL(response.headers.get("location"),url).href;await response.body?.cancel();continue;}
         break;

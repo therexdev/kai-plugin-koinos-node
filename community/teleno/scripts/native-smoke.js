@@ -13,7 +13,7 @@ async function main(){
     const root=fs.mkdtempSync(path.join(os.tmpdir(),"kai-teleno-native-")),r=new Runtime(root,{runtimePins,...(archive?{fetchImpl:async()=>new Response(fs.readFileSync(archive))}:{})}),s=settings({network,rpcPort:port,p2pPort:port+1,grpc:true,grpcPort:port+2});
     try{
       const before=await r.setupStatus(s);assert.equal(before.supported,true);assert.equal(before.runtimeReady,false);
-      if(archive)await r.install(s);
+      if(archive||process.argv.includes("--download"))await r.install(s);
       else {fs.mkdirSync(path.dirname(r.binary));fs.copyFileSync(executable,r.binary);fs.chmodSync(r.binary,0o700);}
       assert.equal((await r.setupStatus(s)).runtimeReady,true);assert.equal(r.snapshot(s).arch,process.arch);
       await r.installed(s);r.prepare(s);
