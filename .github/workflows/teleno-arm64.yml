@@ -53,13 +53,24 @@ jobs:
         run: ./scripts/build-cpp-libp2p-koinos.sh
       - name: Build and run upstream native tests
         working-directory: teleno-source
+        shell: bash
         env:
           TMPDIR: ${{ runner.temp }}/teleno-tests/tmp
           TELENO_TEST_ARTIFACT_ROOT: ${{ runner.temp }}/teleno-tests/artifacts
           TELENO_TEST_BUILD_ROOT: ${{ github.workspace }}/teleno-source/build
         run: |
           mkdir -p "$TMPDIR" "$TELENO_TEST_ARTIFACT_ROOT"
+          # GCC 12 rejects default construction of Fizzy's aggregate import
+          # union in this test fixture. Explicit value initialization preserves
+          # the same fixture and every assertion. Restore the test source and
+          # rebuild the engine cleanly before running the complete suite.
+          git apply ../community/teleno/scripts/patches/teleno-gcc12-test-fixture.patch
+          trap 'git restore -- tests/vm/module_capacity_test.cpp' EXIT
           cmake --build build --parallel 2
+          git restore -- tests/vm/module_capacity_test.cpp
+          trap - EXIT
+          cmake --build build --target teleno_node --parallel 2
+          test -z "$(git status --porcelain)"
           ctest --test-dir build --output-on-failure --output-junit build/native-tests.xml
           python3 -B -m unittest -v tests/scripts/benchmark_transaction_tps_test.py
       - name: Record the exact ARM64 runtime and package it
@@ -75,10 +86,13 @@ jobs:
           cp build/teleno_node ../arm64-runtime/teleno-node-1.3.0/bin/
           cp LICENSE ../arm64-runtime/teleno-node-1.3.0/
           cp ../community/teleno/scripts/patches/libp2p-gcc12-templates.patch ../arm64-runtime/teleno-node-1.3.0/
+          cp ../community/teleno/scripts/patches/teleno-gcc12-test-fixture.patch ../arm64-runtime/teleno-node-1.3.0/
           python3 - <<'PY'
           import hashlib, json, pathlib
           patch = pathlib.Path('../community/teleno/scripts/patches/libp2p-gcc12-templates.patch')
+          test_patch = pathlib.Path('../community/teleno/scripts/patches/teleno-gcc12-test-fixture.patch')
           result = {'engineSource': '2c11229267cff2f9ee39ed8e56ab70af391d85ce', 'cppLibp2pSource': 'c03bf7c44c4fd30a390f3ef93bd1eab482e686a6', 'patch': patch.name, 'patchSha256': hashlib.sha256(patch.read_bytes()).hexdigest(), 'purpose': 'C++ template disambiguation for GCC 12; dependency header syntax only'}
+          result.update({'testFixturePatch': test_patch.name, 'testFixturePatchSha256': hashlib.sha256(test_patch.read_bytes()).hexdigest(), 'testFixturePurpose': 'Explicit aggregate initialization in one upstream test; no assertion or runtime change; test source restored before final clean engine build'})
           pathlib.Path('build/arm64-compatibility.json').write_text(json.dumps(result, indent=2)+'\n')
           PY
           cp build/arm64-compatibility.json ../arm64-runtime/teleno-node-1.3.0/

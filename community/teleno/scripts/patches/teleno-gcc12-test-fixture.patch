@@ -1,0 +1,12 @@
+diff --git a/tests/vm/module_capacity_test.cpp b/tests/vm/module_capacity_test.cpp
+--- a/tests/vm/module_capacity_test.cpp
++++ b/tests/vm/module_capacity_test.cpp
+@@ -51,7 +51,7 @@ void layout() {
+   parsed.typesec.resize(1); parsed.imported_function_types.resize(1);
+   grow(parsed.typesec[0].inputs);grow(parsed.typesec[0].outputs);
+   grow(parsed.imported_function_types[0].inputs);grow(parsed.imported_function_types[0].outputs);
+-  parsed.importsec.resize(1); parsed.exportsec.resize(1); parsed.codesec.resize(1);
++  parsed.importsec.resize(1, ::fizzy::Import{}); parsed.exportsec.resize(1); parsed.codesec.resize(1);
+   parsed.elementsec.resize(1); parsed.datasec.resize(1);
+   auto named=[&](auto& value) {auto before=estimate();auto old=value.capacity();value.reserve(1024);
+     require(estimate()-before==value.capacity()-old,"nested string capacity omitted");};

@@ -24,8 +24,12 @@ assert.equal(compatibility.engineSource,PIN.source);
 assert.equal(compatibility.cppLibp2pSource,"c03bf7c44c4fd30a390f3ef93bd1eab482e686a6");
 assert.equal(compatibility.patchSha256,expectedPatch);
 assert.equal(hash(fs.readFileSync(path.join(bundle,patchName))),expectedPatch);
+const testPatchName="teleno-gcc12-test-fixture.patch",testPatch=hash(fs.readFileSync(path.join(__dirname,"patches",testPatchName)));
+assert.equal(compatibility.testFixturePatch,testPatchName);
+assert.equal(compatibility.testFixturePatchSha256,testPatch);
+assert.equal(hash(fs.readFileSync(path.join(bundle,testPatchName))),testPatch);
 // The later reviewed release URL must serve these identical archive bytes.
 const url=`https://github.com/therexdev/kai-plugin-koinos-node/releases/download/teleno-runtime-${PIN.version}-linux-arm64/${path.basename(archive)}`;
-const candidate={...PIN,native:{...PIN.native,arm64:{url,archiveSha256:hash(bytes),binarySha256:hash(elf),glibc:"2.36",publisher:"therexdev (community Linux build)",source:PIN.source,buildPatchSha256:expectedPatch}}};
+const candidate={...PIN,native:{...PIN.native,arm64:{url,archiveSha256:hash(bytes),binarySha256:hash(elf),glibc:"2.36",publisher:"therexdev (community Linux build)",source:PIN.source,buildPatchSha256:expectedPatch,testFixturePatchSha256:testPatch}}};
 fs.writeFileSync(output,JSON.stringify(candidate,null,2)+"\n",{flag:"wx"});
 console.log(`Recorded ARM64 Linux ${version}; archive ${hash(bytes)}; executable ${hash(elf)}. Not published or signed.`);
