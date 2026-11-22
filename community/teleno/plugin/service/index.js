@@ -37,7 +37,10 @@ function create(api,deps={}) {
   const baseUrls=chain.rpcUrls.bind(chain);chain.rpcUrls=()=>options.network==="harbinger"?[`http://127.0.0.1:${options.rpcPort}`]:baseUrls();
   const history=new WalletHistory({chain,wallet});
   let mining;
-  async function miningStatus(check){mining??=new MiningStats({chain,wallet,state:new GuardedStore(path.join(root,"mining-history.json")),checkNetwork});return mining.read(check);}
+  // This derived index is rewritten frequently; settings and financial journals
+  // keep their default versioned backups. All stores still reject unsafe or
+  // externally changed/unreadable files before any replacement.
+  async function miningStatus(check){mining??=new MiningStats({chain,wallet,state:new GuardedStore(path.join(root,"mining-history.json"),{backup:false}),checkNetwork});return mining.read(check);}
   const active=signal=>{api.signal.throwIfAborted();signal?.throwIfAborted();if(closed)throw Error("Teleno is closing.");store.assert();journal.assert();checkWallet();};
   const identity=()=>JSON.stringify({address:wallet.address,options});
   const context=(signal,id)=>()=>{active(signal);if(identity()!==id)throw Error("Teleno wallet or settings changed. Review the action again.");};
