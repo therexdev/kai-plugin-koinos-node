@@ -4,6 +4,7 @@ const {spawn,execFile} = require("node:child_process");
 const {safe,write,redact} = require("./storage"), {generate} = require("./config");
 const {WslRuntime}=require("./wsl");
 const {copyChains}=require("./wsl-migration");
+const {ChainStorage}=require("./chain-storage");
 const {BackupProgress,ACTIONS,snapshotId}=require("./backup-progress");
 const PIN = require("./runtime.json");
 const hash = bytes => crypto.createHash("sha256").update(bytes).digest("hex");
@@ -24,9 +25,10 @@ class Runtime {
     this.pins=runtimePins;
     this.binary=path.join(root,"runtime","teleno_node");this.activeOptions=null;this.network=null;
     this.wsl=new WslRuntime(root,{command:this.command,owner:this.owner,hostPathImpl:wslHostPathImpl});
+    this.chainStorage=new ChainStorage(root,{platform});this.startedAt=null;
   }
-  storageReady(options) {return options.runtime!=="wsl"||this.wsl.ready(options);}
-  basedir(options) {return safe(options.runtime==="wsl"?this.wsl.paths(options).host:path.join(this.root,"chains",options.network));}
+  storageReady(options) {if(options.runtime==="wsl")return this.wsl.ready(options);try{this.chainStorage.resolve(options);return true;}catch{return false;}}
+  basedir(options) {return options.runtime==="wsl"?safe(this.wsl.paths(options).host):this.chainStorage.resolve(options);}
   executionDir(options) {return options.runtime==="wsl"?this.wsl.paths(options).linux:this.basedir(options);}
   name(options) {return `kai-teleno-${this.owner}-${options.network}`;}
   logFile(options) {return path.join(this.root,"logs",options.network+".log");}
@@ -131,8 +133,9 @@ class Runtime {
       return await this.installed(options,signal);
     } finally {fs.rmSync(staging,{recursive:true,force:true});}
   }
-  idle({allowMigration=false}={}) {
+  idle({allowMigration=false,allowStorage=false}={}) {
     if(this.child)throw Error("Stop Teleno and wait for its current operation before continuing.");
+    if(!allowStorage&&(this.chainStorage.busy||this.chainStorage.pending))throw Error("Finish or resume the chain storage copy before starting or changing node data.");
     const file=path.join(this.root,"process.json");safe(file,true);
     if(fs.existsSync(file))throw Error("A previous Teleno process needs recovery. Click Stop node before starting or changing this database.");
     const migration=path.join(this.root,"wsl-migration.json");safe(migration,true);
@@ -203,7 +206,7 @@ class Runtime {
   }
   launch(options,extra,mode,output=null) {
     this.idle();const spec=this.launchArgs(options,extra);
-    this.lastError=null;this.peers=null;this.peersAt=0;this.activeOptions={...options};this.network=options.network;this.mode=mode;
+    this.lastError=null;this.peers=null;this.peersAt=0;this.activeOptions={...options};this.network=options.network;this.mode=mode;this.startedAt=Date.now();
     const pidfile=path.join(this.root,"process.json");
     if(spec.record)write(pidfile,JSON.stringify({network:options.network,runtime:options.runtime,owner:this.owner,...spec.record}));
     const child=this.spawn(spec.file,spec.args,{windowsHide:true,stdio:["ignore","pipe","pipe"]});this.child=child;
@@ -228,6 +231,7 @@ class Runtime {
     this.launch(options,producer?["--enable","block_producer",...(options.grpc?[]:["--disable","grpc"])]:["--disable","block_producer",...(options.grpc?[]:["grpc"])],producer?"producer":"observer");
   }
   async stop(options) {
+    if(this.chainStorage.busy){await this.chainStorage.cancel();return;}
     const progress=this.child&&this.mode==="maintenance"?this.backupProgress:null;
     progress?.cancel();
     try {
@@ -279,6 +283,15 @@ class Runtime {
     }catch(error){progress.finish(error);throw error;}
   }
   logs(options) {const file=this.logFile(options);safe(file,true,4*1024*1024);return fs.existsSync(file)?redact(fs.readFileSync(file,"utf8").slice(-60000)):"No Teleno logs yet.";}
-  snapshot(options) {return {mode:this.mode,pid:this.child?.pid || null,peers:this.child&&Date.now()-this.peersAt<90000?this.peers:null,network:this.network,job:this.job?.network&&this.job.network!==options.network?null:this.job,error:this.lastError,basedir:this.storageReady(options)?this.basedir(options):`${options.wslDistro} · Install runtime to prepare Linux storage`,support:this.support(options),version:PIN.version,platform:this.platform,arch:this.arch,storageReady:this.storageReady(options),migrationPending:fs.existsSync(path.join(this.root,"wsl-migration.json")),recoveryPending:!this.child&&fs.existsSync(path.join(this.root,"process.json"))};}
+  snapshot(options) {
+    const storage=this.chainStorage.info(options),ready=this.storageReady(options);
+    if(options.runtime==="wsl"){storage.path=ready?this.basedir(options):null;storage.ready=ready;storage.freeBytes=null;}
+    const jobs=[this.job,this.chainStorage.job].filter(j=>j?.network===options.network).sort((a,b)=>b.startedAt-a.startedAt);
+    return {storage,startedAt:this.child?this.startedAt:null,mode:this.chainStorage.busy?"maintenance":this.mode,pid:this.child?.pid||null,
+      peers:this.child&&Date.now()-this.peersAt<90000?this.peers:null,network:this.network,job:jobs[0]||null,error:this.lastError,
+      basedir:options.runtime==="wsl"?(ready?this.basedir(options):`${options.wslDistro} · Install runtime to prepare Linux storage`):storage.path,
+      support:this.support(options),version:PIN.version,platform:this.platform,arch:this.arch,storageReady:ready,
+      migrationPending:fs.existsSync(path.join(this.root,"wsl-migration.json")),recoveryPending:!this.child&&fs.existsSync(path.join(this.root,"process.json"))};
+  }
 }
 module.exports={Runtime,command,decode,PIN};

@@ -1,3 +1,30 @@
+# Teleno Koinos Node 1.4.0 — Dashboard, wallet and USB storage
+
+The Android-inspired Dashboard shows balances, mana, live node health, chain
+height, peers, confirmed blocks and recent rewards, with a primary Start/Stop
+control. Setup now starts observer sync early, highlights the next step and
+keeps production behind its existing readiness checks and native review.
+Wallet adds an offline receive QR, paged transaction history with details,
+compact Send / Get VHP dialogs and Send all with fresh balance/mana checks.
+Password proof, exact wallet/network checks and native financial review remain.
+
+Choose a mounted USB drive or folder in Setup / Settings while stopped.
+Node files (including the hot signing key and snapshots) are checksum-copied
+into an owned per-network directory. The original copy is retained; encrypted
+spending-wallet data stays in the plugin profile. Interrupted copies can resume
+or keep the original location. Missing/replaced drives block node startup;
+there is no fallback to internal chain storage. Linux drives must support
+private permissions, for example ext4. WSL2 stays inside managed Ubuntu storage.
+
+Validation covers unit/lifecycle tests, real sandboxed desktop navigation,
+paged history, independent QR decoding, reviewed transfer requests, signed
+package startup in Core, and offline engine stop/copy/reopen on selected
+storage. No live funds or physical Raspberry Pi uptime claim is involved.
+The 1.3.1 startup timeout/Retry fix is retained. No new engine or Core update
+is required; Core 0.7.33 is sufficient.
+
+---
+
 # Teleno Koinos Node 1.3.1 — Overview startup recovery
 
 Fixes the initial overview staying on Loading Teleno when Core reports the

@@ -4,11 +4,30 @@ An independently installable KAI Core plugin for [Teleno](https://github.com/koi
 
 Install **Teleno Koinos Node** from KAI Core's Community catalog. Its signed package is independent from the regular node, even though both source trees live in this repository. Requires KAI Core 0.7.17 or later.
 
-The Docker-free Windows runtime is included from **1.1.0**. **1.1.3** adds a
-complete front-page checklist with verified progress. Follow the highlighted
-step; completed steps collapse and the guide closes after setup. Choose
-**Observer only** to sync without a wallet, signing key or funds, or use the
-**Block producer guide** for the full sequence below. A Core update is not required.
+Version **1.4.0** puts a compact Android-inspired **Dashboard** first: wallet
+balance, mana, node health, chain height, peers, confirmed blocks, recent rewards,
+storage and memory, with one Start/Stop control. **Setup** highlights the next
+step and lets you sync an observer while preparing the wallet and signing key.
+**History** holds the full mining/reward details. **Wallet** adds an offline
+receive QR, paged transaction history and compact Send / Get VHP dialogs.
+**Send all** reads fresh balances and applies the current KOIN mana limit;
+submission still requires the wallet password and native review.
+
+### Choose chain storage, including a Pi USB drive
+
+In **Setup** or **Settings**, stop the node and choose **Choose drive / folder**.
+Select the mounted USB or desired parent folder. After native review, Teleno
+copies its node directory into its own per-network folder, verifies checksums,
+and then switches downloads, database, hot signing key and snapshots to it.
+The encrypted spending wallet stays in the plugin profile. Original files are
+retained; production never starts automatically. Copy progress can be paused
+and resumed. **Keep original location** abandons only a paused copy task.
+
+On Linux, use a drive supporting private file permissions (for example ext4).
+Keep it mounted while using the node. A missing/replaced drive blocks startup
+instead of falling back to internal storage. To reconnect a changed mount path,
+select the same owned folder's parent again. WSL2 keeps its database inside
+Ubuntu; selecting an external Windows host folder is unsupported.
 
 On Windows, **Set up WSL2** reopens an existing Ubuntu installation, including
 after interrupted username/password setup. Complete any prompts, or return to
@@ -45,20 +64,19 @@ Core including its tray instance and reopen once if the old app already errored.
 
 ### Complete setup order
 
-1. **Set up WSL2 and Ubuntu** (Windows only), finish the Ubuntu prompts and any requested restart, then **Check setup**.
-2. **Install Teleno**, or use the preserving switch for an existing Docker profile.
-3. **Create your Teleno wallet** with a password, or deliberately restore your own Teleno backup. The wallet is separate from Core and other node plugins.
-4. **Save your wallet backup**: enter the password in Wallet, choose **Show backup key**, save it privately offline, and choose **Saved offline** in the native dialog. Merely opening the dialog does not complete the step. The password alone cannot recover a lost wallet.
-5. **Create a block-signing key** while the node is stopped. This separate hot key signs blocks; it is not the spending-wallet backup key.
-6. **Start an observer and sync** until the head is recent and advancing with connected peers. Optional public bootstrap instructions are in Backups.
-7. **Fund your wallet and get VHP** on the selected network. Receive KOIN at the displayed Teleno address, keep KOIN available for mana, and review any chosen irreversible burn into VHP. Receiving VHP is also supported; the guide recognizes existing balances.
-8. **Register your signing key** in Producer using the wallet password, review the network/address/public key, and wait for irreversible confirmation.
-9. **Enable block production** through a separate native review. This requires a synced observer, peers, VHP and matching registration. Locking the wallet does not stop production; use **Stop node**. Restarting Core can start only an observer, so production needs a new review after restart.
+1. Choose chain storage before downloading the chain, if you want an external drive.
+2. On Windows, set up WSL2 / Ubuntu and complete its prompts; then install Teleno.
+3. Start an observer and let it sync. Optional **Download latest chain** in Setup runs the reviewed public bootstrap while stopped.
+4. Create your separate Teleno wallet, save its backup offline through **Back up wallet**, and create its separate hot block-signing key. These steps can run while the observer syncs.
+5. Receive KOIN/VHP on the selected network. Keep KOIN for transaction mana; any burn into VHP remains manual and reviewed.
+6. Register the signing key and wait for irreversible confirmation.
+7. Enable production through its separate native review after a recent advancing head, peers, VHP and matching registration are verified.
 
-If an observer is already running before a wallet or key has been created, the
-guide offers **Stop node** before that step. Wallet backup confirmation is tied
-to the wallet; balances and registration are checked separately for each network
-and key. Unavailable RPC results are shown as unverified, not zero balances.
+Choose **Observer only** to omit all wallet and production requirements. A
+locked wallet does not stop a producer; use **Stop node**. Optional startup
+with Core starts only an observer. Wallet backup state is tied to the wallet;
+balances and registration are checked for each selected network and key.
+Unavailable RPC results are displayed as unverified.
 
 ## Raspberry Pi / Linux ARM64 (1.2.0)
 
@@ -105,13 +123,15 @@ The plugin does not provide AI capacity, distribute the KAI reward pool, import 
 
 ## Pages and setup
 
-1. **Overview** — the complete checklist above appears first on Windows and Linux, highlights the next action and links directly to the relevant page. Completed steps collapse. Missing prerequisites, failed downloads and interrupted migrations remain retryable. Existing Windows Docker profiles use **Switch to Docker-free runtime**, which preserves original data and keys. Observer-only instructions omit wallet and production requirements.
-2. **Wallet** — create a new wallet with a password, save its private-key backup offline, receive KOIN, view KOIN/VHP/Mana and activity, send tokens, or burn a chosen amount into VHP. Import is for deliberately restoring this wallet's backup; do not reuse Core, regular-node, or Master-node keys. No automatic wallet discovery or migration occurs.
-3. **Producer** — create a separate hot key while stopped, register that public key with the Teleno wallet, then start and validate an observer. Production needs an advancing recent head, a current peer reading, VHP, matching on-chain registration, and explicit native review. Each chain mutation requires the wallet password. A locked spending wallet does not stop an active producer.
-4. **Backups** — stop the node, then follow the download → restore → observer steps. A live panel shows the current stage, measured bytes and percentage, elapsed time, speed and estimated time remaining where available. Snapshot lists, completion, cancellation and actionable errors appear here without opening Logs. Select a snapshot from the table; the completion button restores that exact downloaded ID after native review. Local snapshot creation/listing, restore checks and technical details remain available below. Native restore preserves previous databases under `.pre-restore/`. It never imports a legacy snapshot or enables production. Start and validate an observer afterward. Chain snapshots exclude wallet and producer keys: back those up separately.
-5. **Logs** — bounded, redacted runtime and backup output.
-6. **Settings** — Mainnet/Harbinger, native/WSL2/optional Docker, WSL distribution, independent RPC/P2P ports, optional local gRPC, log level, account-history indexing and optional observer startup.
-7. **About & differences** — platform limitations, the comparison above and upstream links.
+- **Dashboard** — compact running/sync/production snapshot and Start/Stop.
+- **Setup** — chain location, optional bootstrap and the next verified setup step.
+- **Wallet** — receive QR/address, KOIN/VHP/mana, transaction history, password-reviewed Send, Send all, manual Get VHP, unlock and backup.
+- **History** — confirmed account block totals, rewards, VHP consumed and dated mining history; partial or stale figures are labeled.
+- **Backups** — snapshot download/restore and native checkpoint tools with progress and cancellation. Restores preserve previous databases. Wallet/producer keys need separate backups.
+- **Logs** — bounded, redacted runtime output.
+- **Settings** — per-network chain storage, network, runtime, ports and optional observer startup.
+- **Differences** — comparison with the regular node and runtime provenance.
+
 
 Default RPC is **127.0.0.1:18085** and P2P is **18890**. RPC is never published on all host interfaces. Docker mounts only the selected Teleno chain directory, not the encrypted wallet. gRPC is optional and loopback-bound; backup-admin endpoints remain disabled. Each network has its own database and block-signing key; the plugin wallet address is the same on both networks, whose balances are separate.
 

@@ -53,4 +53,4 @@ async function copyChains({source,destination,journal,identity,signal,progress})
   if(JSON.stringify(await inventory(source,signal))!==JSON.stringify(entries))throw Error("Source changed during copy. Stop the old node and review both copies before proceeding.");
   return {files:entries.filter(x=>!x.directory).length,bytes};
 }
-module.exports={copyChains,inventory};
+module.exports={copyChains,inventory,digest};
