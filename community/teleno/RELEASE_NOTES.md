@@ -1,3 +1,27 @@
+# Teleno Koinos Node 1.3.1 — Overview startup recovery
+
+Fixes the initial overview staying on Loading Teleno when Core reports the
+embedded plugin view as hidden during startup. The first status read now runs
+before visibility-dependent background polling. Focus and visibility changes
+request a fresh snapshot.
+
+A failed or unanswered startup status read now shows the error and a Retry
+connection button. Status reads have a 20-second deadline; retries issue a new
+read without reloading the app. This deadline applies only to status reads,
+not wallet transfers, burns, key registration or node-control operations.
+
+The mining overview, wallets, signing keys, transaction journals and node data
+are retained. Update the plugin in place from Plugins. Core 0.7.33 is sufficient;
+no new Core installer or node engine is required for this fix.
+
+Validation covers the initially hidden view, fresh-wallet startup, rejected and
+unanswered status reads, retry recovery, and the existing mining overview checks.
+A new release gate also opens the exact signed plugin in the actual Core 0.7.33
+host using its real protocol, preload, IPC and native service on Linux x64 and
+ARM64. Profiles/keychains are disposable test fixtures; no funded mining is used.
+
+---
+
 # Teleno Koinos Node 1.3.0 — Mining overview
 
 The Overview page now shows the current independent Teleno wallet, lock state,

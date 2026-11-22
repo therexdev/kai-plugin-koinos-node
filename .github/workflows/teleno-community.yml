@@ -88,8 +88,37 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw "Native archive extraction failed" }
           node scripts/wsl-smoke.js (Join-Path $env:RUNNER_TEMP "teleno-node-1.3.0/bin/teleno_node") --archive $archive
           if ($LASTEXITCODE -ne 0) { throw "Windows WSL2 runtime qualification failed" }
+  core-startup:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, ubuntu-24.04-arm]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: therexdev/kai-core
+          ref: be1aaefc84a303fc5fab1764eedc523d489db394
+          path: .core-startup
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Install isolated Core host test dependencies
+        shell: bash
+        run: |
+          npm ci --ignore-scripts --prefix "$GITHUB_WORKSPACE/.core-startup"
+          node "$GITHUB_WORKSPACE/.core-startup/node_modules/electron/install.js"
+          sudo chown root:root "$GITHUB_WORKSPACE/.core-startup/node_modules/electron/dist/chrome-sandbox"
+          sudo chmod 4755 "$GITHUB_WORKSPACE/.core-startup/node_modules/electron/dist/chrome-sandbox"
+      - name: Open the signed plugin in the actual Core host with a fresh profile
+        shell: bash
+        run: KAI_CORE_SOURCE="$GITHUB_WORKSPACE/.core-startup" node scripts/core-startup-smoke.cjs
+
   release:
-    needs: [verify, windows-wsl]
+    needs: [verify, windows-wsl, core-startup]
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 10
