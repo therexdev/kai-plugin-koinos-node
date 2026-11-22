@@ -8,7 +8,7 @@ on:
       build_run:
         description: Successful native ARM64 qualification run ID
         required: true
-        default: '44975427828'
+        default: '44983795737'
 permissions:
   actions: read
   contents: write
@@ -18,7 +18,7 @@ jobs:
     container: debian:bookworm
     timeout-minutes: 200
     env:
-      BUILD_RUN: ${{ inputs.build_run || '44975427828' }}
+      BUILD_RUN: ${{ inputs.build_run || '44983795737' }}
     steps:
       - name: Install runtime tools
         run: |
@@ -63,11 +63,14 @@ jobs:
       - name: Verify provenance and all upstream native test results
         run: |
           python3 - <<'PY'
-          import json, pathlib, xml.etree.ElementTree as ET
+          import hashlib, json, pathlib, xml.etree.ElementTree as ET
           root = pathlib.Path('qualified/teleno-source/build')
           info = json.loads((root/'generated/teleno-node-build-info.json').read_text())
           assert info['source_commit'] == '2c11229267cff2f9ee39ed8e56ab70af391d85ce'
           assert info['source_clean'] is True
+          compatibility = json.loads((root/'arm64-compatibility.json').read_text())
+          assert compatibility['engineSource'] == info['source_commit']
+          assert compatibility['patchSha256'] == hashlib.sha256(pathlib.Path('community/teleno/scripts/patches/libp2p-gcc12-templates.patch').read_bytes()).hexdigest()
           cases = ET.parse(root/'native-tests.xml').findall('.//testcase')
           assert len(cases) >= 107
           assert all(c.find('failure') is None and c.find('error') is None and c.find('skipped') is None for c in cases)
@@ -95,6 +98,7 @@ jobs:
           cp "$GITHUB_WORKSPACE/qualified/arm64-runtime/teleno-node-1.3.0-linux-arm64.tar.gz" runtimes/linux-arm64-1.3.0/
           cp "$GITHUB_WORKSPACE/qualified/candidate-pins.json" "$GITHUB_WORKSPACE/qualified/arm64-plugin-smoke.txt" runtimes/linux-arm64-1.3.0/
           cp "$GITHUB_WORKSPACE/qualified/teleno-source/build/generated/teleno-node-build-info.json" "$GITHUB_WORKSPACE/qualified/teleno-source/build/native-tests.xml" runtimes/linux-arm64-1.3.0/
+          cp "$GITHUB_WORKSPACE/qualified/teleno-source/build/arm64-compatibility.json" runtimes/linux-arm64-1.3.0/
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add runtimes
