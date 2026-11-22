@@ -4,6 +4,10 @@ An independently installable KAI Core plugin for [Teleno](https://github.com/koi
 
 Install **Teleno Koinos Node** from KAI Core's Community catalog. Its signed package is independent from the regular node, even though both source trees live in this repository. Requires KAI Core 0.7.17 or later.
 
+**1.4.1** fixes the folder button's “Invalid storage key” error by keeping
+chain-folder commands outside Core's reserved settings-storage API. Update the
+plugin in place; no Core update or data reset is needed.
+
 Version **1.4.0** puts a compact Android-inspired **Dashboard** first: wallet
 balance, mana, node health, chain height, peers, confirmed blocks, recent rewards,
 storage and memory, with one Start/Stop control. **Setup** highlights the next

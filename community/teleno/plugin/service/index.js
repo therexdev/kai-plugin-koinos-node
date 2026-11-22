@@ -154,8 +154,8 @@ function create(api,deps={}) {
     active(signal);if(!input||typeof input!=="object"||Array.isArray(input))throw Error("Invalid Teleno input.");
     if(method==="status")return status(signal);
     if(method==="runtime.setupStatus")return runtime.setupStatus({...options},signal);
-    if(method==="storage.info")return runtime.chainStorage.info(options);
-    if(method==="storage.choose") {
+    if(method==="chainStorage.info")return runtime.chainStorage.info(options);
+    if(method==="chainStorage.choose") {
       runtime.idle();clearPending();const id=identity(),check=context(signal,id);
       if(options.runtime==="wsl")throw Error("WSL2 uses its managed Linux storage inside Ubuntu.");
       const picked=await electron.dialog.showOpenDialog(electron.BrowserWindow.fromId(api.desktop.hostWindowId()),{title:"Choose Teleno chain drive or folder",properties:["openDirectory","createDirectory"]});check();
@@ -164,9 +164,9 @@ function create(api,deps={}) {
       await confirm(plan.reattach?"Reconnect Teleno chain location":"Use this Teleno chain location",`${options.network.toUpperCase()}\nFrom: ${plan.source}\nUse: ${plan.destination}\n${plan.reattach?"Reconnect the verified chain folder already belonging to this profile.":"Copy and checksum-verify this node's files, including its signing key and snapshots. Keep the original copy. Nothing at the destination is overwritten or merged."}\nYour encrypted spending wallet stays in this plugin's profile. The node stays stopped. Keep the drive connected whenever the node is running.`,signal,id);check();
       return runtime.chainStorage.begin(plan,AbortSignal.any([api.signal,lifetime.signal]));
     }
-    if(method==="storage.resume") {runtime.idle({allowStorage:true});clearPending();const p=runtime.chainStorage.readPlan();await confirm("Resume Teleno chain copy",`${p.network.toUpperCase()}\nFrom: ${p.source}\nTo: ${p.destination}\nVerify existing copied files and finish the copy. Original files stay in place; the node remains stopped.`,signal);return runtime.chainStorage.resume(options,AbortSignal.any([api.signal,lifetime.signal]));}
-    if(method==="storage.cancel")return runtime.chainStorage.cancel();
-    if(method==="storage.keepOriginal") {runtime.idle({allowStorage:true});const p=runtime.chainStorage.readPlan();await confirm("Keep the original chain location",`Use the original files at ${p.source}. Keep the partial copy at ${p.destination}. This removes only the saved copy task, not either data folder. The node stays stopped.`,signal);return runtime.chainStorage.keepOriginal(options);}
+    if(method==="chainStorage.resume") {runtime.idle({allowStorage:true});clearPending();const p=runtime.chainStorage.readPlan();await confirm("Resume Teleno chain copy",`${p.network.toUpperCase()}\nFrom: ${p.source}\nTo: ${p.destination}\nVerify existing copied files and finish the copy. Original files stay in place; the node remains stopped.`,signal);return runtime.chainStorage.resume(options,AbortSignal.any([api.signal,lifetime.signal]));}
+    if(method==="chainStorage.cancel")return runtime.chainStorage.cancel();
+    if(method==="chainStorage.keepOriginal") {runtime.idle({allowStorage:true});const p=runtime.chainStorage.readPlan();await confirm("Keep the original chain location",`Use the original files at ${p.source}. Keep the partial copy at ${p.destination}. This removes only the saved copy task, not either data folder. The node stays stopped.`,signal);return runtime.chainStorage.keepOriginal(options);}
     if(method==="setup.productionStatus")return productionSetup(signal);
     if(method==="dashboard.summary") {
       const address=wallet.address,network=options.network,check=context(signal,identity());
@@ -264,7 +264,7 @@ function create(api,deps={}) {
     }
     throw Error("Unknown Teleno method.");
   }
-  const reads=new Set(["status","runtime.setupStatus","setup.productionStatus","dashboard.summary","storage.info","logs","wallet.balances","wallet.history","wallet.maxSend","wallet.pending","producer.status"]);
+  const reads=new Set(["status","runtime.setupStatus","setup.productionStatus","dashboard.summary","chainStorage.info","logs","wallet.balances","wallet.history","wallet.maxSend","wallet.pending","producer.status"]);
   return {
     call(method,input={},signal) {
       const frozen=structuredClone(input),combined=AbortSignal.any([api.signal,lifetime.signal,...(signal?[signal]:[])]);
