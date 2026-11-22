@@ -21,7 +21,6 @@ jobs:
       KOINOS_BUILD_TESTS: 'ON'
       CFLAGS: '-march=armv8-a -mtune=generic'
       CXXFLAGS: '-march=armv8-a -mtune=generic'
-      CPP_LIBP2P_PATCH: ${{ runner.temp }}/teleno-libp2p-gcc12.patch
     steps:
       - name: Install Debian 12 build tools (Pi OS Bookworm compatibility)
         run: |
@@ -45,10 +44,12 @@ jobs:
           key: teleno-arm64-bookworm-v2-2c11229267cf
       - name: Prepare the GCC 12 dependency compatibility patch
         run: |
-          cat teleno-source/cmake/cpp-libp2p-koinos.patch community/teleno/scripts/patches/libp2p-gcc12-templates.patch > "$CPP_LIBP2P_PATCH"
+          cat teleno-source/cmake/cpp-libp2p-koinos.patch community/teleno/scripts/patches/libp2p-gcc12-templates.patch > "$RUNNER_TEMP/teleno-libp2p-gcc12.patch"
           sha256sum community/teleno/scripts/patches/libp2p-gcc12-templates.patch
       - name: Build the native ARM64 engine
         working-directory: teleno-source
+        env:
+          CPP_LIBP2P_PATCH: ${{ runner.temp }}/teleno-libp2p-gcc12.patch
         run: ./scripts/build-cpp-libp2p-koinos.sh
       - name: Build and run upstream native tests
         working-directory: teleno-source
