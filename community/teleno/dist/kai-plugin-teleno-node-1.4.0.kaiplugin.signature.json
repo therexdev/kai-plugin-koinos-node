@@ -1,8 +1,8 @@
 {
   "format": 1,
   "asset": "kai-plugin-teleno-node-1.4.0.kaiplugin",
-  "bytes": 19363978,
-  "sha256": "961a90bf9a63249ea484a65419b5ea4179a339799c2be59143835c5fd9ec03c1",
+  "bytes": 19364217,
+  "sha256": "3384d16884f378f21c96d680bd2a7034776864bb1123491f7823c9aeba81a4e2",
   "publicKey": "MCowBQYDK2VwAyEAujPt2xYcqLkorZIdmrBEa0ZlLml+yEERDhP+YtI2t5o=",
-  "signature": "+32WSTL3NeYepvnD3HWv0j/yAdbQz3jzJgtXPma++qMBJ6XGpEo4wGxPoaHtYwJVJGBqZhu1WHgRDnrkA4YHBQ=="
+  "signature": "shFFxJ1sCGvzRXd8KM9WaIcLM3Bh+0VbAHiX6wwAaWwqKfkR1A6Lb2RVwp2+cpjLEocMbRCkuFen7gvzWmCaCg=="
 }

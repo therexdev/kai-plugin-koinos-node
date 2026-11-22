@@ -9,11 +9,11 @@
     function reset(){document.querySelectorAll(".wallet-dialog[open]").forEach(close);data={key:key(),rows:[],cursor:null,balances:null,at:0,pages:0};}
     function scoped(){return data.key===key()&&getPage()==="wallet";}
     function qr(){if(!getState().wallet.address)return;try{const svg=root.KQR.svg(root.KQR.encode(getState().wallet.address,{ec:"M"}));for(const id of ["wallet-qr","wallet-qr-large"])if($(id))$(id).innerHTML=svg;}catch(error){for(const id of ["wallet-qr","wallet-qr-large"])if($(id))$(id).textContent="QR unavailable. Copy the address below.";}}
-    function open(id){dialogContext=context();const dialog=$(id);if(dialog&&!dialog.open)dialog.showModal();}
+    function open(id){dialogContext=context();if(id==="wallet-send-dialog"){$("send-all").disabled=false;$("send-all").dataset.blocked="false";}const dialog=$(id);if(dialog&&!dialog.open)dialog.showModal();}
     function historyDetail(row){
       let dialog=$("wallet-history-detail");if(dialog)dialog.remove();dialog=document.createElement("dialog");dialog.id="wallet-history-detail";dialog.className="wallet-dialog history-detail";
       const heading=document.createElement("div");heading.className="dialog-heading";const title=document.createElement("h2");title.textContent=row.label;const exit=document.createElement("button");exit.textContent="×";exit.setAttribute("aria-label","Close");exit.onclick=()=>dialog.close();heading.append(title,exit);dialog.append(heading);
-      const dl=document.createElement("dl"),fields={Network:getState().settings.network,Status:row.status,When:row.timestamp?new Date(row.timestamp).toLocaleString():"Time unavailable",Block:row.height||"Not available",ID:row.id,...(row.counterparty?{Counterparty:row.counterparty}:{})};
+      const dl=document.createElement("dl"),fields={Movement:row.changes.map(c=>(c.direction==="out"?"−":"+")+units(c.amount)+" "+c.asset).join(", ")||"No token movement",Network:getState().settings.network,Status:row.status,When:row.timestamp?new Date(row.timestamp).toLocaleString():"Time unavailable",Block:row.height||"Not available",ID:row.id,...(row.counterparty?{Counterparty:row.counterparty}:{})};
       for(const [label,value]of Object.entries(fields)){const dt=document.createElement("dt"),dd=document.createElement("dd");dt.textContent=label;dd.textContent=value;dl.append(dt,dd);}dialog.append(dl);const copy=document.createElement("button");copy.textContent="Copy transaction ID";copy.onclick=()=>void call("util.copy",{text:row.id}).catch(e=>notice(e.message,true));dialog.append(copy);document.body.append(dialog);dialog.showModal();
     }
     function draw(){
