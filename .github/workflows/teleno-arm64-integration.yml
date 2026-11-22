@@ -61,9 +61,11 @@ jobs:
           name: teleno-linux-arm64-1.3.0-${{ env.BUILD_RUN }}
           path: qualified
       - name: Verify provenance and all upstream native test results
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           python3 - <<'PY'
-          import hashlib, json, pathlib, xml.etree.ElementTree as ET
+          import hashlib, json, os, pathlib, re, urllib.error, urllib.parse, urllib.request, xml.etree.ElementTree as ET
           root = pathlib.Path('qualified/teleno-source/build')
           info = json.loads((root/'generated/teleno-node-build-info.json').read_text())
           assert info['source_commit'] == '2c11229267cff2f9ee39ed8e56ab70af391d85ce'
@@ -72,10 +74,43 @@ jobs:
           assert compatibility['engineSource'] == info['source_commit']
           assert compatibility['patchSha256'] == hashlib.sha256(pathlib.Path('community/teleno/scripts/patches/libp2p-gcc12-templates.patch').read_bytes()).hexdigest()
           assert compatibility['testFixturePatchSha256'] == hashlib.sha256(pathlib.Path('community/teleno/scripts/patches/teleno-gcc12-test-fixture.patch').read_bytes()).hexdigest()
-          cases = ET.parse(root/'native-tests.xml').findall('.//testcase')
-          assert len(cases) >= 107
-          assert all(c.find('failure') is None and c.find('error') is None and c.find('skipped') is None for c in cases)
-          print(f'{len(cases)} upstream native tests passed on ARM64')
+          report = root/'native-tests.xml'
+          if report.exists():
+              cases = ET.parse(report).findall('.//testcase')
+              assert len(cases) == 107
+              assert all(c.find('failure') is None and c.find('error') is None and c.find('skipped') is None for c in cases)
+          # Early qualification runs wrote JUnit relative to CTest's build
+          # directory. Preserve their actual successful test output instead;
+          # require every unique test ID, the zero-failure summary and the
+          # successful test step from the authenticated native run.
+          repo, run = os.environ['GITHUB_REPOSITORY'], os.environ['BUILD_RUN']
+          headers = {'Authorization': 'Bearer '+os.environ['GH_TOKEN']}
+          with urllib.request.urlopen(urllib.request.Request(f'https://api.github.com/repos/{repo}/actions/runs/{run}/jobs', headers=headers), timeout=30) as response:
+              jobs = json.load(response)['jobs']
+          job = next(j for j in jobs if j['name'] == 'native')
+          assert job['conclusion'] == 'success'
+          assert any(s['name'] == 'Build and run upstream native tests' and s['conclusion'] == 'success' for s in job['steps'])
+          class NoRedirect(urllib.request.HTTPRedirectHandler):
+              def redirect_request(self, req, fp, code, msg, hdrs, newurl):
+                  return None
+          request = urllib.request.Request(f"https://api.github.com/repos/{repo}/actions/jobs/{job['id']}/logs", headers=headers)
+          try:
+              urllib.request.build_opener(NoRedirect).open(request, timeout=30)
+              raise AssertionError('Expected a signed log download redirect')
+          except urllib.error.HTTPError as response:
+              assert response.code == 302
+              url = response.headers['Location']
+          assert urllib.parse.urlsplit(url).scheme == 'https'
+          # The signed download request deliberately has no GitHub credential.
+          with urllib.request.urlopen(url, timeout=60) as response:
+              lines = response.read().decode().splitlines()
+          passed = [line for line in lines if re.search(r'\b(\d+)/107 Test\s+#(\d+):.*?\bPassed\s+[0-9.]+ sec', line)]
+          ids = [int(re.search(r'Test\s+#(\d+):', line).group(1)) for line in passed]
+          assert len(ids) == 107 and set(ids) == set(range(1,108))
+          summary = [line for line in lines if '100% tests passed, 0 tests failed out of 107' in line]
+          assert len(summary) == 1
+          (root/'native-tests.log').write_text('\n'.join(passed+summary)+'\n')
+          print('All 107 upstream native tests passed on ARM64; exact log retained')
           PY
       - name: Qualify the real ARM64 engine through the plugin
         shell: bash
@@ -99,7 +134,7 @@ jobs:
           mkdir -p runtimes/linux-arm64-1.3.0
           cp "$GITHUB_WORKSPACE/qualified/arm64-runtime/teleno-node-1.3.0-linux-arm64.tar.gz" runtimes/linux-arm64-1.3.0/
           cp "$GITHUB_WORKSPACE/qualified/candidate-pins.json" "$GITHUB_WORKSPACE/qualified/arm64-plugin-smoke.txt" runtimes/linux-arm64-1.3.0/
-          cp "$GITHUB_WORKSPACE/qualified/teleno-source/build/generated/teleno-node-build-info.json" "$GITHUB_WORKSPACE/qualified/teleno-source/build/native-tests.xml" runtimes/linux-arm64-1.3.0/
+          cp "$GITHUB_WORKSPACE/qualified/teleno-source/build/generated/teleno-node-build-info.json" "$GITHUB_WORKSPACE/qualified/teleno-source/build/native-tests.log" runtimes/linux-arm64-1.3.0/
           cp "$GITHUB_WORKSPACE/qualified/teleno-source/build/arm64-compatibility.json" runtimes/linux-arm64-1.3.0/
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'

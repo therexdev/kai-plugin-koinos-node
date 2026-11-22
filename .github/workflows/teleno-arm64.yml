@@ -71,7 +71,7 @@ jobs:
           trap - EXIT
           cmake --build build --target teleno_node --parallel 2
           test -z "$(git status --porcelain)"
-          ctest --test-dir build --output-on-failure --output-junit build/native-tests.xml
+          ctest --test-dir build --output-on-failure --output-junit "$GITHUB_WORKSPACE/teleno-source/build/native-tests.xml"
           python3 -B -m unittest -v tests/scripts/benchmark_transaction_tps_test.py
       - name: Record the exact ARM64 runtime and package it
         working-directory: teleno-source
