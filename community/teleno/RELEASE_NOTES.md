@@ -1,3 +1,25 @@
+# Teleno Koinos Node 1.4.3 — Visible production controls
+
+Adds a permanent Production tab and a Block production shortcut on Dashboard.
+A production panel stays visible at the top of Setup while an observer is
+running, including when the Observer only checklist is complete or collapsed.
+
+The production page lists runtime/storage, observer sync, wallet, signing key,
+VHP, registration and pending-transaction readiness. The enable button remains
+visible with the current blocker. A node behind the current chain stays in
+observer mode until its head is recent and advancing with connected peers.
+Once ready, enabling production still requires your explicit click and native
+review; it never starts automatically after syncing or opening a page.
+
+Existing wallets, keys, chain data, transaction journals, platform engines and
+the 1.4.2 reward-history repair are retained. This is a plugin-only update.
+Validation includes 119 unit/lifecycle checks, sandboxed renderer navigation
+through syncing/ready observer-only states, password-field retention during
+polling, explicit production-request dispatch, and actual Core-host navigation
+with the signed package. No live funds or funded production are used.
+
+---
+
 # Teleno Koinos Node 1.4.2 — Confirmed rewards and wallet history
 
 Fixes confirmed blocks and recent rewards staying at zero while KOIN/VHP

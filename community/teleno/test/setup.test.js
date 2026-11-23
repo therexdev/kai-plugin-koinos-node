@@ -42,3 +42,15 @@ test("Linux has the same complete guide without a WSL step; interrupted migratio
   assert.equal(progress(s,{runtimeReady:false}).steps[0].id,"runtime");assert.equal(progress(s,{runtimeReady:true}).steps.length,8);
   s.runtime.migrationPending=true;assert.equal(progress(s,{runtimeReady:true}).runtimeReady,false);
 });
+test("production explains sync delay even when the observer guide is complete",()=>{
+  const s=state();s.setup.goal="observer";s.wallet={exists:true,address:"wallet"};s.producer={exists:true,publicKey:"key"};s.runtime.mode="observer";s.head={recent:false,advancing:true};s.peers=3;
+  let g=progress(s,runtime,funded(s));assert.equal(g.complete,true);assert.equal(g.canProduce,false);assert.match(g.productionMessage,/Syncing/);
+  s.head.recent=true;g=progress(s,runtime,funded(s));assert.equal(g.canProduce,true);assert.match(g.productionMessage,/Review and enable/);assert.equal(s.runtime.mode,"observer");
+});
+test("production explains unverified balances, pending registration and unavailable storage",()=>{
+  const s=state();s.wallet={exists:true,address:"wallet"};s.producer={exists:true,publicKey:"key"};s.runtime.mode="observer";s.head={recent:true,advancing:true};s.peers=1;
+  assert.match(progress(s,runtime).productionMessage,/verify the VHP balance/);
+  const evidence=funded(s);evidence.registered=null;assert.match(progress(s,runtime,evidence).productionMessage,/register this signing key/);
+  s.pending={txId:"pending"};assert.match(progress(s,runtime,evidence).productionMessage,/irreversibly confirmed/);
+  s.pending=null;s.runtime.storage={ready:false};assert.equal(progress(s,runtime,funded(s)).canProduce,false);assert.match(progress(s,runtime,funded(s)).productionMessage,/Reconnect/);
+});
