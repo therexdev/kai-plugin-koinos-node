@@ -1,4 +1,4 @@
-# Unreleased — Confirmed rewards and wallet history
+# Teleno Koinos Node 1.4.2 — Confirmed rewards and wallet history
 
 Fixes confirmed blocks and recent rewards staying at zero while KOIN/VHP
 balances change. A successful empty account-history response from one RPC no
@@ -15,7 +15,7 @@ Validation: 114 plugin tests, source-format verification, and read-only live
 mainnet comparison. The published reader returned zero for a public account;
 the patched reader recovered two irreversible rewards and eight wallet rows,
 with identical totals after reopening. No wallet transactions were submitted.
-Release signing, package qualification and catalog publication remain pending.
+Catalog publication remains pending.
 
 ---
 
