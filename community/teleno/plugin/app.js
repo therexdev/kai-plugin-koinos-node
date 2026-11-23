@@ -7,7 +7,7 @@ let page="overview",state=null,busy=false,polling=false,lastLogs="",backupSelect
 let setup=null,setupPromise=null,setupChecking=false,setupCheckedAt=0,paintedOverviewKey="";
 let production=null,productionPromise=null,productionChecking=false,productionCheckedAt=0,pendingChecking=false,pendingCheckedAt=0;
 let mining=null,miningPromise=null,miningCheckedAt=0,miningExpanded=false;
-const titles={overview:"Dashboard",setup:"Setup",history:"History",wallet:"Teleno wallet",producer:"Production setup",backups:"Backups & recovery",logs:"Node logs",settings:"Settings",about:"Differences"};
+const titles={overview:"Dashboard",setup:"Setup",history:"History",wallet:"Teleno wallet",producer:"Block production",backups:"Backups & recovery",logs:"Node logs",settings:"Settings",about:"Differences"};
 function notice(text,error=false){$("notice").hidden=!text;$("notice").classList.toggle("error",error);$("notice").textContent=text||"";}
 function button(action,label,kind="",blocked=false){return `<button data-action="${action}" class="${kind}" data-blocked="${blocked}" ${blocked?"disabled":""} data-i18n="${esc(label)}">${esc(KaiLocale.t(label))}</button>`;}
 function syncControls(){document.querySelectorAll("button").forEach(b=>b.disabled=busy||b.dataset.blocked==="true");}
@@ -16,7 +16,7 @@ function currentSetup(){return setup?.key===setupIdentity()?setup:null;}
 function guideProgress(){return TelenoSetup.progress(state,currentSetup(),production);}
 function overviewKey(){return JSON.stringify([setupIdentity(),currentSetup(),setupChecking,production,productionChecking,state?.setup,state?.wallet.address,state?.producer,state?.runtime.mode,state?.runtime.migrationPending,state?.runtime.recoveryPending,state?.head?.recent,state?.head?.advancing,(state?.peers||0)>0,state?.pending]);}
 async function checkProduction(force=false){
-  if(!state?.wallet.exists||(!force&&state.setup?.goal==="observer"&&page!=="producer"))return;
+  if(!state?.wallet.exists||(!force&&state.setup?.goal==="observer"&&page!=="producer"&&page!=="setup"))return;
   if(productionPromise){if(!force)return productionPromise;await productionPromise;}
   const key=TelenoSetup.identity(state);
   if(!force&&production?.key===key&&Date.now()-productionCheckedAt<30000)return;
@@ -64,7 +64,9 @@ function updateProducerControls(){
     const b=document.querySelector(`[data-action="${action}"]`);if(b)b.dataset.blocked=String(blocked);
   }
   if($("producer-registration"))$("producer-registration").textContent=g.registered?"The signing key matches the on-chain registration.":productionChecking?"Checking registration…":g.evidence?.registrationError?"Registration could not be verified: "+g.evidence.registrationError:"Registration is not verified yet. Use Check registration.";
-  if($("producer-readiness"))$("producer-readiness").textContent=state.pending?"Wait for the pending transaction to be irreversibly confirmed.":!g.runtimeReady?"Complete runtime setup in Setup first.":!g.synced?"Start an observer and wait for a recent, advancing head and connected peers.":!g.funded?"VHP balance has not been verified. Check progress in Setup.":!g.registered?"Register this signing key and verify that registration.":"Observer, VHP and signing-key registration are ready for review.";
+  if($("producer-readiness"))$("producer-readiness").textContent=g.productionMessage;
+  if($("producer-checks"))$("producer-checks").innerHTML=TelenoProduction.checks(state,g,{esc,units});
+  if($("producer-key"))$("producer-key").textContent=state.producer.publicKey||"Not created";
   syncControls();
 }
 async function checkSetup(force=false){
@@ -77,7 +79,7 @@ async function checkSetup(force=false){
   setupPromise=(async()=>{
     try{const value=await call("runtime.setupStatus");if(key===setupIdentity())setup={...value,key};}
     catch(error){if(key===setupIdentity())setup={key,wslReady:false,runtimeReady:false,message:error.message};}
-    finally{setupChecking=false;setupCheckedAt=Date.now();setupPromise=null;if((page==="overview"||page==="setup")&&!busy)paint();}
+    finally{setupChecking=false;setupCheckedAt=Date.now();setupPromise=null;if((page==="overview"||page==="setup")&&!busy)paint();else if(page==="producer")updateProducerControls();}
   })();return setupPromise;
 }
 function jobStatus(job){
@@ -112,19 +114,19 @@ async function loadMining(force=false){
   })();return miningPromise;
 }
 function overview(){return `<div id="mining-panel">${TelenoDashboard.render(state,mining,{esc,units,button,progress:guideProgress()})}</div>`;}
-function setupPage(){return TelenoStorage.render(state,{esc,button})+KaiLocale.html`<section class="card setup-launch"><div><h2>Download the chain faster</h2><p>Optional: download and verify the latest public snapshot, then start the observer. Wallet setup can continue while it syncs.</p></div>${button("quick-bootstrap","Download latest chain","",guideProgress().locked||!guideProgress().runtimeReady||!guideProgress().storageReady)}</section>`+TelenoBackups.progress(state,{button,esc})+TelenoGuide.render(state,currentSetup(),production,{button,esc,units,checking:setupChecking,productionChecking});}
+function setupPage(){const panel=TelenoProduction.panel(state,guideProgress(),{esc,button}),running=["observer","producer"].includes(state.runtime.mode),body=TelenoStorage.render(state,{esc,button})+KaiLocale.html`<section class="card setup-launch"><div><h2>Download the chain faster</h2><p>Optional: download and verify the latest public snapshot, then start the observer. Wallet setup can continue while it syncs.</p></div>${button("quick-bootstrap","Download latest chain","",guideProgress().locked||!guideProgress().runtimeReady||!guideProgress().storageReady)}</section>`+TelenoBackups.progress(state,{button,esc})+TelenoGuide.render(state,currentSetup(),production,{button,esc,units,checking:setupChecking,productionChecking});return running?panel+body:body+panel;}
 
 function paint(){
   if(!state){$("content").innerHTML=KaiLocale.html('<div class="card">Loading Teleno…</div>');return;}
   const openDetails=[...document.querySelectorAll("details[id][open]")].map(d=>d.id);
   const {settings:s,wallet:w,runtime:r}=state,g=guideProgress();KaiLocale.setText($("title"), titles[page]);KaiLocale.setText($("network"), (s.network==="mainnet" ? KaiLocale.message(["Mainnet"]) : KaiLocale.message(["Harbinger testnet"])));
-  document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("selected",b.dataset.page===page||page==="producer"&&b.dataset.page==="setup"));
+  document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("selected",b.dataset.page===page));
   let html="";
   if(page==="overview"){html=overview();paintedOverviewKey=overviewKey();}
   if(page==="wallet")html=TelenoWallet.render(state,{esc,units,button});
   if(page==="setup")html=setupPage();
   if(page==="history")html=`<div id="mining-panel">${TelenoMining.render(state,mining,{esc,units,button,expanded:miningExpanded})}</div>`;
-  if(page==="producer")html=KaiLocale.html`<div class="page-guide-link">${button("go-overview","Back to Setup")}</div><section class="card"><h2>Enable block production deliberately</h2><p>Create and back up your Teleno wallet, start an observer and let it sync while creating its separate signing key. Then fund the wallet, get VHP, register the key, and wait for confirmation before enabling production.</p><p class="note">This earns Koinos block rewards. It does not provide AI capacity or distribute the KAI reward pool. Wallet locking does not stop an already running producer. Restarting KAI starts only an observer when enabled in Settings.</p><h3>Producer wallet</h3><div class="address">${esc(w.address||"Create a Teleno wallet first.")}</div><h3>Block-signing public key</h3><code id="producer-key">${esc(state.producer.publicKey||"Not created")}</code><p id="producer-registration" class="muted">Registration not checked yet.</p><div class="actions">${button("key","Create block-signing key")}${button("producer-check","Check registration")}</div><p id="producer-readiness" class="note"></p>${password("producer-password")}<div class="actions">${button("register","Review key registration")}${button("produce","Enable production","primary")}${button("stop","Stop node","danger")}</div><p>Registration and enabling production are separate reviewed actions. Teleno stores the hot block-signing key in its own node folder; the encrypted spending key is never placed there.</p></section>`;
+  if(page==="producer")html=TelenoProduction.page(state,guideProgress(),{esc,units,button,password});
   if(page==="backups")html=TelenoBackups.render(state,{button,esc},backupSelection);
   if(page==="logs")html=KaiLocale.html`<section class="card"><h2>Teleno runtime output</h2><p>Wallet passwords and signing keys are redacted. The log is bounded and refreshes while this page is open.</p><pre id="logs">${esc(lastLogs||"Loading logs…")}</pre>${button("copy-logs","Copy logs")}</section>`;
   if(page==="settings")html=KaiLocale.html`<section class="card"><h2>Node settings</h2><p>Stop Teleno before changing settings. Each network keeps its own chain database and producer key. Wallet funds remain on their original network.</p><form id="settings-form"><div class="grid two"><label>Network<select id="setting-network"><option value="mainnet">Mainnet</option><option value="harbinger">Harbinger testnet</option></select></label><label>Runtime<select id="setting-runtime"><option value="wsl">Windows · Native through WSL2 (no Docker)</option><option value="native">Native Linux (x64 / ARM64)</option><option value="docker">Docker · x64 Linux container</option></select></label><label>WSL distribution (Windows)<input id="setting-wsl" maxlength="64" value="${esc(s.wslDistro)}" pattern="[A-Za-z0-9][A-Za-z0-9_.-]*" required></label><label>Local RPC port<input id="setting-rpc" type="number" min="1024" max="65535" value="${s.rpcPort}" required></label><label>P2P port<input id="setting-p2p" type="number" min="1024" max="65535" value="${s.p2pPort}" required></label><label>Local gRPC port<input id="setting-grpc-port" type="number" min="1024" max="65535" value="${s.grpcPort}" required></label></div><label class="toggle"><input id="setting-grpc" type="checkbox" ${s.grpc?"checked":""}>Enable local gRPC</label><label>Log level<select id="setting-log"><option>info</option><option>debug</option><option>warn</option><option>error</option></select></label><label class="toggle"><input id="setting-history" type="checkbox" ${s.history?"checked":""}>Local transaction and account history</label><label class="toggle"><input id="setting-autostart" type="checkbox" ${s.autoStart?"checked":""}>Start an observer when KAI opens</label><p>JSON-RPC and optional gRPC stay on localhost. Backup administration endpoints stay off. Starting with KAI never enables production. No automatic burns, transfers, or key registration.</p><button class="primary">Save settings</button></form></section>`;

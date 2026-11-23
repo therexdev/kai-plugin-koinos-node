@@ -4,6 +4,13 @@ An independently installable KAI Core plugin for [Teleno](https://github.com/koi
 
 Install **Teleno Koinos Node** from KAI Core's Community catalog. Its signed package is independent from the regular node, even though both source trees live in this repository. Requires KAI Core 0.7.17 or later.
 
+**1.4.3** adds an always-visible **Production** tab plus direct access from
+Dashboard and the top of Setup while the node is running. Open Production while
+syncing to prepare the wallet/key and see each remaining requirement. Enable
+block production becomes available only after the local head is recent and
+advancing, peers are connected, VHP is verified and the key registration
+matches. Enabling remains a separate explicit native review.
+
 **1.4.1** fixes the folder button's “Invalid storage key” error by keeping
 chain-folder commands outside Core's reserved settings-storage API. Update the
 plugin in place; no Core update or data reset is needed.

@@ -13,7 +13,8 @@
     const walletReady=!!w.exists,backupReady=walletReady&&!!state.setup?.walletBackupSaved,keyReady=!!p.exists&&!!p.publicKey;
     const funded=!!evidence?.balances&&positive(evidence.balances.vhp),registered=keyReady&&!!evidence&&evidence.registered===p.publicKey;
     const canRegister=runtimeReady&&walletReady&&keyReady&&!state.pending&&positive(evidence?.balances?.mana);
-    const canProduce=runtimeReady&&storageReady&&!storageLocked&&r.mode==="observer"&&synced&&funded&&registered&&!state.pending;
+    const canProduce=runtimeReady&&storageReady&&!storageLocked&&r.mode==="observer"&&!r.recoveryPending&&walletReady&&keyReady&&synced&&funded&&registered&&!state.pending;
+    const productionMessage=r.mode==="producer"?"Block production is enabled.":state.pending?"Waiting for the submitted transaction to be irreversibly confirmed.":!runtimeCheck?"Checking runtime readiness…":!runtimeReady?"Complete runtime setup before producing blocks.":!storageReady?"Reconnect the selected chain drive.":storageLocked?"Finish the chain storage copy before producing blocks.":r.recoveryPending?"Recover the previous node process first.":r.mode!=="observer"?"Start an observer and let it catch up to the network.":!synced?"Syncing — wait for a recent, advancing head and connected peers.":!walletReady?"Create your separate Teleno wallet.":!keyReady?"Create the separate block-signing key.":!evidence?.balances?"Check readiness to verify the VHP balance.":!funded?"The selected Teleno wallet needs VHP to produce blocks.":!registered?"Check or register this signing key, then wait for confirmation.":"Ready. Review and enable block production when you choose.";
     const steps=[];
     if(windows)steps.push({id:"wsl",title:"Set up WSL2 and Ubuntu",done:!!runtimeCheck?.wslReady});
     steps.push({id:"runtime",title:windows&&(s.runtime!=="wsl"||r.migrationPending)?"Switch and install Teleno":"Install Teleno",done:runtimeReady});
@@ -27,7 +28,7 @@
       {id:"register",title:"Register your signing key",done:registered&&!state.pending},
       {id:"produce",title:"Enable block production",done:r.mode==="producer"});
     const current=steps.findIndex(step=>!step.done);
-    return {goal,windows,locked,runtimeReady,storageReady,storageLocked,walletCreationBlocked:!["stopped","observer"].includes(r.mode)||!!r.recoveryPending||storageLocked,synced,walletReady,backupReady,keyReady,evidence,funded,registered,canRegister,canProduce,
+    return {goal,windows,locked,runtimeReady,storageReady,storageLocked,walletCreationBlocked:!["stopped","observer"].includes(r.mode)||!!r.recoveryPending||storageLocked,synced,walletReady,backupReady,keyReady,evidence,funded,registered,canRegister,canProduce,productionMessage,
       complete:current===-1,completed:steps.filter(step=>step.done).length,
       steps:steps.map((step,index)=>({...step,number:index+1,current:index===current}))};
   }

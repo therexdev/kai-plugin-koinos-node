@@ -3,7 +3,7 @@
   "apiVersion": 3,
   "id": "community.teleno-node",
   "name": "Teleno Koinos Node",
-  "version": "1.4.2",
+  "version": "1.4.3",
   "description": "Teleno node with a compact live dashboard, guided setup, USB chain storage, wallet QR, paged history and reviewed transfers with Send all. Mining progress, confirmed rewards, snapshots and public bootstrap. Native Linux x64 / ARM64 (64-bit Raspberry Pi OS), Windows x64 through WSL2 and optional x64 Docker.",
   "entry": "index.html",
   "runtime": "native",
