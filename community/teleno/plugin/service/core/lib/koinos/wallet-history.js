@@ -3,6 +3,7 @@ const crypto = require("node:crypto");
 const { utils } = require("koilib");
 const { formatAmount } = require("./format");
 const { MAINNET_CHAIN } = require("../koin-network/payment-network");
+const { historyPage, openAccountHistory } = require("./account-history");
 const PAGE = 20, MAX_UINT = (1n << 64n) - 1n;
 const id = v => typeof v === "string" && /^0x1220[a-f0-9]{64}$/.test(v);
 const integer = v => typeof v === "string" && /^(0|[1-9][0-9]{0,19})$/.test(v) && BigInt(v) <= MAX_UINT;
@@ -108,19 +109,23 @@ class WalletHistory {
     finally { this.pending.delete(key); }
   }
   async load({ account, net, cursor, context }) {
-    const provider = this.chain.provider(), chainId = await provider.getChainId(); context();
-    if (typeof chainId !== "string" || Buffer.from(chainId, "base64url").length !== 34 || (net.id === "mainnet") !== (chainId === MAINNET_CHAIN)) throw Error("Wallet history network mismatch");
+    const verify = async provider => {
+      const chainId = await provider.getChainId(); context();
+      if (typeof chainId !== "string" || Buffer.from(chainId, "base64url").length !== 34 || (net.id === "mainnet") !== (chainId === MAINNET_CHAIN)) throw Error("Wallet history network mismatch");
+      return chainId;
+    };
+    const { provider, chainId, latest } = await openAccountHistory({ chain: this.chain, account, limit: PAGE, irreversible: false, verify, check: context }); context();
     const [koin, vhp] = await Promise.all([provider.invokeGetContractAddress("koin"), provider.invokeGetContractAddress("vhp")]);
     const contracts = { koin: koin?.value?.address, vhp: vhp?.value?.address };
     if (!address(contracts.koin) || !address(contracts.vhp) || contracts.koin === contracts.vhp) throw Error("Native wallet tokens could not be verified");
     const params = { address: account, limit: PAGE, ascending: false, ...(cursor ? { seq_num: cursor.seq } : {}) };
-    const [recent, final] = await Promise.all([false, true].map(irreversible => provider.call("account_history.get_account_history", { ...params, irreversible })));
+    const [recent, final] = await Promise.all([
+      cursor ? provider.call("account_history.get_account_history", { ...params, irreversible: false }) : { values: latest },
+      provider.call("account_history.get_account_history", { ...params, irreversible: true }),
+    ]);
     context();
     const read = value => {
-      if (!value || typeof value !== "object" || value.error || value.rpc_error || (value.values !== undefined && !Array.isArray(value.values))) throw Error("Transaction history is unavailable");
-      const rows = value.values || [];
-      if (rows.length > PAGE || JSON.stringify(rows).length > 4000000 || rows.some(e => !integer(e.seq_num) || (cursor && BigInt(e.seq_num) > BigInt(cursor.seq)))) throw Error("Invalid wallet history page");
-      return rows;
+      return historyPage(value, params);
     };
     const entries = read(recent), confirmed = new Set(read(final).map(e => evidence(e))), rows = [], seen = new Set();
     for (const entry of entries) {

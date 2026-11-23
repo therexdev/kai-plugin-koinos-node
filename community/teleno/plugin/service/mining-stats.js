@@ -1,5 +1,6 @@
 "use strict";
 const {normalize,tokenEvent}=require("./core/lib/koinos/wallet-history");
+const {historyPage,openAccountHistory}=require("./core/lib/koinos/account-history");
 const {utils}=require("koilib");
 const uint=value=>typeof value==="string"&&/^(0|[1-9][0-9]{0,19})$/.test(value)&&BigInt(value)<(1n<<64n);
 const empty=()=>({cursor:"0",blocks:"0",rewards:"0",vhp:"0",lastHeight:null,feed:[],updatedAt:null});
@@ -21,18 +22,16 @@ class MiningStats {
     try{const value=await task;check();this.cached={key,value};return structuredClone(value);}finally{if(this.pending?.task===task)this.pending=null;}
   }
   async load(account,network,check) {
-    const provider=this.chain.provider(),chainId=await this.checkNetwork(provider);check();
+    const {provider,chainId,latest}=await openAccountHistory({chain:this.chain,account,limit:100,irreversible:true,verify:this.checkNetwork,check});check();
     const [koin,vhp,head]=await Promise.all([provider.invokeGetContractAddress("koin"),provider.invokeGetContractAddress("vhp"),provider.getHeadInfo()]);check();
     const contracts={koin:koin?.value?.address,vhp:vhp?.value?.address},lib=String(head.last_irreversible_block);
     if(!uint(lib)||!utils.isChecksumAddress(contracts.koin)||!utils.isChecksumAddress(contracts.vhp)||contracts.koin===contracts.vhp)throw Error("Mining history could not verify native tokens or the irreversible head.");
     const stateKey=`mining.${network}.${account}`,saved=this.state.get(stateKey,null),next=saved?structuredClone(saved):empty();
     if(!next||!["cursor","blocks","rewards","vhp"].every(k=>uint(next[k]))||!(next.lastHeight===null||uint(next.lastHeight))||!Array.isArray(next.feed)||next.feed.length>40||next.feed.some(row=>!row||!/^0x1220[0-9a-f]{64}$/.test(row.id)||!["height","reward","vhp"].every(k=>uint(row[k]))||row.status!=="confirmed"||row.timestamp!==null&&(!Number.isSafeInteger(row.timestamp)||row.timestamp<=0)))throw Error("Saved mining history needs recovery; the original file was preserved.");
     const page=async(limit,ascending,seq)=>{
-      const result=await provider.call("account_history.get_account_history",{address:account,limit,ascending,irreversible:true,...(seq===undefined?{}:{seq_num:seq})});check();
-      if(!result||typeof result!=="object"||result.error||result.rpc_error||result.values!==undefined&&!Array.isArray(result.values)||JSON.stringify(result).length>4*1024*1024)throw Error("Mining account history is unavailable.");
-      const entries=result.values||[];if(entries.length>limit)throw Error("Mining history page is too large.");
-      let previous=null;for(const entry of entries){if(!uint(entry.seq_num)||(seq!==undefined&&BigInt(entry.seq_num)<BigInt(seq))||(previous!==null&&(ascending?BigInt(entry.seq_num)<=previous:BigInt(entry.seq_num)>=previous)))throw Error("Invalid mining history sequence.");previous=BigInt(entry.seq_num);}
-      return entries;
+      const params={address:account,limit,ascending,irreversible:true,...(seq===undefined?{}:{seq_num:seq})};
+      const result=await provider.call("account_history.get_account_history",params);check();
+      return historyPage(result,params);
     };
     const producerBlock=entry=>{
       const row=normalize(entry,{account,contracts,chainId,tokenSymbol:network==="mainnet"?"KOIN":"tKOIN",confirmed:true});
@@ -46,7 +45,7 @@ class MiningStats {
       }
       return {id:row.id,height:row.height,timestamp:row.timestamp&&row.timestamp<=this.clock()+60000?row.timestamp:null,reward:String(reward),vhp:String(spent),status:"confirmed"};
     };
-    const latest=await page(100,false),tip=latest.length?BigInt(latest[0].seq_num):-1n,recent=latest.map(producerBlock).filter(Boolean).slice(0,40);
+    const tip=latest.length?BigInt(latest[0].seq_num):-1n,recent=latest.map(producerBlock).filter(Boolean).slice(0,40);
     if(tip+1n<BigInt(next.cursor))throw Error("Mining history moved backwards; saved totals were preserved.");
     let changed=false;
     for(let pages=0;pages<3&&BigInt(next.cursor)<=tip;pages++) {

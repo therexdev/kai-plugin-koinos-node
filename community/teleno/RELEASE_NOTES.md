@@ -1,3 +1,24 @@
+# Teleno Koinos Node 1.4.2 — Confirmed rewards and wallet history
+
+Fixes confirmed blocks and recent rewards staying at zero while KOIN/VHP
+balances change. A successful empty account-history response from one RPC no
+longer hides a fuller index on another configured RPC. Each refresh verifies
+the chain identity, selects the index with the newest account sequence, and
+keeps backfill pages and confirmation evidence on that same source.
+
+History readers also accept protobuf JSON's omitted sequence-zero field. This
+allows the first wallet entry to be indexed instead of rejecting the entire
+history. Explicit malformed sequences, gaps and duplicate blocks still fail
+without replacing saved totals. Existing indexes resume without a reset.
+
+Validation: 114 plugin tests, source-format verification, and read-only live
+mainnet comparison. The published reader returned zero for a public account;
+the patched reader recovered two irreversible rewards and eight wallet rows,
+with identical totals after reopening. No wallet transactions were submitted.
+Catalog publication remains pending.
+
+---
+
 # Teleno Koinos Node 1.4.1 — Folder picker routing fix
 
 Fixes “Invalid storage key” when choosing a chain drive or folder. The 1.4.0
