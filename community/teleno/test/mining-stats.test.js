@@ -40,3 +40,25 @@ test("corrupt saved mining state is preserved and concurrent refreshes share one
   const key=[...f.store.keys()][0];f.store.set(key,{cursor:"bad"});f.advance();await assert.rejects(f.stats.read(),/original file was preserved/);assert.deepEqual(f.store.get(key),{cursor:"bad"});
 });
 test("cancellation after an RPC await prevents history persistence",async()=>{const f=fixture([block(0)]);let active=true;const original=f.provider.call;f.provider.call=async(...args)=>{const result=await original(...args);active=false;return result;};await assert.rejects(f.stats.read(()=>{if(!active)throw Error("cancelled");}),/cancelled/);assert.equal(f.store.size,0);});
+
+test("an omitted protobuf sequence zero does not block indexing or reopening",async()=>{
+  const f=fixture([tx(0),block(1)]),call=f.provider.call;
+  f.provider.call=async(...args)=>{const result=structuredClone(await call(...args));for(const entry of result.values)if(entry.seq_num==="0")delete entry.seq_num;return result;};
+  const result=await f.stats.read();assert.equal(result.totals.blocks,"1");assert.equal(result.throughSequence,"1");assert.equal(result.feed[0].height,"2");
+  const reopened=new MiningStats({chain:f.chain,wallet:f.wallet,state:f.state,checkNetwork:async()=>chainId,clock:()=>now+32000});
+  assert.deepEqual((await reopened.read()).totals,result.totals);
+});
+
+test("empty or incomplete primary index cannot hide rewards in a fuller RPC and every backfill uses that source",async()=>{
+  for(const primary of [[],[tx(0)]]){
+    const f=fixture([tx(0),block(1),block(2)]),calls=[];
+    f.chain.rpcUrls=()=>["https://primary.invalid","https://full.invalid"];
+    f.chain.provider=urls=>({...f.provider,call:async(method,p)=>{
+      calls.push({url:urls[0],p});if(urls[0]==="https://primary.invalid"){assert.equal(p.ascending,false);return {values:primary};}
+      const result=structuredClone(await f.provider.call(method,p));for(const entry of result.values)if(entry.seq_num==="0")delete entry.seq_num;return result;
+    }});
+    const result=await f.stats.read();assert.equal(result.totals.blocks,"2");assert.equal(result.totals.rewards,"250000000");
+    assert.equal(result.syncing,false);assert(calls.some(c=>c.url==="https://full.invalid"&&c.p.ascending));
+    f.advance();assert.deepEqual((await f.stats.read()).totals,result.totals);
+  }
+});

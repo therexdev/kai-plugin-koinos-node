@@ -47,6 +47,12 @@ data. Core **0.7.33** is sufficient for this plugin patch.
 
 ### Mining overview
 
+The pending history fix compares account-history coverage across configured
+RPCs rather than accepting the first empty response. All pages and confirmation
+evidence for a refresh stay on one verified source. It also handles protobuf
+JSON omitting sequence number zero. Previously missed rewards are backfilled
+from chain receipts; wallet and node data do not need a reset.
+
 Version **1.3.0** brings the selected wallet and balances, node health, chain
 progress, confirmed produced blocks, KOIN rewards and VHP consumed to Overview.
 The recent reward feed includes block heights and local dates/times. Use
